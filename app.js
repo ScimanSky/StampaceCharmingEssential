@@ -2,7 +2,7 @@ const appContent = {
   appName: "Stampace Charming",
   hero: {
     subtitle: "Luxury apartment",
-    address: "Via del Demo 12, Cagliari",
+    address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
     license: "CIN: IT000000B000000000",
   },
   menu: [
