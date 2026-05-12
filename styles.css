@@ -1,0 +1,248 @@
+:root {
+  --bg: #f5f0e8;
+  --bg-soft: #ede5da;
+  --paper: rgba(255, 252, 248, 0.84);
+  --paper-strong: rgba(255, 252, 248, 0.94);
+  --line: rgba(66, 50, 35, 0.12);
+  --text: #2c241f;
+  --muted: #6b5d51;
+  --accent: #8a6546;
+  --accent-soft: #c9b39d;
+  --shadow: 0 22px 48px rgba(54, 37, 22, 0.12);
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(201, 179, 157, 0.32), transparent 26%),
+    linear-gradient(180deg, #f8f3ed 0%, #f1e8dc 55%, #f7f1ea 100%);
+  color: var(--text);
+  font-family: "Manrope", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.page-shell {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.5rem, env(safe-area-inset-bottom));
+}
+
+.hero {
+  margin-bottom: 1rem;
+}
+
+.hero-card,
+.panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--paper);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+}
+
+.hero-card {
+  padding: 1.4rem 1.2rem 1.3rem;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.9), rgba(247, 239, 230, 0.84)),
+    var(--paper);
+}
+
+.hero-kicker,
+.section-kicker {
+  margin: 0;
+  color: var(--accent);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.hero h1,
+.panel h2 {
+  margin: 0.45rem 0 0;
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(2.4rem, 11vw, 4rem);
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+}
+
+.hero-subtitle,
+.host-copy,
+.detail-list,
+.place-card,
+.action-card span {
+  color: var(--muted);
+}
+
+.hero-subtitle {
+  margin: 0.7rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.hero-meta {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 1rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+main {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel {
+  padding: 1.15rem;
+}
+
+.panel-soft {
+  background: var(--paper-strong);
+}
+
+.section-heading h2 {
+  margin-top: 0.28rem;
+  font-size: 2rem;
+  line-height: 0.98;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.action-card {
+  min-height: 7.8rem;
+  border: 1px solid rgba(66, 50, 35, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.52);
+  padding: 1rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.action-card strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.action-card span {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.action-card em {
+  font-style: normal;
+  font-size: 1.35rem;
+  color: var(--accent);
+}
+
+.detail-list {
+  margin: 1rem 0 0;
+  padding-left: 1rem;
+  display: grid;
+  gap: 0.7rem;
+  line-height: 1.55;
+}
+
+.place-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.place-card {
+  border-top: 1px solid rgba(66, 50, 35, 0.08);
+  padding-top: 0.7rem;
+}
+
+.place-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.place-card strong {
+  display: block;
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.place-card span {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.host-copy {
+  margin: 1rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.host-actions {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.host-link {
+  border: 1px solid rgba(66, 50, 35, 0.1);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.56);
+  padding: 0.95rem 1rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.host-link strong,
+.host-link span {
+  display: block;
+}
+
+.host-link strong {
+  font-size: 0.95rem;
+}
+
+.host-link span {
+  margin-top: 0.18rem;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+@media (min-width: 700px) {
+  .page-shell {
+    padding-left: 1.2rem;
+    padding-right: 1.2rem;
+  }
+
+  .actions-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
