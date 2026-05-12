@@ -1,140 +1,81 @@
 const appContent = {
+  appName: "Stampace Charming",
   hero: {
-    kicker: "Guest app",
-    title: "Stampace Charming",
-    subtitle:
-      "Una guida essenziale per gli ospiti, pensata per smartphone e curata nei dettagli.",
+    subtitle: "Luxury apartment",
     address: "Via del Demo 12, Cagliari",
     license: "CIN: IT000000B000000000",
   },
-  essentials: {
-    kicker: "Accessi rapidi",
-    title: "Tutto il necessario",
-    items: [
-      {
-        icon: "⌂",
-        title: "Check-in",
-        description: "Indicazioni chiare per ingresso, orari e accesso all'appartamento.",
-      },
-      {
-        icon: "◌",
-        title: "Wi-Fi",
-        description: "Rete e password sempre a portata di mano, senza passaggi inutili.",
-      },
-      {
-        icon: "⌘",
-        title: "Regole",
-        description: "Poche regole importanti, scritte in modo semplice e leggibile.",
-      },
-      {
-        icon: "✦",
-        title: "Dintorni",
-        description: "Una selezione essenziale di luoghi utili e consigli affidabili.",
-      },
-    ],
-  },
-  house: {
-    kicker: "Per il soggiorno",
-    title: "Informazioni della casa",
-    items: [
-      "Check-in dalle 15:00, check-out entro le 10:30.",
-      "Silenzio e rispetto degli spazi comuni nelle ore serali.",
-      "Aria condizionata e luci da spegnere quando si esce.",
-      "Contatti host sempre disponibili per necessità o chiarimenti.",
-    ],
-  },
-  area: {
-    kicker: "In zona",
-    title: "Punti utili nelle vicinanze",
-    places: [
-      {
-        name: "Caffetteria consigliata",
-        note: "Perfetta per colazione e pause veloci, a pochi minuti a piedi.",
-      },
-      {
-        name: "Market di quartiere",
-        note: "Comodo per acqua, frutta, snack e piccole necessità quotidiane.",
-      },
-      {
-        name: "Fermata bus principale",
-        note: "Collegamento pratico con centro, stazione e aree balneari.",
-      },
-    ],
-  },
-  host: {
-    kicker: "Host",
-    title: "Sempre raggiungibile",
-    copy:
-      "Qui inseriremo i contatti finali dell'host, in un formato semplice e ordinato. Per ora questa sezione resta in mockup.",
-    links: [
-      { label: "Email", value: "hello@example.com", href: "mailto:hello@example.com" },
-      { label: "WhatsApp", value: "+39 340 000 0000", href: "https://wa.me/393400000000" },
-      { label: "Instagram", value: "@stampacecharming", href: "https://instagram.com/" },
-    ],
-  },
+  menu: [
+    {
+      icon: "shield",
+      title: "Check-in",
+      description: "Ingresso, orari e accesso alla struttura.",
+    },
+    {
+      icon: "wifi",
+      title: "Wi-Fi",
+      description: "Rete e password subito disponibili.",
+    },
+    {
+      icon: "spark",
+      title: "Regole della casa",
+      description: "Poche indicazioni, chiare e leggibili.",
+    },
+    {
+      icon: "key",
+      title: "Porta e codici",
+      description: "Istruzioni essenziali per l'accesso.",
+    },
+    {
+      icon: "pin",
+      title: "Dintorni",
+      description: "Mappa, servizi utili e suggerimenti vicini.",
+    },
+    {
+      icon: "user",
+      title: "Host",
+      description: "Contatti rapidi e informazioni utili.",
+    },
+  ],
 };
 
-function renderActions(items) {
+const iconPaths = {
+  shield:
+    '<path d="M12 3l6 2.7v5.7c0 3.7-2.3 6.9-6 8.6-3.7-1.7-6-4.9-6-8.6V5.7L12 3z"/><path d="M9.4 11.8 11 13.4l3.7-3.8"/>',
+  wifi:
+    '<path d="M3.5 8.8a13.5 13.5 0 0 1 17 0"/><path d="M6.5 12.1a9.3 9.3 0 0 1 11 0"/><path d="M9.8 15.3a4.7 4.7 0 0 1 4.4 0"/><circle cx="12" cy="18.5" r="1" fill="currentColor" stroke="none"/>',
+  spark:
+    '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
+  key:
+    '<circle cx="8.3" cy="14.2" r="3.2"/><path d="M11.2 14.2H20"/><path d="M16.4 14.2v-2.4"/><path d="M13.8 14.2v2.4"/>',
+  pin:
+    '<path d="M12 20s5-4.7 5-9a5 5 0 1 0-10 0c0 4.3 5 9 5 9z"/><circle cx="12" cy="11" r="1.8"/>',
+  user:
+    '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
+};
+
+function renderIcon(name) {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function renderMenu(items) {
   return items
     .map(
       (item) => `
-        <article class="action-card">
-          <em aria-hidden="true">${item.icon}</em>
-          <div>
+        <article class="menu-row is-static">
+          <div class="menu-icon">${renderIcon(item.icon)}</div>
+          <div class="menu-copy">
             <strong>${item.title}</strong>
-            <span>${item.description}</span>
           </div>
+          <span class="menu-chevron" aria-hidden="true">›</span>
         </article>
       `,
     )
     .join("");
 }
 
-function renderPlaces(items) {
-  return items
-    .map(
-      (item) => `
-        <article class="place-card">
-          <strong>${item.name}</strong>
-          <span>${item.note}</span>
-        </article>
-      `,
-    )
-    .join("");
-}
-
-function renderHostLinks(items) {
-  return items
-    .map(
-      (item) => `
-        <a class="host-link" href="${item.href}" target="_blank" rel="noreferrer">
-          <strong>${item.label}</strong>
-          <span>${item.value}</span>
-        </a>
-      `,
-    )
-    .join("");
-}
-
-document.querySelector("#hero-kicker").textContent = appContent.hero.kicker;
-document.querySelector("#hero-title").textContent = appContent.hero.title;
+document.querySelector("#app-name").textContent = appContent.appName;
 document.querySelector("#hero-subtitle").textContent = appContent.hero.subtitle;
-document.querySelector("#hero-address").textContent = appContent.hero.address;
-document.querySelector("#hero-license").textContent = appContent.hero.license;
-
-document.querySelector("#essentials-kicker").textContent = appContent.essentials.kicker;
-document.querySelector("#essentials-title").textContent = appContent.essentials.title;
-document.querySelector("#actions-grid").innerHTML = renderActions(appContent.essentials.items);
-
-document.querySelector("#house-kicker").textContent = appContent.house.kicker;
-document.querySelector("#house-title").textContent = appContent.house.title;
-document.querySelector("#house-list").innerHTML = appContent.house.items.map((item) => `<li>${item}</li>`).join("");
-
-document.querySelector("#area-kicker").textContent = appContent.area.kicker;
-document.querySelector("#area-title").textContent = appContent.area.title;
-document.querySelector("#place-list").innerHTML = renderPlaces(appContent.area.places);
-
-document.querySelector("#host-kicker").textContent = appContent.host.kicker;
-document.querySelector("#host-title").textContent = appContent.host.title;
-document.querySelector("#host-copy").textContent = appContent.host.copy;
-document.querySelector("#host-actions").innerHTML = renderHostLinks(appContent.host.links);
+document.querySelector("#footer-address").textContent = appContent.hero.address;
+document.querySelector("#footer-license").textContent = appContent.hero.license;
+document.querySelector("#main-menu").innerHTML = renderMenu(appContent.menu);

@@ -6,64 +6,36 @@
     <title>Stampace Charming Essential</title>
     <meta
       name="description"
-      content="Guest app elegante e mobile-first per strutture ricettive."
+      content="Guest app elegante, essenziale e mobile-first per strutture ricettive."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="page-shell">
-      <header class="hero">
-        <div class="hero-card">
-          <p class="hero-kicker" id="hero-kicker"></p>
-          <h1 id="hero-title"></h1>
-          <p class="hero-subtitle" id="hero-subtitle"></p>
-          <div class="hero-meta">
-            <span id="hero-address"></span>
-            <span id="hero-license"></span>
-          </div>
+      <header class="topbar">
+        <span class="topbar-mark" aria-hidden="true"></span>
+        <div class="topbar-copy">
+          <strong class="topbar-name" id="app-name"></strong>
         </div>
       </header>
 
-      <main>
-        <section class="panel">
-          <div class="section-heading">
-            <p class="section-kicker" id="essentials-kicker"></p>
-            <h2 id="essentials-title"></h2>
-          </div>
-          <div class="actions-grid" id="actions-grid"></div>
-        </section>
+      <section class="hero-block" aria-hidden="true"></section>
 
-        <section class="panel panel-soft">
-          <div class="section-heading">
-            <p class="section-kicker" id="house-kicker"></p>
-            <h2 id="house-title"></h2>
-          </div>
-          <ul class="detail-list" id="house-list"></ul>
-        </section>
+      <section class="hero-caption">
+        <p class="hero-subtitle" id="hero-subtitle"></p>
+        <div class="hero-meta">
+          <span id="footer-address"></span>
+          <span id="footer-license"></span>
+        </div>
+      </section>
 
-        <section class="panel">
-          <div class="section-heading">
-            <p class="section-kicker" id="area-kicker"></p>
-            <h2 id="area-title"></h2>
-          </div>
-          <div class="place-list" id="place-list"></div>
-        </section>
-
-        <section class="panel host-panel">
-          <div class="section-heading">
-            <p class="section-kicker" id="host-kicker"></p>
-            <h2 id="host-title"></h2>
-          </div>
-          <p class="host-copy" id="host-copy"></p>
-          <div class="host-actions" id="host-actions"></div>
-        </section>
-      </main>
+      <main class="main-menu" id="main-menu"></main>
     </div>
 
     <script type="module" src="./app.js"></script>
