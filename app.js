@@ -3,7 +3,7 @@ const appContent = {
   hero: {
     subtitle: "Luxury apartment",
     address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
-    license: "CIN: IT000000B000000000",
+    license: "CIN: IT000000B0000000000",
   },
   menu: [
     {

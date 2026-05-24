@@ -139,27 +139,20 @@ button {
 }
 
 .hero-meta {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.55rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 240, 220, 0.12);
   color: rgba(242, 237, 230, 0.74);
   font-size: 0.72rem;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .hero-meta span {
-  display: inline-block;
-}
-
-.hero-meta span + span::before {
-  content: "•";
-  margin-right: 0.55rem;
-  color: rgba(242, 237, 230, 0.42);
+  display: block;
 }
 
 .main-menu {
