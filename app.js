@@ -66,6 +66,7 @@ let template = null;
 let activeSectionId = null;
 let remoteTemplateUpdatedAt = null;
 let unsubscribeRealtime = null;
+const SHEET_HISTORY_KEY = "stampaceSectionId";
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -153,7 +154,7 @@ function renderSectionItems(items, sectionId) {
     .join("");
 }
 
-function openSection(sectionId) {
+function renderOpenSection(sectionId) {
   const section = template.sections.find((item) => item.id === sectionId);
   if (!section) return;
 
@@ -169,11 +170,29 @@ function openSection(sectionId) {
   document.body.classList.add("sheet-open");
 }
 
-function closeSection() {
+function openSection(sectionId, { pushHistory = true } = {}) {
+  if (pushHistory) {
+    window.history.pushState(
+      {
+        ...(window.history.state ?? {}),
+        [SHEET_HISTORY_KEY]: sectionId,
+      },
+      "",
+    );
+  }
+
+  renderOpenSection(sectionId);
+}
+
+function closeSection({ fromHistory = false } = {}) {
   activeSectionId = null;
   dom.sheet.classList.add("hidden");
   dom.sheet.setAttribute("aria-hidden", "true");
   document.body.classList.remove("sheet-open");
+
+  if (!fromHistory && window.history.state?.[SHEET_HISTORY_KEY]) {
+    window.history.back();
+  }
 }
 
 function bindMenu() {
@@ -185,12 +204,24 @@ function bindMenu() {
 }
 
 function bindSheet() {
-  dom.sheetBackdrop.addEventListener("click", closeSection);
-  dom.sheetClose.addEventListener("click", closeSection);
+  dom.sheetBackdrop.addEventListener("click", () => closeSection());
+  dom.sheetClose.addEventListener("click", () => closeSection());
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && activeSectionId) {
       closeSection();
+    }
+  });
+
+  window.addEventListener("popstate", (event) => {
+    const nextSectionId = event.state?.[SHEET_HISTORY_KEY];
+    if (nextSectionId) {
+      renderOpenSection(nextSectionId);
+      return;
+    }
+
+    if (activeSectionId) {
+      closeSection({ fromHistory: true });
     }
   });
 }
@@ -211,7 +242,7 @@ function render() {
   dom.mainMenu.innerHTML = renderMenu(template.sections);
 
   if (activeSectionId) {
-    openSection(activeSectionId);
+    renderOpenSection(activeSectionId);
   }
 }
 
