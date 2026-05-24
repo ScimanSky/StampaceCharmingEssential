@@ -6,12 +6,16 @@ const iconPaths = {
     '<path d="M12 3l6 2.7v5.7c0 3.7-2.3 6.9-6 8.6-3.7-1.7-6-4.9-6-8.6V5.7L12 3z"/><path d="M9.4 11.8 11 13.4l3.7-3.8"/>',
   clock:
     '<circle cx="12" cy="12" r="8"/><path d="M12 7.8v4.6l3 1.8"/>',
+  calendar:
+    '<rect x="5" y="6" width="14" height="13" rx="2"/><path d="M8 4.8v2.4"/><path d="M16 4.8v2.4"/><path d="M5 9.5h14"/>',
   wifi:
     '<path d="M3.5 8.8a13.5 13.5 0 0 1 17 0"/><path d="M6.5 12.1a9.3 9.3 0 0 1 11 0"/><path d="M9.8 15.3a4.7 4.7 0 0 1 4.4 0"/><circle cx="12" cy="18.5" r="1" fill="currentColor" stroke="none"/>',
   spark:
     '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
   key:
     '<circle cx="8.3" cy="14.2" r="3.2"/><path d="M11.2 14.2H20"/><path d="M16.4 14.2v-2.4"/><path d="M13.8 14.2v2.4"/>',
+  lock:
+    '<rect x="6.2" y="10.2" width="11.6" height="9" rx="2"/><path d="M8.7 10.2V8.3a3.3 3.3 0 0 1 6.6 0v1.9"/>',
   safe:
     '<rect x="5" y="4.5" width="14" height="15" rx="2.2"/><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5v5"/><path d="M9.5 12H14.5"/>',
   pin:
@@ -22,12 +26,16 @@ const iconPaths = {
     '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
   mail:
     '<rect x="4" y="6.2" width="16" height="11.6" rx="2"/><path d="m5.3 7.7 6.7 5 6.7-5"/>',
+  card:
+    '<rect x="4.5" y="6.2" width="15" height="11.6" rx="2"/><path d="M4.5 10h15"/><path d="M8 14.2h2.8"/>',
   door:
     '<path d="M7 20V6.5c0-.6.4-1.1 1-1.2l6-1.3c.7-.1 1.3.4 1.3 1.2V20"/><path d="M7 20h10"/><circle cx="12.2" cy="12.3" r="0.7" fill="currentColor" stroke="none"/>',
   home:
     '<path d="M4.5 10.2 12 4l7.5 6.2"/><path d="M6.5 9.4V19h11V9.4"/>',
   bag:
     '<path d="M7 18V8.5c0-.8.7-1.5 1.5-1.5h7c.8 0 1.5.7 1.5 1.5V18"/><path d="M10 7V5.8A2 2 0 0 1 12 4a2 2 0 0 1 2 1.8V7"/>',
+  luggage:
+    '<rect x="6.4" y="7.2" width="11.2" height="11.4" rx="2"/><path d="M9.7 7.2V5.8c0-.8.7-1.4 1.5-1.4h1.6c.8 0 1.5.6 1.5 1.4v1.4"/><path d="M12 10v5"/>',
   moon:
     '<path d="M15.8 4.8a6.7 6.7 0 1 0 3.4 11.9 7.4 7.4 0 1 1-3.4-11.9z"/>',
   ban:
@@ -36,6 +44,8 @@ const iconPaths = {
     '<path d="M8.2 7.4h7.6"/><path d="M9.3 7.4V6.3c0-.5.4-.9.9-.9h3.6c.5 0 .9.4.9.9v1.1"/><path d="m7.6 8.3.7 9c0 .7.6 1.2 1.3 1.2h4.8c.7 0 1.2-.5 1.3-1.2l.7-9"/>',
   car:
     '<path d="M5.2 14.8h13.6"/><path d="m7 14.8 1-4.2c.2-.7.8-1.2 1.5-1.2h5c.7 0 1.3.5 1.5 1.2l1 4.2"/><circle cx="8.3" cy="16.8" r="1.3"/><circle cx="15.7" cy="16.8" r="1.3"/>',
+  bus:
+    '<rect x="6.3" y="4.8" width="11.4" height="12" rx="2"/><path d="M8.5 8h2.6"/><path d="M13 8h2.5"/><path d="M8 18.2 6.9 20"/><path d="M17.1 18.2 16 20"/><circle cx="9" cy="15.2" r="0.7" fill="currentColor" stroke="none"/><circle cx="15" cy="15.2" r="0.7" fill="currentColor" stroke="none"/>',
   cart:
     '<circle cx="10" cy="17.5" r="1.2"/><circle cx="16" cy="17.5" r="1.2"/><path d="M5 6h1.6l1.2 7h8.2l1.6-5.2H8.3"/>',
   cross:
@@ -44,6 +54,10 @@ const iconPaths = {
     '<rect x="7" y="5.2" width="10" height="11.6" rx="2"/><path d="M9.5 8.2h5"/><path d="M9.5 11.2h5"/><path d="M9.2 18.2 8 20"/><path d="M14.8 18.2 16 20"/>',
   wave:
     '<path d="M3.8 15.2c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1"/><path d="M4 10.5c1 0 1-.8 2-.8s1 .8 2 .8 1-.8 2-.8 1 .8 2 .8 1-.8 2-.8 1 .8 2 .8"/>',
+  id:
+    '<rect x="4.8" y="6" width="14.4" height="12" rx="2"/><circle cx="9.3" cy="11" r="1.6"/><path d="M7.2 14.4c.7-1.1 1.5-1.6 2.1-1.6s1.4.5 2.1 1.6"/><path d="M13.6 10h3.1"/><path d="M13.6 13h3.1"/>',
+  receipt:
+    '<path d="M7 4.8h10v14.4l-1.4-.8-1.6.8-1.6-.8-1.6.8-1.6-.8-1.2.8z"/><path d="M9.3 8h5.4"/><path d="M9.3 11h5.4"/><path d="M9.3 14h3.2"/>',
 };
 
 const dom = {
@@ -81,8 +95,11 @@ function iconForItem(item, sectionId) {
   const text = getItemText(item);
 
   if (/wifi|rete|password|connession/.test(text)) return "wifi";
-  if (/check-?in|check-?out|orario|arrivo|partenza|prima dell'arrivo/.test(text)) return "clock";
-  if (/chiave|codic|serratur|porton|porta|accesso|cassetta/.test(text)) return "key";
+  if (/tassa|soggiorn|€|euro|contanti|pagamento/.test(text)) return "receipt";
+  if (/documento|identit|passaport|patente|questura/.test(text)) return "id";
+  if (/check-?out|partenza/.test(text)) return "calendar";
+  if (/check-?in|orario|arrivo|prima dell'arrivo|late check|early check/.test(text)) return "clock";
+  if (/chiave|codic|serratur|porton|porta|accesso|cassetta/.test(text)) return "lock";
   if (/cassafort|safe/.test(text)) return "safe";
   if (/host|whatsapp|telefono|contatt|chiama/.test(text)) return "phone";
   if (/email|mail/.test(text)) return "mail";
@@ -90,19 +107,21 @@ function iconForItem(item, sectionId) {
   if (/fum|divieto|vietat|rumore|regol|regole/.test(text)) return "ban";
   if (/rifiut|spazzatura|raccolta/.test(text)) return "trash";
   if (/parcheg|auto|noleggio/.test(text)) return "car";
+  if (/bus|navetta/.test(text)) return "bus";
   if (/ristorant|bar|spesa|supermercat/.test(text)) return "cart";
   if (/farmacia|emergenz|medic/.test(text)) return "cross";
   if (/spiagg|mare/.test(text)) return "wave";
   if (/treno|stazione|metro/.test(text)) return "train";
-  if (/aeroport|transfer|bagagli/.test(text)) return "bag";
+  if (/aeroport|transfer/.test(text)) return "bus";
+  if (/bagagli|valigi/.test(text)) return "luggage";
   if (/casa|struttura|appartament/.test(text)) return "home";
   if (/mappa|dintorn|mezzi|quartiere|vicin/.test(text)) return "pin";
 
   const sectionFallbacks = {
-    checkin: "clock",
+    checkin: "calendar",
     rules: "spark",
     wifi: "wifi",
-    access: "key",
+    access: "lock",
     safe: "safe",
     around: "pin",
     host: "user",
