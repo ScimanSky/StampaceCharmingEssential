@@ -8,7 +8,7 @@ const appContent = {
   menu: [
     {
       icon: "shield",
-      title: "Check-in",
+      title: "Check-in & Check-out",
       description: "Ingresso, orari e accesso alla struttura.",
     },
     {
