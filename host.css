@@ -181,6 +181,13 @@ button,
   padding: 1rem;
 }
 
+.host-live-actions {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.9rem;
+}
+
 .host-grid,
 .host-section-grid {
   display: grid;
@@ -252,5 +259,9 @@ button,
 
   .host-grid-wide {
     grid-column: auto;
+  }
+
+  .host-live-actions > * {
+    width: 100%;
   }
 }

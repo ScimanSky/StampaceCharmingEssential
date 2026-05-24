@@ -1,8 +1,14 @@
 import {
   clearTemplate,
   defaultTemplate,
+  fetchRemoteTemplateEnvelope,
+  GITHUB_REPO_NAME,
+  GITHUB_REPO_OWNER,
+  loadGithubToken,
   loadTemplate,
   normalizeTemplate,
+  publishTemplateToGithub,
+  saveGithubToken,
   saveTemplate,
 } from "./content.js";
 
@@ -29,14 +35,18 @@ const dom = {
   reset: document.querySelector("#host-reset"),
   export: document.querySelector("#host-export"),
   import: document.querySelector("#host-import"),
+  publish: document.querySelector("#host-publish"),
+  tokenSave: document.querySelector("#host-token-save"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
   address: document.querySelector("#field-address"),
   license: document.querySelector("#field-license"),
+  githubToken: document.querySelector("#field-github-token"),
   sections: document.querySelector("#host-sections"),
 };
 
 let state = null;
+let remoteSha = null;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -114,6 +124,7 @@ function syncFields() {
   dom.subtitle.value = state.subtitle;
   dom.address.value = state.address;
   dom.license.value = state.license;
+  dom.githubToken.value = loadGithubToken();
   renderSectionEditors();
 }
 
@@ -144,7 +155,7 @@ function collectTemplate() {
 function saveCurrentTemplate() {
   state = saveTemplate(collectTemplate());
   syncFields();
-  setStatus("Template locale salvato. Per pubblicarlo a tutti, esporta il JSON e sostituisci template.json.", "success");
+  setStatus("Template locale salvato su questo browser.", "success");
 }
 
 function downloadTemplate() {
@@ -182,10 +193,50 @@ function importTemplate(file) {
   reader.readAsText(file);
 }
 
+function saveTokenLocally() {
+  saveGithubToken(dom.githubToken.value);
+  dom.githubToken.value = loadGithubToken();
+  setStatus("Token GitHub memorizzato solo su questo browser host.", "success");
+}
+
+async function publishLiveTemplate() {
+  const token = saveGithubToken(dom.githubToken.value);
+  if (!token) {
+    setStatus("Inserisci prima un GitHub token valido.", "error");
+    return;
+  }
+
+  state = saveTemplate(collectTemplate());
+  setStatus(`Pubblicazione live in corso su ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}...`);
+
+  try {
+    if (!remoteSha) {
+      const remote = await fetchRemoteTemplateEnvelope();
+      remoteSha = remote.sha;
+    }
+
+    const published = await publishTemplateToGithub(state, token, remoteSha);
+    remoteSha = published.sha;
+    state = published.template;
+    syncFields();
+    setStatus(
+      "Template pubblicato live. L'app ospiti si aggiorna in remoto entro pochi secondi o al prossimo refresh.",
+      "success",
+    );
+  } catch (error) {
+    setStatus(
+      "Pubblicazione live fallita. Verifica token, permessi sul repo e presenza di modifiche concorrenti.",
+      "error",
+    );
+  }
+}
+
 function bindEvents() {
   dom.save.addEventListener("click", saveCurrentTemplate);
   dom.export.addEventListener("click", downloadTemplate);
   dom.reset.addEventListener("click", restoreDefaultTemplate);
+  dom.publish.addEventListener("click", publishLiveTemplate);
+  dom.tokenSave.addEventListener("click", saveTokenLocally);
   dom.import.addEventListener("change", (event) => {
     importTemplate(event.target.files?.[0]);
     event.target.value = "";
@@ -193,7 +244,13 @@ function bindEvents() {
 }
 
 async function init() {
-  state = await loadTemplate({ preferLocal: false });
+  state = await loadTemplate({ preferLocal: true });
+  try {
+    const remote = await fetchRemoteTemplateEnvelope();
+    remoteSha = remote.sha;
+  } catch {
+    remoteSha = null;
+  }
   syncFields();
   bindEvents();
 }

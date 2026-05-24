@@ -35,6 +35,24 @@
         <p class="host-status" id="host-status"></p>
 
         <section class="host-card">
+          <h2>Pubblicazione live</h2>
+          <p class="host-copy">
+            Le modifiche salvate qui possono essere pubblicate sul repository GitHub e diventano
+            visibili all'app ospiti in remoto entro pochi secondi o al prossimo refresh/focus.
+          </p>
+          <div class="host-grid">
+            <label class="host-grid-wide">
+              <span>GitHub token host</span>
+              <input id="field-github-token" type="password" autocomplete="off" />
+            </label>
+          </div>
+          <div class="host-live-actions">
+            <button id="host-token-save" type="button">Memorizza token su questo browser</button>
+            <button id="host-publish" type="button">Pubblica live per gli ospiti</button>
+          </div>
+        </section>
+
+        <section class="host-card">
           <h2>Dati generali</h2>
           <div class="host-grid">
             <label>

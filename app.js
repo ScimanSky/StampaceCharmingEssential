@@ -1,4 +1,4 @@
-import { loadTemplate } from "./content.js";
+import { fetchRemoteTemplateEnvelope, loadTemplate } from "./content.js";
 
 const iconPaths = {
   shield:
@@ -35,6 +35,8 @@ const dom = {
 
 let template = null;
 let activeSectionId = null;
+let remoteTemplateSha = null;
+let syncIntervalId = null;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -138,14 +140,50 @@ function render() {
   dom.address.textContent = template.address;
   dom.license.textContent = template.license;
   dom.mainMenu.innerHTML = renderMenu(template.sections);
+
+  if (activeSectionId) {
+    openSection(activeSectionId);
+  }
+}
+
+async function syncRemoteTemplate() {
+  try {
+    const remote = await fetchRemoteTemplateEnvelope();
+    if (remote.sha === remoteTemplateSha) return;
+    remoteTemplateSha = remote.sha;
+    template = remote.template;
+    render();
+  } catch {
+    // Keep the current rendered template if remote sync fails.
+  }
+}
+
+function startLiveSync() {
+  syncIntervalId = window.setInterval(syncRemoteTemplate, 45000);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      syncRemoteTemplate();
+    }
+  });
+
+  window.addEventListener("focus", syncRemoteTemplate);
 }
 
 async function init() {
   template = await loadTemplate();
+  try {
+    const remote = await fetchRemoteTemplateEnvelope();
+    remoteTemplateSha = remote.sha;
+    template = remote.template;
+  } catch {
+    remoteTemplateSha = null;
+  }
   render();
   bindMenu();
   bindSheet();
   preventCopy();
+  startLiveSync();
 }
 
 init();
