@@ -1,4 +1,12 @@
-import { clearTemplate, defaultTemplate, loadTemplate, normalizeTemplate, saveTemplate } from "./content.js";
+import {
+  clearTemplate,
+  defaultTemplate,
+  HOST_PRIVATE_ITEM,
+  isHostPrivateItem,
+  loadTemplate,
+  normalizeTemplate,
+  saveTemplate,
+} from "./content.js";
 import {
   fetchRemoteTemplateRow,
   getHostSupabase,
@@ -64,6 +72,7 @@ function setStatus(message, variant = "") {
 
 function serializeItems(items) {
   return items
+    .filter((item) => !isHostPrivateItem(item))
     .map((item) => {
       if (typeof item === "string") return item;
       return JSON.stringify(item);
@@ -118,6 +127,11 @@ function renderSectionEditors() {
               <textarea data-field="items">${serializeItems(section.items)}</textarea>
             </label>
           </div>
+          ${
+            section.id === "host"
+              ? `<p class="host-lock-note">La voce "${HOST_PRIVATE_ITEM.title}" viene reinserita automaticamente e non può essere eliminata.</p>`
+              : ""
+          }
         </section>
       `,
     )

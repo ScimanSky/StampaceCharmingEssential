@@ -1,6 +1,12 @@
 import { fetchRemoteTemplateRow } from "./supabase.js";
 
 export const STORAGE_KEY = "stampace_essential_template_v1";
+export const HOST_PRIVATE_ITEM = Object.freeze({
+  title: "Privato",
+  body: "Apri l'editor riservato all'host per modificare il template dell'app.",
+  label: "Apri editor host",
+  href: "./host.html",
+});
 
 export const defaultTemplate = {
   appName: "Stampace Charming",
@@ -92,12 +98,7 @@ export const defaultTemplate = {
         "Nome host: da inserire",
         "Telefono / WhatsApp: da inserire",
         "Email: da inserire",
-        {
-          title: "Privato",
-          body: "Apri l'editor riservato all'host per modificare il template dell'app.",
-          label: "Apri editor host",
-          href: "./host.html",
-        },
+        HOST_PRIVATE_ITEM,
       ],
     },
   ],
@@ -130,14 +131,30 @@ function normalizeItems(items, fallbackItems) {
   return next.length ? next : fallbackItems;
 }
 
+export function isHostPrivateItem(item) {
+  if (!item || typeof item !== "object") return false;
+  return (
+    cleanString(item.title) === HOST_PRIVATE_ITEM.title &&
+    cleanString(item.label) === HOST_PRIVATE_ITEM.label &&
+    cleanString(item.href) === HOST_PRIVATE_ITEM.href
+  );
+}
+
+function ensureHostPrivateItem(items) {
+  const editableItems = items.filter((item) => !isHostPrivateItem(item));
+  return [...editableItems, { ...HOST_PRIVATE_ITEM }];
+}
+
 function normalizeSection(section, baseSection) {
+  const normalizedItems = normalizeItems(section?.items, baseSection.items);
   return {
     id: baseSection.id,
     icon: cleanString(section?.icon, baseSection.icon),
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
-    items: normalizeItems(section?.items, baseSection.items),
+    items:
+      baseSection.id === "host" ? ensureHostPrivateItem(normalizedItems) : normalizedItems,
   };
 }
 
