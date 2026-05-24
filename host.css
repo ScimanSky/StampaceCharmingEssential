@@ -3,9 +3,10 @@
   --panel: rgba(18, 15, 12, 0.78);
   --panel-strong: rgba(24, 20, 16, 0.9);
   --line: rgba(224, 205, 177, 0.12);
-  --text: #f2ede6;
-  --muted: #c1b19d;
-  --accent: #e7d8c1;
+  --copy: #e7d8c1;
+  --text: var(--copy);
+  --muted: rgba(231, 216, 193, 0.72);
+  --accent: var(--copy);
   --success: #9fd7a4;
   --danger: #efb0a8;
 }
@@ -60,7 +61,7 @@ textarea {
   font-size: 0.74rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(231, 216, 193, 0.62);
+  color: var(--muted);
 }
 
 .host-gate h1,
@@ -93,7 +94,7 @@ textarea {
 .host-gate-form span,
 .host-grid span,
 .host-section-grid span {
-  color: rgba(242, 237, 230, 0.8);
+  color: rgba(231, 216, 193, 0.8);
   font-size: 0.88rem;
 }
 
