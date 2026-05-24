@@ -4,6 +4,8 @@ import { subscribeToRemoteTemplate } from "./supabase.js";
 const iconPaths = {
   shield:
     '<path d="M12 3l6 2.7v5.7c0 3.7-2.3 6.9-6 8.6-3.7-1.7-6-4.9-6-8.6V5.7L12 3z"/><path d="M9.4 11.8 11 13.4l3.7-3.8"/>',
+  clock:
+    '<circle cx="12" cy="12" r="8"/><path d="M12 7.8v4.6l3 1.8"/>',
   wifi:
     '<path d="M3.5 8.8a13.5 13.5 0 0 1 17 0"/><path d="M6.5 12.1a9.3 9.3 0 0 1 11 0"/><path d="M9.8 15.3a4.7 4.7 0 0 1 4.4 0"/><circle cx="12" cy="18.5" r="1" fill="currentColor" stroke="none"/>',
   spark:
@@ -16,6 +18,32 @@ const iconPaths = {
     '<path d="M12 20s5-4.7 5-9a5 5 0 1 0-10 0c0 4.3 5 9 5 9z"/><circle cx="12" cy="11" r="1.8"/>',
   user:
     '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
+  phone:
+    '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
+  mail:
+    '<rect x="4" y="6.2" width="16" height="11.6" rx="2"/><path d="m5.3 7.7 6.7 5 6.7-5"/>',
+  door:
+    '<path d="M7 20V6.5c0-.6.4-1.1 1-1.2l6-1.3c.7-.1 1.3.4 1.3 1.2V20"/><path d="M7 20h10"/><circle cx="12.2" cy="12.3" r="0.7" fill="currentColor" stroke="none"/>',
+  home:
+    '<path d="M4.5 10.2 12 4l7.5 6.2"/><path d="M6.5 9.4V19h11V9.4"/>',
+  bag:
+    '<path d="M7 18V8.5c0-.8.7-1.5 1.5-1.5h7c.8 0 1.5.7 1.5 1.5V18"/><path d="M10 7V5.8A2 2 0 0 1 12 4a2 2 0 0 1 2 1.8V7"/>',
+  moon:
+    '<path d="M15.8 4.8a6.7 6.7 0 1 0 3.4 11.9 7.4 7.4 0 1 1-3.4-11.9z"/>',
+  ban:
+    '<circle cx="12" cy="12" r="7.5"/><path d="M8.7 15.3 15.3 8.7"/>',
+  trash:
+    '<path d="M8.2 7.4h7.6"/><path d="M9.3 7.4V6.3c0-.5.4-.9.9-.9h3.6c.5 0 .9.4.9.9v1.1"/><path d="m7.6 8.3.7 9c0 .7.6 1.2 1.3 1.2h4.8c.7 0 1.2-.5 1.3-1.2l.7-9"/>',
+  car:
+    '<path d="M5.2 14.8h13.6"/><path d="m7 14.8 1-4.2c.2-.7.8-1.2 1.5-1.2h5c.7 0 1.3.5 1.5 1.2l1 4.2"/><circle cx="8.3" cy="16.8" r="1.3"/><circle cx="15.7" cy="16.8" r="1.3"/>',
+  cart:
+    '<circle cx="10" cy="17.5" r="1.2"/><circle cx="16" cy="17.5" r="1.2"/><path d="M5 6h1.6l1.2 7h8.2l1.6-5.2H8.3"/>',
+  cross:
+    '<path d="M12 5.4v13.2"/><path d="M5.4 12h13.2"/>',
+  train:
+    '<rect x="7" y="5.2" width="10" height="11.6" rx="2"/><path d="M9.5 8.2h5"/><path d="M9.5 11.2h5"/><path d="M9.2 18.2 8 20"/><path d="M14.8 18.2 16 20"/>',
+  wave:
+    '<path d="M3.8 15.2c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1"/><path d="M4 10.5c1 0 1-.8 2-.8s1 .8 2 .8 1-.8 2-.8 1 .8 2 .8 1-.8 2-.8 1 .8 2 .8"/>',
 };
 
 const dom = {
@@ -43,6 +71,45 @@ function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
 }
 
+function getItemText(item) {
+  if (typeof item === "string") return item.toLowerCase();
+  return `${item?.title ?? ""} ${item?.body ?? ""} ${item?.label ?? ""}`.toLowerCase();
+}
+
+function iconForItem(item, sectionId) {
+  const text = getItemText(item);
+
+  if (/wifi|rete|password|connession/.test(text)) return "wifi";
+  if (/check-?in|check-?out|orario|arrivo|partenza|prima dell'arrivo/.test(text)) return "clock";
+  if (/chiave|codic|serratur|porton|porta|accesso|cassetta/.test(text)) return "key";
+  if (/cassafort|safe/.test(text)) return "safe";
+  if (/host|whatsapp|telefono|contatt|chiama/.test(text)) return "phone";
+  if (/email|mail/.test(text)) return "mail";
+  if (/privato|editor/.test(text)) return "user";
+  if (/fum|divieto|vietat|rumore|regol|regole/.test(text)) return "ban";
+  if (/rifiut|spazzatura|raccolta/.test(text)) return "trash";
+  if (/parcheg|auto|noleggio/.test(text)) return "car";
+  if (/ristorant|bar|spesa|supermercat/.test(text)) return "cart";
+  if (/farmacia|emergenz|medic/.test(text)) return "cross";
+  if (/spiagg|mare/.test(text)) return "wave";
+  if (/treno|stazione|metro/.test(text)) return "train";
+  if (/aeroport|transfer|bagagli/.test(text)) return "bag";
+  if (/casa|struttura|appartament/.test(text)) return "home";
+  if (/mappa|dintorn|mezzi|quartiere|vicin/.test(text)) return "pin";
+
+  const sectionFallbacks = {
+    checkin: "clock",
+    rules: "spark",
+    wifi: "wifi",
+    access: "key",
+    safe: "safe",
+    around: "pin",
+    host: "user",
+  };
+
+  return sectionFallbacks[sectionId] ?? "spark";
+}
+
 function renderMenu(sections) {
   return sections
     .map(
@@ -59,13 +126,14 @@ function renderMenu(sections) {
     .join("");
 }
 
-function renderSectionItems(items) {
+function renderSectionItems(items, sectionId) {
   return items
-    .map((item, index) => {
+    .map((item) => {
+      const itemIcon = renderIcon(iconForItem(item, sectionId));
       if (typeof item === "string") {
         return `
           <article class="sheet-card">
-            <span class="sheet-card-index">${String(index + 1).padStart(2, "0")}</span>
+            <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>
             <p>${item}</p>
           </article>
         `;
@@ -73,7 +141,7 @@ function renderSectionItems(items) {
 
       return `
         <article class="sheet-card sheet-card-link">
-          <span class="sheet-card-index">${String(index + 1).padStart(2, "0")}</span>
+          <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>
           <div class="sheet-card-copy">
             <strong>${item.title ?? ""}</strong>
             <p>${item.body ?? ""}</p>
@@ -94,7 +162,7 @@ function openSection(sectionId) {
   dom.sheetBrand.textContent = template.appName;
   dom.sheetTitle.textContent = section.sectionTitle;
   dom.sheetLead.textContent = section.lead;
-  dom.sheetContent.innerHTML = renderSectionItems(section.items);
+  dom.sheetContent.innerHTML = renderSectionItems(section.items, section.id);
 
   dom.sheet.classList.remove("hidden");
   dom.sheet.setAttribute("aria-hidden", "false");
