@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Stampace Charming Host</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./host.css" />
+  </head>
+  <body>
+    <main class="host-shell">
+      <section class="host-app" id="host-app">
+        <header class="host-header">
+          <div>
+            <p class="host-kicker">Stampace Charming</p>
+            <h1>Editor template</h1>
+          </div>
+          <div class="host-actions">
+            <button class="ghost-button" id="host-reset" type="button">Ripristina default</button>
+            <button class="ghost-button" id="host-export" type="button">Esporta JSON</button>
+            <label class="ghost-button file-button">
+              <span>Importa JSON</span>
+              <input id="host-import" type="file" accept="application/json" />
+            </label>
+            <button id="host-save" type="button">Salva su questo dispositivo</button>
+          </div>
+        </header>
+
+        <p class="host-status" id="host-status"></p>
+
+        <section class="host-card">
+          <h2>Dati generali</h2>
+          <div class="host-grid">
+            <label>
+              <span>Nome struttura</span>
+              <input id="field-app-name" type="text" />
+            </label>
+            <label>
+              <span>Sottotitolo</span>
+              <input id="field-subtitle" type="text" />
+            </label>
+            <label class="host-grid-wide">
+              <span>Indirizzo</span>
+              <input id="field-address" type="text" />
+            </label>
+            <label class="host-grid-wide">
+              <span>CIN</span>
+              <input id="field-license" type="text" />
+            </label>
+          </div>
+        </section>
+
+        <section class="host-sections" id="host-sections"></section>
+      </section>
+    </main>
+
+    <script type="module" src="./host.js"></script>
+  </body>
+</html>

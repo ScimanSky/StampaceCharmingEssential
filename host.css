@@ -1,0 +1,256 @@
+:root {
+  --bg: #090705;
+  --panel: rgba(18, 15, 12, 0.78);
+  --panel-strong: rgba(24, 20, 16, 0.9);
+  --line: rgba(224, 205, 177, 0.12);
+  --text: #f2ede6;
+  --muted: #c1b19d;
+  --accent: #e7d8c1;
+  --success: #9fd7a4;
+  --danger: #efb0a8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(9, 7, 5, 0.88), rgba(9, 7, 5, 0.96)),
+    url("./img/patternlegn.png") center top / 42rem auto repeat;
+  color: var(--text);
+  font-family: "Roboto", sans-serif;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.hidden {
+  display: none;
+}
+
+.host-shell {
+  width: min(100%, 56rem);
+  margin: 0 auto;
+  padding: max(1.2rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
+}
+
+.host-gate,
+.host-card,
+.host-section-card {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--panel);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.2);
+}
+
+.host-gate {
+  max-width: 28rem;
+  margin: 8vh auto 0;
+  padding: 1.3rem;
+}
+
+.host-kicker {
+  margin: 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(231, 216, 193, 0.62);
+}
+
+.host-gate h1,
+.host-header h1,
+.host-card h2,
+.host-section-card h2 {
+  margin: 0.35rem 0 0;
+  font-weight: 400;
+}
+
+.host-copy {
+  margin: 0.7rem 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.host-gate-form {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 1rem;
+}
+
+.host-gate-form label,
+.host-grid label,
+.host-section-grid label {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.host-gate-form span,
+.host-grid span,
+.host-section-grid span {
+  color: rgba(242, 237, 230, 0.8);
+  font-size: 0.88rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.78rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 0.85rem 0.9rem;
+  outline: none;
+}
+
+textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+button,
+.file-button {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.78rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ghost-button {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.file-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.host-app {
+  display: grid;
+  gap: 1rem;
+}
+
+.host-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+}
+
+.host-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: end;
+}
+
+.host-status {
+  min-height: 1.2rem;
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+}
+
+.host-status.is-success {
+  color: var(--success);
+}
+
+.host-status.is-error {
+  color: var(--danger);
+}
+
+.host-card,
+.host-section-card {
+  padding: 1rem;
+}
+
+.host-grid,
+.host-section-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.host-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.9rem;
+}
+
+.host-grid-wide {
+  grid-column: 1 / -1;
+}
+
+.host-sections {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.host-section-grid {
+  margin-top: 0.9rem;
+}
+
+.host-section-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.host-section-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.host-section-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 720px) {
+  .host-header {
+    grid-template-columns: 1fr;
+    display: grid;
+    align-items: start;
+  }
+
+  .host-actions {
+    justify-content: stretch;
+  }
+
+  .host-actions > * {
+    width: 100%;
+  }
+
+  .host-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .host-grid-wide {
+    grid-column: auto;
+  }
+}

@@ -38,6 +38,24 @@
       <main class="main-menu" id="main-menu"></main>
     </div>
 
+    <div class="section-sheet hidden" id="section-sheet" aria-hidden="true">
+      <button class="sheet-backdrop" id="sheet-backdrop" type="button" aria-label="Close"></button>
+      <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <header class="sheet-header">
+          <div class="sheet-icon" id="sheet-icon" aria-hidden="true"></div>
+          <div class="sheet-title-block">
+            <p class="sheet-brand" id="sheet-brand"></p>
+            <h2 id="sheet-title"></h2>
+            <p class="sheet-lead" id="sheet-lead"></p>
+          </div>
+          <button class="sheet-close" id="sheet-close" type="button" aria-label="Close section">
+            <span aria-hidden="true">×</span>
+          </button>
+        </header>
+        <div class="sheet-content" id="sheet-content"></div>
+      </section>
+    </div>
+
     <script type="module" src="./app.js"></script>
   </body>
 </html>

@@ -32,6 +32,13 @@ body {
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+body.sheet-open {
+  overflow: hidden;
 }
 
 body::before {
@@ -57,6 +64,18 @@ body::after {
 a,
 button {
   font: inherit;
+}
+
+img,
+svg,
+.hero-block,
+.menu-row,
+.topbar-name,
+.hero-subtitle,
+.hero-meta {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .page-shell {
@@ -178,6 +197,10 @@ button {
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
 }
 
 .menu-row.is-static {
@@ -188,6 +211,12 @@ button {
 
 .menu-row:active {
   background: var(--row-hover);
+}
+
+.menu-row:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 244, 224, 0.09), rgba(255, 244, 224, 0.03)),
+    var(--row-hover);
 }
 
 .menu-icon {
@@ -240,4 +269,145 @@ button {
   color: rgba(242, 237, 230, 0.66);
   font-size: 1.02rem;
   line-height: 1;
+}
+
+.hidden {
+  display: none;
+}
+
+.section-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+}
+
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(4, 4, 4, 0.74);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.sheet-panel {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
+  background:
+    linear-gradient(180deg, rgba(10, 8, 6, 0.9), rgba(7, 6, 5, 0.98)),
+    url("./img/patternlegn.png") center top / 42rem auto repeat;
+}
+
+.sheet-header {
+  display: grid;
+  grid-template-columns: 3rem 1fr 2.7rem;
+  align-items: start;
+  gap: 0.95rem;
+  margin: 0 auto;
+  width: min(100%, 34rem);
+}
+
+.sheet-icon {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  color: rgba(243, 238, 231, 0.92);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sheet-icon svg {
+  width: 1.95rem;
+  height: 1.95rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sheet-title-block {
+  min-width: 0;
+}
+
+.sheet-brand {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(231, 216, 193, 0.62);
+}
+
+.sheet-title-block h2 {
+  margin: 0.3rem 0 0;
+  font-size: 1.42rem;
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.sheet-lead {
+  margin: 0.45rem 0 0;
+  color: rgba(242, 237, 230, 0.74);
+  line-height: 1.45;
+  font-size: 0.94rem;
+}
+
+.sheet-close {
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(243, 238, 231, 0.88);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.sheet-close span {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.sheet-content {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1rem auto 0;
+  width: min(100%, 34rem);
+}
+
+.sheet-card {
+  display: grid;
+  grid-template-columns: 2.1rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.9rem;
+  background: rgba(17, 14, 11, 0.42);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.sheet-card-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(231, 216, 193, 0.68);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+}
+
+.sheet-card p {
+  margin: 0;
+  line-height: 1.5;
+  color: rgba(242, 237, 230, 0.88);
+  font-size: 0.96rem;
 }

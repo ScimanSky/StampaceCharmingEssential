@@ -1,43 +1,4 @@
-const appContent = {
-  appName: "Stampace Charming",
-  hero: {
-    subtitle: "Luxury apartment",
-    address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
-    license: "CIN: IT092009C2000R8066",
-  },
-  menu: [
-    {
-      icon: "shield",
-      title: "Check-in & Check-out",
-      description: "Ingresso, orari e accesso alla struttura.",
-    },
-    {
-      icon: "wifi",
-      title: "Wi-Fi",
-      description: "Rete e password subito disponibili.",
-    },
-    {
-      icon: "spark",
-      title: "Regole della casa",
-      description: "Poche indicazioni, chiare e leggibili.",
-    },
-    {
-      icon: "key",
-      title: "Porta e codici",
-      description: "Istruzioni essenziali per l'accesso.",
-    },
-    {
-      icon: "pin",
-      title: "Dintorni",
-      description: "Mappa, servizi utili e suggerimenti vicini.",
-    },
-    {
-      icon: "user",
-      title: "Host",
-      description: "Contatti rapidi e informazioni utili.",
-    },
-  ],
-};
+import { loadTemplate } from "./content.js";
 
 const iconPaths = {
   shield:
@@ -48,34 +9,143 @@ const iconPaths = {
     '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
   key:
     '<circle cx="8.3" cy="14.2" r="3.2"/><path d="M11.2 14.2H20"/><path d="M16.4 14.2v-2.4"/><path d="M13.8 14.2v2.4"/>',
+  safe:
+    '<rect x="5" y="4.5" width="14" height="15" rx="2.2"/><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5v5"/><path d="M9.5 12H14.5"/>',
   pin:
     '<path d="M12 20s5-4.7 5-9a5 5 0 1 0-10 0c0 4.3 5 9 5 9z"/><circle cx="12" cy="11" r="1.8"/>',
   user:
     '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
 };
 
+const dom = {
+  appName: document.querySelector("#app-name"),
+  subtitle: document.querySelector("#hero-subtitle"),
+  address: document.querySelector("#footer-address"),
+  license: document.querySelector("#footer-license"),
+  mainMenu: document.querySelector("#main-menu"),
+  sheet: document.querySelector("#section-sheet"),
+  sheetBackdrop: document.querySelector("#sheet-backdrop"),
+  sheetClose: document.querySelector("#sheet-close"),
+  sheetIcon: document.querySelector("#sheet-icon"),
+  sheetBrand: document.querySelector("#sheet-brand"),
+  sheetTitle: document.querySelector("#sheet-title"),
+  sheetLead: document.querySelector("#sheet-lead"),
+  sheetContent: document.querySelector("#sheet-content"),
+};
+
+let template = null;
+let activeSectionId = null;
+
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
 }
 
-function renderMenu(items) {
-  return items
+function renderMenu(sections) {
+  return sections
     .map(
-      (item) => `
-        <article class="menu-row is-static">
-          <div class="menu-icon">${renderIcon(item.icon)}</div>
-          <div class="menu-copy">
-            <strong>${item.title}</strong>
-          </div>
+      (section) => `
+        <button class="menu-row" type="button" data-section-id="${section.id}">
+          <span class="menu-icon">${renderIcon(section.icon)}</span>
+          <span class="menu-copy">
+            <strong>${section.menuTitle}</strong>
+          </span>
           <span class="menu-chevron" aria-hidden="true">›</span>
-        </article>
+        </button>
       `,
     )
     .join("");
 }
 
-document.querySelector("#app-name").textContent = appContent.appName;
-document.querySelector("#hero-subtitle").textContent = appContent.hero.subtitle;
-document.querySelector("#footer-address").textContent = appContent.hero.address;
-document.querySelector("#footer-license").textContent = appContent.hero.license;
-document.querySelector("#main-menu").innerHTML = renderMenu(appContent.menu);
+function renderSectionItems(items) {
+  return items
+    .map((item, index) => {
+      if (typeof item === "string") {
+        return `
+          <article class="sheet-card">
+            <span class="sheet-card-index">${String(index + 1).padStart(2, "0")}</span>
+            <p>${item}</p>
+          </article>
+        `;
+      }
+
+      return `
+        <article class="sheet-card sheet-card-link">
+          <span class="sheet-card-index">${String(index + 1).padStart(2, "0")}</span>
+          <div class="sheet-card-copy">
+            <strong>${item.title ?? ""}</strong>
+            <p>${item.body ?? ""}</p>
+            ${item.href ? `<a class="sheet-link" href="${item.href}">${item.label || item.href}</a>` : ""}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function openSection(sectionId) {
+  const section = template.sections.find((item) => item.id === sectionId);
+  if (!section) return;
+
+  activeSectionId = section.id;
+  dom.sheetIcon.innerHTML = renderIcon(section.icon);
+  dom.sheetBrand.textContent = template.appName;
+  dom.sheetTitle.textContent = section.sectionTitle;
+  dom.sheetLead.textContent = section.lead;
+  dom.sheetContent.innerHTML = renderSectionItems(section.items);
+
+  dom.sheet.classList.remove("hidden");
+  dom.sheet.setAttribute("aria-hidden", "false");
+  document.body.classList.add("sheet-open");
+}
+
+function closeSection() {
+  activeSectionId = null;
+  dom.sheet.classList.add("hidden");
+  dom.sheet.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("sheet-open");
+}
+
+function bindMenu() {
+  dom.mainMenu.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-section-id]");
+    if (!trigger) return;
+    openSection(trigger.dataset.sectionId);
+  });
+}
+
+function bindSheet() {
+  dom.sheetBackdrop.addEventListener("click", closeSection);
+  dom.sheetClose.addEventListener("click", closeSection);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && activeSectionId) {
+      closeSection();
+    }
+  });
+}
+
+function preventCopy() {
+  ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((eventName) => {
+    document.addEventListener(eventName, (event) => {
+      event.preventDefault();
+    });
+  });
+}
+
+function render() {
+  dom.appName.textContent = template.appName;
+  dom.subtitle.textContent = template.subtitle;
+  dom.address.textContent = template.address;
+  dom.license.textContent = template.license;
+  dom.mainMenu.innerHTML = renderMenu(template.sections);
+}
+
+async function init() {
+  template = await loadTemplate();
+  render();
+  bindMenu();
+  bindSheet();
+  preventCopy();
+}
+
+init();
