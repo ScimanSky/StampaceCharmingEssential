@@ -1,4 +1,5 @@
-import { fetchRemoteTemplateEnvelope, loadTemplate } from "./content.js";
+import { fetchRemoteTemplateEnvelope, loadTemplate, normalizeTemplate } from "./content.js";
+import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
   shield:
@@ -35,8 +36,8 @@ const dom = {
 
 let template = null;
 let activeSectionId = null;
-let remoteTemplateSha = null;
-let syncIntervalId = null;
+let remoteTemplateUpdatedAt = null;
+let unsubscribeRealtime = null;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -149,8 +150,8 @@ function render() {
 async function syncRemoteTemplate() {
   try {
     const remote = await fetchRemoteTemplateEnvelope();
-    if (remote.sha === remoteTemplateSha) return;
-    remoteTemplateSha = remote.sha;
+    if (remote.updatedAt && remote.updatedAt === remoteTemplateUpdatedAt) return;
+    remoteTemplateUpdatedAt = remote.updatedAt ?? null;
     template = remote.template;
     render();
   } catch {
@@ -159,8 +160,6 @@ async function syncRemoteTemplate() {
 }
 
 function startLiveSync() {
-  syncIntervalId = window.setInterval(syncRemoteTemplate, 45000);
-
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) {
       syncRemoteTemplate();
@@ -168,16 +167,24 @@ function startLiveSync() {
   });
 
   window.addEventListener("focus", syncRemoteTemplate);
+
+  unsubscribeRealtime = subscribeToRemoteTemplate((row) => {
+    remoteTemplateUpdatedAt = row.updated_at ?? null;
+    if (row.content) {
+      template = normalizeTemplate(row.content);
+      render();
+    }
+  });
 }
 
 async function init() {
   template = await loadTemplate();
   try {
     const remote = await fetchRemoteTemplateEnvelope();
-    remoteTemplateSha = remote.sha;
+    remoteTemplateUpdatedAt = remote.updatedAt ?? null;
     template = remote.template;
   } catch {
-    remoteTemplateSha = null;
+    remoteTemplateUpdatedAt = null;
   }
   render();
   bindMenu();

@@ -1,0 +1,180 @@
+begin;
+
+create table if not exists public.app_templates (
+  id text primary key,
+  content jsonb not null,
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = timezone('utc', now());
+  return new;
+end;
+$$;
+
+drop trigger if exists touch_app_templates_updated_at on public.app_templates;
+create trigger touch_app_templates_updated_at
+before update on public.app_templates
+for each row
+execute function public.touch_updated_at();
+
+alter table public.app_templates enable row level security;
+
+drop policy if exists "public can read live template" on public.app_templates;
+create policy "public can read live template"
+on public.app_templates
+for select
+to anon, authenticated
+using (id = 'live');
+
+drop policy if exists "host can insert live template" on public.app_templates;
+create policy "host can insert live template"
+on public.app_templates
+for insert
+to authenticated
+with check (
+  id = 'live'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+drop policy if exists "host can update live template" on public.app_templates;
+create policy "host can update live template"
+on public.app_templates
+for update
+to authenticated
+using (
+  id = 'live'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+)
+with check (
+  id = 'live'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+insert into public.app_templates (id, content)
+values (
+  'live',
+  $${
+    "appName": "Stampace Charming",
+    "subtitle": "Luxury apartment",
+    "address": "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
+    "license": "CIN: IT092009C2000R8066",
+    "sections": [
+      {
+        "id": "checkin",
+        "icon": "shield",
+        "menuTitle": "Check-in & Check-out",
+        "sectionTitle": "Check-in & Check-out",
+        "lead": "Tutte le informazioni essenziali per arrivare, entrare in appartamento e lasciare la struttura in modo semplice.",
+        "items": [
+          "Check-in: inserire qui l'orario di arrivo consentito e le eventuali istruzioni per il self check-in o per l'incontro con l'host.",
+          "Prima dell'arrivo: chiedere all'ospite di comunicare l'orario indicativo di arrivo con un po' di anticipo, così da organizzare al meglio l'accoglienza.",
+          "Accesso alla struttura: inserire qui il percorso corretto, eventuali riferimenti utili e dove recuperare chiavi o codici.",
+          "Check-out: inserire qui l'orario entro cui lasciare l'appartamento e indicare se le chiavi devono essere lasciate in casa, in cassetta o consegnate all'host.",
+          "Prima di partire: ricordare agli ospiti di spegnere luci e climatizzazione, chiudere porte e finestre e verificare di non aver dimenticato effetti personali."
+        ]
+      },
+      {
+        "id": "rules",
+        "icon": "spark",
+        "menuTitle": "Regole della casa",
+        "sectionTitle": "Regole della casa",
+        "lead": "Poche regole chiare per rendere il soggiorno semplice e piacevole.",
+        "items": [
+          "Aggiungere qui le regole principali della struttura.",
+          "Specificare se è consentito fumare o meno.",
+          "Inserire eventuali indicazioni su rumore, rifiuti e uso degli spazi."
+        ]
+      },
+      {
+        "id": "wifi",
+        "icon": "wifi",
+        "menuTitle": "Wi-Fi",
+        "sectionTitle": "Wi-Fi",
+        "lead": "Rete, password e suggerimenti rapidi per connettersi.",
+        "items": [
+          "Nome rete: da inserire",
+          "Password: da inserire",
+          "Se hai problemi di connessione, contatta l'host."
+        ]
+      },
+      {
+        "id": "access",
+        "icon": "key",
+        "menuTitle": "Porta e codici",
+        "sectionTitle": "Porta e codici",
+        "lead": "Codici, apertura porta e accessi utili durante il soggiorno.",
+        "items": [
+          "Inserire il codice del portone o della cassetta chiavi.",
+          "Aggiungere eventuali istruzioni per serrature smart o tastiere.",
+          "Specificare cosa fare in caso di smarrimento o blocco."
+        ]
+      },
+      {
+        "id": "safe",
+        "icon": "safe",
+        "menuTitle": "Cassaforte",
+        "sectionTitle": "Cassaforte",
+        "lead": "Istruzioni semplici per uso, apertura e chiusura della cassaforte.",
+        "items": [
+          "Inserire dove si trova la cassaforte all'interno dell'appartamento.",
+          "Aggiungere qui la procedura corretta per apertura e chiusura.",
+          "Specificare cosa fare in caso di blocco o difficoltà."
+        ]
+      },
+      {
+        "id": "around",
+        "icon": "pin",
+        "menuTitle": "Dintorni",
+        "sectionTitle": "Dintorni",
+        "lead": "Luoghi utili e riferimenti vicini alla struttura.",
+        "items": [
+          "Aggiungere supermercato, farmacia e parcheggio più vicini.",
+          "Inserire 2 o 3 consigli affidabili su bar o ristoranti.",
+          "Aggiungere eventuali indicazioni per spiagge o mezzi pubblici."
+        ]
+      },
+      {
+        "id": "host",
+        "icon": "user",
+        "menuTitle": "Host",
+        "sectionTitle": "Host",
+        "lead": "Contatti rapidi e riferimenti utili dell'host.",
+        "items": [
+          "Nome host: da inserire",
+          "Telefono / WhatsApp: da inserire",
+          "Email: da inserire",
+          {
+            "title": "Privato",
+            "body": "Apri l'editor riservato all'host per modificare il template dell'app.",
+            "label": "Apri editor host",
+            "href": "./host.html"
+          }
+        ]
+      }
+    ]
+  }$$::jsonb
+)
+on conflict (id) do update
+set content = excluded.content,
+    updated_at = timezone('utc', now());
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'app_templates'
+  ) then
+    alter publication supabase_realtime add table public.app_templates;
+  end if;
+end;
+$$;
+
+commit;

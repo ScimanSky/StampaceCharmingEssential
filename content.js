@@ -1,10 +1,6 @@
+import { fetchRemoteTemplateRow } from "./supabase.js";
+
 export const STORAGE_KEY = "stampace_essential_template_v1";
-export const GITHUB_TOKEN_KEY = "stampace_essential_github_token_v1";
-export const GITHUB_REPO_OWNER = "ScimanSky";
-export const GITHUB_REPO_NAME = "StampaceCharmingEssential";
-export const GITHUB_REPO_BRANCH = "main";
-export const TEMPLATE_FILE_PATH = "template.json";
-export const REMOTE_TEMPLATE_API = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/contents/${TEMPLATE_FILE_PATH}?ref=${GITHUB_REPO_BRANCH}`;
 
 export const defaultTemplate = {
   appName: "Stampace Charming",
@@ -171,40 +167,11 @@ export async function fetchTemplateFile() {
   return normalizeTemplate(await response.json());
 }
 
-function decodeBase64Utf8(value) {
-  return decodeURIComponent(
-    Array.from(window.atob(value))
-      .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, "0")}`)
-      .join(""),
-  );
-}
-
-function encodeBase64Utf8(value) {
-  return window.btoa(
-    encodeURIComponent(value).replace(/%([0-9A-F]{2})/g, (_, hex) =>
-      String.fromCharCode(Number.parseInt(hex, 16)),
-    ),
-  );
-}
-
 export async function fetchRemoteTemplateEnvelope() {
-  const response = await fetch(REMOTE_TEMPLATE_API, {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`Remote template load failed: ${response.status}`);
-  }
-
-  const payload = await response.json();
-  const content = decodeBase64Utf8(payload.content.replace(/\n/g, ""));
-
+  const row = await fetchRemoteTemplateRow();
   return {
-    sha: payload.sha,
-    template: normalizeTemplate(JSON.parse(content)),
+    updatedAt: row.updated_at,
+    template: normalizeTemplate(row.content),
   };
 }
 
@@ -243,47 +210,4 @@ export function saveTemplate(template) {
 
 export function clearTemplate() {
   window.localStorage.removeItem(STORAGE_KEY);
-}
-
-export function loadGithubToken() {
-  return window.localStorage.getItem(GITHUB_TOKEN_KEY) ?? "";
-}
-
-export function saveGithubToken(token) {
-  const cleaned = typeof token === "string" ? token.trim() : "";
-  if (!cleaned) {
-    window.localStorage.removeItem(GITHUB_TOKEN_KEY);
-    return "";
-  }
-  window.localStorage.setItem(GITHUB_TOKEN_KEY, cleaned);
-  return cleaned;
-}
-
-export async function publishTemplateToGithub(template, token, sha) {
-  const normalized = normalizeTemplate(template);
-  const response = await fetch(REMOTE_TEMPLATE_API, {
-    method: "PUT",
-    headers: {
-      Accept: "application/vnd.github+json",
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      message: `Update live template ${new Date().toISOString()}`,
-      content: encodeBase64Utf8(JSON.stringify(normalized, null, 2)),
-      branch: GITHUB_REPO_BRANCH,
-      sha,
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Remote publish failed: ${response.status} ${errorText}`);
-  }
-
-  const payload = await response.json();
-  return {
-    template: normalized,
-    sha: payload.content?.sha ?? sha,
-  };
 }

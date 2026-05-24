@@ -1,16 +1,10 @@
+import { clearTemplate, defaultTemplate, loadTemplate, normalizeTemplate, saveTemplate } from "./content.js";
 import {
-  clearTemplate,
-  defaultTemplate,
-  fetchRemoteTemplateEnvelope,
-  GITHUB_REPO_NAME,
-  GITHUB_REPO_OWNER,
-  loadGithubToken,
-  loadTemplate,
-  normalizeTemplate,
-  publishTemplateToGithub,
-  saveGithubToken,
-  saveTemplate,
-} from "./content.js";
+  fetchRemoteTemplateRow,
+  getHostSupabase,
+  HOST_EMAIL,
+  publishRemoteTemplate,
+} from "./supabase.js";
 
 const iconPaths = {
   shield:
@@ -29,24 +23,35 @@ const iconPaths = {
     '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
 };
 
+const AUTO_PUBLISH_DELAY = 900;
+
 const dom = {
+  gate: document.querySelector("#host-gate"),
+  app: document.querySelector("#host-app"),
+  email: document.querySelector("#host-email"),
+  password: document.querySelector("#host-password"),
+  login: document.querySelector("#host-login"),
+  logout: document.querySelector("#host-logout"),
   status: document.querySelector("#host-status"),
   save: document.querySelector("#host-save"),
   reset: document.querySelector("#host-reset"),
   export: document.querySelector("#host-export"),
   import: document.querySelector("#host-import"),
   publish: document.querySelector("#host-publish"),
-  tokenSave: document.querySelector("#host-token-save"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
   address: document.querySelector("#field-address"),
   license: document.querySelector("#field-license"),
-  githubToken: document.querySelector("#field-github-token"),
   sections: document.querySelector("#host-sections"),
 };
 
+const supabase = getHostSupabase();
+
 let state = null;
-let remoteSha = null;
+let session = null;
+let latestRemoteUpdatedAt = null;
+let autoPublishTimer = null;
+let authBound = false;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -124,7 +129,6 @@ function syncFields() {
   dom.subtitle.value = state.subtitle;
   dom.address.value = state.address;
   dom.license.value = state.license;
-  dom.githubToken.value = loadGithubToken();
   renderSectionEditors();
 }
 
@@ -152,10 +156,20 @@ function collectTemplate() {
   });
 }
 
+function isAuthorizedSession(nextSession) {
+  const email = nextSession?.user?.email?.toLowerCase();
+  return Boolean(nextSession && email === HOST_EMAIL.toLowerCase());
+}
+
+function updateAccessState() {
+  const allowed = isAuthorizedSession(session);
+  dom.gate.classList.toggle("hidden", allowed);
+  dom.app.classList.toggle("hidden", !allowed);
+}
+
 function saveCurrentTemplate() {
   state = saveTemplate(collectTemplate());
-  syncFields();
-  setStatus("Template locale salvato su questo browser.", "success");
+  setStatus("Bozza locale salvata su questo browser.", "success");
 }
 
 function downloadTemplate() {
@@ -169,23 +183,58 @@ function downloadTemplate() {
   setStatus("template.json esportato.", "success");
 }
 
-function restoreDefaultTemplate() {
+async function publishNow({ silent = false } = {}) {
+  if (!isAuthorizedSession(session)) {
+    setStatus("Accedi come host per pubblicare live.", "error");
+    return;
+  }
+
+  state = saveTemplate(collectTemplate());
+  if (!silent) {
+    setStatus("Pubblicazione live in corso...", "");
+  }
+
+  try {
+    const published = await publishRemoteTemplate(state, supabase);
+    latestRemoteUpdatedAt = published.updated_at ?? null;
+    if (!silent) {
+      setStatus("Template pubblicato live. L'app ospiti si aggiorna in remoto.", "success");
+    } else {
+      setStatus("Modifiche sincronizzate live.", "success");
+    }
+  } catch {
+    setStatus("Pubblicazione live fallita. Verifica accesso host e setup Supabase.", "error");
+  }
+}
+
+function queueAutoPublish() {
+  if (!isAuthorizedSession(session)) return;
+  window.clearTimeout(autoPublishTimer);
+  setStatus("Modifica rilevata. Sincronizzazione live in corso...", "");
+  autoPublishTimer = window.setTimeout(() => {
+    publishNow({ silent: true });
+  }, AUTO_PUBLISH_DELAY);
+}
+
+async function restoreDefaultTemplate() {
   clearTemplate();
   state = normalizeTemplate(defaultTemplate);
   syncFields();
-  setStatus("Template locale ripristinato ai valori di default.", "success");
+  setStatus("Template ripristinato ai valori di default.", "success");
+  await publishNow({ silent: true });
 }
 
-function importTemplate(file) {
+async function importTemplate(file) {
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try {
       const parsed = JSON.parse(reader.result);
       state = saveTemplate(parsed);
       syncFields();
       setStatus("Template importato correttamente.", "success");
+      await publishNow({ silent: true });
     } catch {
       setStatus("Il file JSON non è valido.", "error");
     }
@@ -193,66 +242,98 @@ function importTemplate(file) {
   reader.readAsText(file);
 }
 
-function saveTokenLocally() {
-  saveGithubToken(dom.githubToken.value);
-  dom.githubToken.value = loadGithubToken();
-  setStatus("Token GitHub memorizzato solo su questo browser host.", "success");
-}
-
-async function publishLiveTemplate() {
-  const token = saveGithubToken(dom.githubToken.value);
-  if (!token) {
-    setStatus("Inserisci prima un GitHub token valido.", "error");
+async function login() {
+  const password = dom.password.value.trim();
+  if (!password) {
+    setStatus("Inserisci la password host.", "error");
     return;
   }
 
-  state = saveTemplate(collectTemplate());
-  setStatus(`Pubblicazione live in corso su ${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}...`);
+  setStatus("Accesso host in corso...", "");
+  const { error } = await supabase.auth.signInWithPassword({
+    email: HOST_EMAIL,
+    password,
+  });
 
-  try {
-    if (!remoteSha) {
-      const remote = await fetchRemoteTemplateEnvelope();
-      remoteSha = remote.sha;
-    }
-
-    const published = await publishTemplateToGithub(state, token, remoteSha);
-    remoteSha = published.sha;
-    state = published.template;
-    syncFields();
-    setStatus(
-      "Template pubblicato live. L'app ospiti si aggiorna in remoto entro pochi secondi o al prossimo refresh.",
-      "success",
-    );
-  } catch (error) {
-    setStatus(
-      "Pubblicazione live fallita. Verifica token, permessi sul repo e presenza di modifiche concorrenti.",
-      "error",
-    );
+  if (error) {
+    setStatus("Accesso fallito. Verifica la password host in Supabase Auth.", "error");
+    return;
   }
+
+  dom.password.value = "";
+  setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
 }
 
-function bindEvents() {
+async function logout() {
+  window.clearTimeout(autoPublishTimer);
+  await supabase.auth.signOut();
+  session = null;
+  updateAccessState();
+  setStatus("Sessione host chiusa.", "success");
+}
+
+function bindEditorEvents() {
   dom.save.addEventListener("click", saveCurrentTemplate);
   dom.export.addEventListener("click", downloadTemplate);
   dom.reset.addEventListener("click", restoreDefaultTemplate);
-  dom.publish.addEventListener("click", publishLiveTemplate);
-  dom.tokenSave.addEventListener("click", saveTokenLocally);
+  dom.publish.addEventListener("click", () => publishNow({ silent: false }));
+  dom.logout.addEventListener("click", logout);
   dom.import.addEventListener("change", (event) => {
     importTemplate(event.target.files?.[0]);
     event.target.value = "";
   });
+
+  dom.app.addEventListener("input", (event) => {
+    if (!event.target.matches("input, textarea")) return;
+    queueAutoPublish();
+  });
+}
+
+function bindAuthEvents() {
+  if (authBound) return;
+  authBound = true;
+
+  dom.login.addEventListener("click", login);
+  dom.password.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      login();
+    }
+  });
+  supabase.auth.onAuthStateChange((_event, nextSession) => {
+    session = nextSession;
+    updateAccessState();
+    if (isAuthorizedSession(session)) {
+      setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+    }
+  });
 }
 
 async function init() {
+  dom.email.value = HOST_EMAIL;
+
   state = await loadTemplate({ preferLocal: true });
+
   try {
-    const remote = await fetchRemoteTemplateEnvelope();
-    remoteSha = remote.sha;
+    const remote = await fetchRemoteTemplateRow(supabase);
+    latestRemoteUpdatedAt = remote.updated_at ?? null;
+    if (remote.content) {
+      state = normalizeTemplate(remote.content);
+    }
   } catch {
-    remoteSha = null;
+    latestRemoteUpdatedAt = null;
   }
+
+  const { data } = await supabase.auth.getSession();
+  session = data.session;
+  updateAccessState();
   syncFields();
-  bindEvents();
+  bindAuthEvents();
+  bindEditorEvents();
+
+  if (isAuthorizedSession(session)) {
+    setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+  }
 }
 
 init();
