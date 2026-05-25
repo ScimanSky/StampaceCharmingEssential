@@ -1,7 +1,10 @@
 import {
+  AVAILABLE_LANGUAGES,
   clearTemplate,
   defaultTemplate,
+  FIXED_LOCALE,
   HOST_PRIVATE_ITEM,
+  MAX_OPTIONAL_LOCALES,
   isImageItem,
   isHostPrivateItem,
   loadTemplate,
@@ -53,6 +56,8 @@ const dom = {
   export: document.querySelector("#host-export"),
   import: document.querySelector("#host-import"),
   publish: document.querySelector("#host-publish"),
+  editorLocale: document.querySelector("#field-editor-locale"),
+  enabledLocales: document.querySelector("#field-enabled-locales"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
   address: document.querySelector("#field-address"),
@@ -70,9 +75,35 @@ let authBound = false;
 let editorBound = false;
 let editorReady = false;
 let editorLoading = false;
+let selectedEditorLocale = FIXED_LOCALE;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function currentLocaleState() {
+  return state.locales[selectedEditorLocale] ?? state.locales[FIXED_LOCALE];
+}
+
+function renderLanguageOptions() {
+  const activeSet = new Set(state.enabledLocales);
+  const optionalCount = state.enabledLocales.filter((code) => code !== FIXED_LOCALE).length;
+
+  dom.enabledLocales.innerHTML = AVAILABLE_LANGUAGES.map((language) => {
+    const checked = activeSet.has(language.code);
+    const disabled = language.fixed || (!checked && optionalCount >= MAX_OPTIONAL_LOCALES);
+
+    return `
+      <label class="host-language-option${language.fixed ? " is-fixed" : ""}">
+        <input type="checkbox" data-locale-toggle value="${language.code}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""} />
+        <span class="host-language-flag" aria-hidden="true">${language.flag}</span>
+        <span class="host-language-copy">
+          <strong>${language.label}</strong>
+          <span>${language.nativeLabel}</span>
+        </span>
+      </label>
+    `;
+  }).join("");
 }
 
 function setStatus(message, variant = "") {
@@ -163,7 +194,12 @@ function renderSectionImages(section) {
 }
 
 function renderSectionEditors() {
-  dom.sections.innerHTML = state.sections
+  const localeState = currentLocaleState();
+  const localeHostPrivateItem = localeState.sections
+    .find((section) => section.id === "host")
+    ?.items.find(isHostPrivateItem) ?? HOST_PRIVATE_ITEM;
+
+  dom.sections.innerHTML = localeState.sections
     .map(
       (section) => `
         <section class="host-section-card" data-section-id="${section.id}">
@@ -209,7 +245,7 @@ function renderSectionEditors() {
           </div>
           ${
             section.id === "host"
-              ? `<p class="host-lock-note">La voce "${HOST_PRIVATE_ITEM.title}" viene reinserita automaticamente e non può essere eliminata.</p>`
+              ? `<p class="host-lock-note">La voce "${localeHostPrivateItem.title}" viene reinserita automaticamente e non può essere eliminata.</p>`
               : ""
           }
         </section>
@@ -219,18 +255,24 @@ function renderSectionEditors() {
 }
 
 function syncFields() {
+  const localeState = currentLocaleState();
   dom.appName.value = state.appName;
-  dom.subtitle.value = state.subtitle;
   dom.address.value = state.address;
   dom.license.value = state.license;
+  dom.subtitle.value = localeState.subtitle;
+  dom.editorLocale.innerHTML = AVAILABLE_LANGUAGES.map(
+    (language) => `<option value="${language.code}" ${language.code === selectedEditorLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
+  ).join("");
+  renderLanguageOptions();
   renderSectionEditors();
 }
 
 function collectTemplate() {
+  const next = JSON.parse(JSON.stringify(state));
   const sectionCards = [...dom.sections.querySelectorAll("[data-section-id]")];
   const sections = sectionCards.map((card) => {
     const id = card.dataset.sectionId;
-    const base = state.sections.find((section) => section.id === id);
+    const base = currentLocaleState().sections.find((section) => section.id === id);
     const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
       type: "image",
       path: item.dataset.imagePath || "",
@@ -248,13 +290,37 @@ function collectTemplate() {
     };
   });
 
-  return normalizeTemplate({
-    appName: dom.appName.value,
+  const optionalEnabled = [...dom.enabledLocales.querySelectorAll('[data-locale-toggle]:checked')]
+    .map((input) => input.value)
+    .filter((code) => code !== FIXED_LOCALE)
+    .slice(0, MAX_OPTIONAL_LOCALES);
+
+  next.appName = dom.appName.value;
+  next.address = dom.address.value;
+  next.license = dom.license.value;
+  next.enabledLocales = [FIXED_LOCALE, ...optionalEnabled];
+  next.locales[selectedEditorLocale] = {
+    ...next.locales[selectedEditorLocale],
     subtitle: dom.subtitle.value,
-    address: dom.address.value,
-    license: dom.license.value,
     sections,
-  });
+  };
+
+  return normalizeTemplate(next);
+}
+
+function switchEditorLocale(nextLocale) {
+  if (!AVAILABLE_LANGUAGES.some((language) => language.code === nextLocale)) return;
+
+  state = saveTemplate(collectTemplate());
+  selectedEditorLocale = nextLocale;
+  syncFields();
+  setStatus(`Ora stai modificando la lingua ${nextLocale.toUpperCase()}.`, "success");
+}
+
+function updateEnabledLocales() {
+  state = saveTemplate(collectTemplate());
+  syncFields();
+  queueAutoPublish();
 }
 
 function isAuthorizedSession(nextSession) {
@@ -393,7 +459,7 @@ async function handleImageUpload(sectionId, file) {
 
   try {
     const uploaded = await uploadSectionImage(file, sectionId, supabase);
-    const section = state.sections.find((item) => item.id === sectionId);
+    const section = currentLocaleState().sections.find((item) => item.id === sectionId);
     if (!section) return;
 
     section.items.push({
@@ -415,7 +481,7 @@ async function handleImageUpload(sectionId, file) {
 
 async function removeImage(sectionId, imageIndex) {
   state = collectTemplate();
-  const section = state.sections.find((item) => item.id === sectionId);
+  const section = currentLocaleState().sections.find((item) => item.id === sectionId);
   if (!section) return;
   const imageItems = section.items.filter(isImageItem);
   const target = imageItems[imageIndex];
@@ -485,6 +551,15 @@ function bindEditorEvents() {
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
     queueAutoPublish();
+  });
+
+  dom.editorLocale.addEventListener("change", (event) => {
+    switchEditorLocale(event.target.value);
+  });
+
+  dom.enabledLocales.addEventListener("change", (event) => {
+    if (!event.target.matches('[data-locale-toggle]')) return;
+    updateEnabledLocales();
   });
 
   dom.sections.addEventListener("change", (event) => {

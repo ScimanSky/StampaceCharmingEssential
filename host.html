@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./host.css?v=20260525f" />
+    <link rel="stylesheet" href="./host.css?v=20260526a" />
   </head>
   <body>
     <main class="host-shell">
@@ -59,12 +59,21 @@
         <section class="host-card">
           <h2>Dati generali</h2>
           <div class="host-grid">
+            <label class="host-grid-wide">
+              <span>Lingua in modifica</span>
+              <select id="field-editor-locale"></select>
+            </label>
+            <div class="host-grid-wide host-language-card">
+              <span>Lingue visibili nell'app ospiti</span>
+              <p class="host-language-note">Italiano sempre attivo. Puoi selezionare al massimo 2 lingue extra.</p>
+              <div class="host-language-options" id="field-enabled-locales"></div>
+            </div>
             <label>
               <span>Nome struttura</span>
               <input id="field-app-name" type="text" />
             </label>
             <label>
-              <span>Sottotitolo</span>
+              <span>Sottotitolo della lingua selezionata</span>
               <input id="field-subtitle" type="text" />
             </label>
             <label class="host-grid-wide">
@@ -82,6 +91,6 @@
       </section>
     </main>
 
-    <script type="module" src="./host.js?v=20260525f"></script>
+    <script type="module" src="./host.js?v=20260526a"></script>
   </body>
 </html>

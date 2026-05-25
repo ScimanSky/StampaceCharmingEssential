@@ -35,6 +35,18 @@ textarea {
   max-width: 100%;
 }
 
+select {
+  font: inherit;
+  max-width: 100%;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.78rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 0.85rem 0.9rem;
+  outline: none;
+}
+
 .hidden {
   display: none !important;
 }
@@ -228,6 +240,70 @@ button,
   grid-column: 1 / -1;
 }
 
+.host-language-card {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.host-language-note {
+  margin: -0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.host-language-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.host-language-option {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.host-language-option.is-fixed {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.host-language-option input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.host-language-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.host-language-copy {
+  display: grid;
+  gap: 0.08rem;
+  min-width: 0;
+}
+
+.host-language-copy strong,
+.host-language-copy span {
+  overflow-wrap: anywhere;
+}
+
+.host-language-copy strong {
+  font-weight: 400;
+}
+
+.host-language-copy span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .host-sections {
   display: grid;
   gap: 0.95rem;
@@ -353,6 +429,10 @@ button,
   }
 
   .host-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .host-language-options {
     grid-template-columns: 1fr;
   }
 

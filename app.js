@@ -1,5 +1,8 @@
 import {
+  FIXED_LOCALE,
   fetchRemoteTemplateEnvelope,
+  getLocaleContent,
+  getVisibleLocales,
   isImageItem,
   loadTemplate,
   normalizeTemplate,
@@ -69,6 +72,7 @@ const iconPaths = {
 
 const dom = {
   appName: document.querySelector("#app-name"),
+  localeBar: document.querySelector("#locale-bar"),
   subtitle: document.querySelector("#hero-subtitle"),
   address: document.querySelector("#footer-address"),
   license: document.querySelector("#footer-license"),
@@ -88,9 +92,15 @@ let activeSectionId = null;
 let remoteTemplateUpdatedAt = null;
 let unsubscribeRealtime = null;
 const SHEET_HISTORY_KEY = "stampaceSectionId";
+const LOCALE_STORAGE_KEY = "stampace_essential_guest_locale";
+let currentLocale = FIXED_LOCALE;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function localeState() {
+  return getLocaleContent(template, currentLocale);
 }
 
 function getItemText(item) {
@@ -154,6 +164,25 @@ function renderMenu(sections) {
     .join("");
 }
 
+function renderLocaleBar() {
+  const visibleLocales = getVisibleLocales(template);
+  dom.localeBar.innerHTML = visibleLocales
+    .map(
+      (language) => `
+        <button
+          class="locale-chip${language.code === currentLocale ? " is-active" : ""}"
+          type="button"
+          data-locale-code="${language.code}"
+          aria-label="${language.label}"
+          title="${language.label}"
+        >
+          <span aria-hidden="true">${language.flag}</span>
+        </button>
+      `,
+    )
+    .join("");
+}
+
 function renderSectionItems(items, sectionId) {
   return items
     .map((item) => {
@@ -197,7 +226,7 @@ function renderSectionItems(items, sectionId) {
 }
 
 function renderOpenSection(sectionId) {
-  const section = template.sections.find((item) => item.id === sectionId);
+  const section = localeState().sections.find((item) => item.id === sectionId);
   if (!section) return;
 
   activeSectionId = section.id;
@@ -245,6 +274,16 @@ function bindMenu() {
   });
 }
 
+function bindLocaleBar() {
+  dom.localeBar.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-locale-code]");
+    if (!trigger) return;
+    currentLocale = trigger.dataset.localeCode;
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
+    render();
+  });
+}
+
 function bindSheet() {
   dom.sheetBackdrop.addEventListener("click", () => closeSection());
   dom.sheetClose.addEventListener("click", () => closeSection());
@@ -277,11 +316,13 @@ function preventCopy() {
 }
 
 function render() {
+  const localeTemplate = localeState();
   dom.appName.textContent = template.appName;
-  dom.subtitle.textContent = template.subtitle;
+  renderLocaleBar();
+  dom.subtitle.textContent = localeTemplate.subtitle;
   dom.address.textContent = template.address;
   dom.license.textContent = template.license;
-  dom.mainMenu.innerHTML = renderMenu(template.sections);
+  dom.mainMenu.innerHTML = renderMenu(localeTemplate.sections);
 
   if (activeSectionId) {
     renderOpenSection(activeSectionId);
@@ -294,6 +335,10 @@ async function syncRemoteTemplate() {
     if (remote.updatedAt && remote.updatedAt === remoteTemplateUpdatedAt) return;
     remoteTemplateUpdatedAt = remote.updatedAt ?? null;
     template = remote.template;
+    if (!template.enabledLocales.includes(currentLocale)) {
+      currentLocale = FIXED_LOCALE;
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
+    }
     render();
   } catch {
     // Keep the current rendered template if remote sync fails.
@@ -313,12 +358,17 @@ function startLiveSync() {
     remoteTemplateUpdatedAt = row.updated_at ?? null;
     if (row.content) {
       template = normalizeTemplate(row.content);
+      if (!template.enabledLocales.includes(currentLocale)) {
+        currentLocale = FIXED_LOCALE;
+        window.localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
+      }
       render();
     }
   });
 }
 
 async function init() {
+  currentLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY) || FIXED_LOCALE;
   template = await loadTemplate();
   try {
     const remote = await fetchRemoteTemplateEnvelope();
@@ -327,8 +377,12 @@ async function init() {
   } catch {
     remoteTemplateUpdatedAt = null;
   }
+  if (!template.enabledLocales.includes(currentLocale)) {
+    currentLocale = FIXED_LOCALE;
+  }
   render();
   bindMenu();
+  bindLocaleBar();
   bindSheet();
   preventCopy();
   startLiveSync();
