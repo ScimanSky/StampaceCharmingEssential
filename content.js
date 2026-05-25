@@ -640,6 +640,10 @@ export function getHostPrivateItem(localeCode = FIXED_LOCALE) {
   return HOST_PRIVATE_ITEMS[cleanLocaleCode(localeCode)] ?? HOST_PRIVATE_ITEMS[FIXED_LOCALE];
 }
 
+function itemsAreEquivalent(left = [], right = []) {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
 function normalizeEnabledLocales(values) {
   const requested = Array.isArray(values)
     ? values
@@ -752,6 +756,13 @@ function mirrorItalianContent(localeMap) {
           sections: italian.sections.map((section, index) => {
             const localizedSection = localized?.sections?.[index];
             const localizedDefaultSection = localizedDefaults.sections[index];
+            const localizedItems = Array.isArray(localizedSection?.items) ? localizedSection.items : [];
+            const fallbackItems = Array.isArray(localizedDefaultSection?.items) ? localizedDefaultSection.items : [];
+            const resolvedItems = localizedItems.length
+              ? itemsAreEquivalent(localizedItems, section.items)
+                ? fallbackItems.map(cloneItem)
+                : localizedItems.map(cloneItem)
+              : fallbackItems.map(cloneItem);
             return {
               id: section.id,
               icon: section.icon,
@@ -760,8 +771,8 @@ function mirrorItalianContent(localeMap) {
               lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),
               items:
                 section.id === "host"
-                  ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)
-                  : section.items.map(cloneItem),
+                  ? ensureHostPrivateItem(resolvedItems, language.code)
+                  : resolvedItems,
             };
           }),
         },

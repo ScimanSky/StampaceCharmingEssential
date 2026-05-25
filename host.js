@@ -3,6 +3,7 @@ import {
   clearTemplate,
   defaultTemplate,
   FIXED_LOCALE,
+  getHostPrivateItem,
   HOST_PRIVATE_ITEM,
   MAX_OPTIONAL_LOCALES,
   REQUIRED_LOCALES,
@@ -11,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260527d";
+} from "./content.js?v=20260527e";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -77,9 +78,198 @@ let editorBound = false;
 let editorReady = false;
 let editorLoading = false;
 let selectedEditorLocale = FIXED_LOCALE;
+const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
+const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
+const TRANSLATE_CHUNK_LIMIT = 2400;
+const translationCache = new Map();
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function translationKey(targetLocale, text) {
+  return `${targetLocale}::${text}`;
+}
+
+async function translateBatch(texts, targetLocale) {
+  if (!texts.length || targetLocale === FIXED_LOCALE) return texts;
+
+  const translated = [];
+  let currentChunk = [];
+  let currentSize = 0;
+
+  async function flushChunk() {
+    if (!currentChunk.length) return;
+    const joined = currentChunk.join(TRANSLATE_SEPARATOR);
+    const params = new URLSearchParams({
+      client: "gtx",
+      sl: FIXED_LOCALE,
+      tl: targetLocale,
+      dt: "t",
+      q: joined,
+    });
+    const response = await fetch(`${TRANSLATE_ENDPOINT}?${params.toString()}`);
+    if (!response.ok) {
+      throw new Error("Servizio di traduzione non disponibile.");
+    }
+    const payload = await response.json();
+    const translatedText = (payload[0] ?? []).map((part) => part[0] ?? "").join("");
+    const parts = translatedText.split(TRANSLATE_SEPARATOR);
+    if (parts.length !== currentChunk.length) {
+      throw new Error("Formato risposta traduzione non valido.");
+    }
+    translated.push(...parts);
+    currentChunk = [];
+    currentSize = 0;
+  }
+
+  for (const text of texts) {
+    const nextSize = currentSize + text.length + TRANSLATE_SEPARATOR.length;
+    if (currentChunk.length && nextSize > TRANSLATE_CHUNK_LIMIT) {
+      await flushChunk();
+    }
+    currentChunk.push(text);
+    currentSize += text.length + TRANSLATE_SEPARATOR.length;
+  }
+
+  await flushChunk();
+  return translated;
+}
+
+async function translateTexts(texts, targetLocale) {
+  const results = new Array(texts.length);
+  const missingTexts = [];
+  const missingIndexes = [];
+
+  texts.forEach((text, index) => {
+    if (!text || targetLocale === FIXED_LOCALE) {
+      results[index] = text;
+      return;
+    }
+    const key = translationKey(targetLocale, text);
+    if (translationCache.has(key)) {
+      results[index] = translationCache.get(key);
+      return;
+    }
+    missingTexts.push(text);
+    missingIndexes.push(index);
+  });
+
+  if (missingTexts.length) {
+    const translated = await translateBatch(missingTexts, targetLocale);
+    translated.forEach((value, idx) => {
+      const source = missingTexts[idx];
+      const index = missingIndexes[idx];
+      const key = translationKey(targetLocale, source);
+      translationCache.set(key, value);
+      results[index] = value;
+    });
+  }
+
+  return results;
+}
+
+async function buildTranslatedLocale(italianLocale, targetLocale) {
+  if (targetLocale === FIXED_LOCALE) {
+    return JSON.parse(JSON.stringify(italianLocale));
+  }
+
+  const draftLocale = {
+    subtitle: "",
+    sections: italianLocale.sections.map((section) => ({
+      id: section.id,
+      icon: section.icon,
+      menuTitle: "",
+      sectionTitle: "",
+      lead: "",
+      items: [],
+    })),
+  };
+
+  const texts = [];
+  const appliers = [];
+
+  texts.push(italianLocale.subtitle);
+  appliers.push((value) => {
+    draftLocale.subtitle = value;
+  });
+
+  italianLocale.sections.forEach((section, sectionIndex) => {
+    const targetSection = draftLocale.sections[sectionIndex];
+
+    texts.push(section.menuTitle);
+    appliers.push((value) => {
+      targetSection.menuTitle = value;
+    });
+
+    texts.push(section.sectionTitle);
+    appliers.push((value) => {
+      targetSection.sectionTitle = value;
+    });
+
+    texts.push(section.lead);
+    appliers.push((value) => {
+      targetSection.lead = value;
+    });
+
+    section.items.forEach((item) => {
+      if (isImageItem(item)) {
+        targetSection.items.push({ ...item });
+        return;
+      }
+
+      if (isHostPrivateItem(item)) {
+        targetSection.items.push({ ...getHostPrivateItem(targetLocale) });
+        return;
+      }
+
+      if (typeof item === "string") {
+        const nextIndex = targetSection.items.push("") - 1;
+        texts.push(item);
+        appliers.push((value) => {
+          targetSection.items[nextIndex] = value;
+        });
+        return;
+      }
+
+      const translatedItem = { ...item, title: "", body: "", label: "" };
+      const nextIndex = targetSection.items.push(translatedItem) - 1;
+
+      texts.push(item.title ?? "");
+      appliers.push((value) => {
+        targetSection.items[nextIndex].title = value;
+      });
+
+      texts.push(item.body ?? "");
+      appliers.push((value) => {
+        targetSection.items[nextIndex].body = value;
+      });
+
+      texts.push(item.label ?? "");
+      appliers.push((value) => {
+        targetSection.items[nextIndex].label = value;
+      });
+    });
+  });
+
+  const translatedTexts = await translateTexts(texts, targetLocale);
+  translatedTexts.forEach((value, index) => {
+    appliers[index](value);
+  });
+
+  return draftLocale;
+}
+
+async function buildPublishedTemplate(template) {
+  const next = JSON.parse(JSON.stringify(template));
+  const italianLocale = next.locales[FIXED_LOCALE];
+
+  for (const language of AVAILABLE_LANGUAGES) {
+    if (language.code === FIXED_LOCALE) continue;
+    next.locales[language.code] = await buildTranslatedLocale(italianLocale, language.code);
+  }
+
+  return normalizeTemplate(next);
 }
 
 function currentLocaleState() {
@@ -399,10 +589,12 @@ async function publishNow({ silent = false } = {}) {
 
   state = saveTemplate(collectTemplate());
   if (!silent) {
-    setStatus("Pubblicazione live in corso...", "");
+    setStatus("Traduzione e pubblicazione live in corso...", "");
   }
 
   try {
+    state = await buildPublishedTemplate(state);
+    saveTemplate(state);
     const published = await publishRemoteTemplate(state, supabase);
     latestRemoteUpdatedAt = published.updated_at ?? null;
     if (!silent) {
@@ -411,7 +603,7 @@ async function publishNow({ silent = false } = {}) {
       setStatus("Modifiche sincronizzate live.", "success");
     }
   } catch {
-    setStatus("Pubblicazione live fallita. Verifica accesso host e setup Supabase.", "error");
+    setStatus("Pubblicazione live fallita. Verifica accesso host, setup Supabase o traduzione online.", "error");
   }
 }
 
