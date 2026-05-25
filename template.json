@@ -6,7 +6,7 @@
   "sections": [
     {
       "id": "checkin",
-      "icon": "shield",
+      "icon": "checkin",
       "menuTitle": "Check-in & Check-out",
       "sectionTitle": "Check-in & Check-out",
       "lead": "Tutte le informazioni essenziali per arrivare, entrare in appartamento e lasciare la struttura in modo semplice.",
@@ -20,7 +20,7 @@
     },
     {
       "id": "rules",
-      "icon": "spark",
+      "icon": "notepad",
       "menuTitle": "Regole della casa",
       "sectionTitle": "Regole della casa",
       "lead": "Poche regole chiare per rendere il soggiorno semplice e piacevole.",
@@ -44,7 +44,7 @@
     },
     {
       "id": "access",
-      "icon": "key",
+      "icon": "keypad",
       "menuTitle": "Porta e codici",
       "sectionTitle": "Porta e codici",
       "lead": "Codici, apertura porta e accessi utili durante il soggiorno.",
@@ -56,7 +56,7 @@
     },
     {
       "id": "safe",
-      "icon": "safe",
+      "icon": "vault",
       "menuTitle": "Cassaforte",
       "sectionTitle": "Cassaforte",
       "lead": "Istruzioni semplici per uso, apertura e chiusura della cassaforte.",
@@ -68,7 +68,7 @@
     },
     {
       "id": "around",
-      "icon": "pin",
+      "icon": "binoculars",
       "menuTitle": "Dintorni",
       "sectionTitle": "Dintorni",
       "lead": "Luoghi utili e riferimenti vicini alla struttura.",
@@ -80,7 +80,7 @@
     },
     {
       "id": "host",
-      "icon": "user",
+      "icon": "avatar",
       "menuTitle": "Host",
       "sectionTitle": "Host",
       "lead": "Contatti rapidi e riferimenti utili dell'host.",

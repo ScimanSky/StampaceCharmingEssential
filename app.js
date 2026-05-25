@@ -68,6 +68,18 @@ const iconPaths = {
     '<rect x="4.8" y="6" width="14.4" height="12" rx="2"/><circle cx="9.3" cy="11" r="1.6"/><path d="M7.2 14.4c.7-1.1 1.5-1.6 2.1-1.6s1.4.5 2.1 1.6"/><path d="M13.6 10h3.1"/><path d="M13.6 13h3.1"/>',
   receipt:
     '<path d="M7 4.8h10v14.4l-1.4-.8-1.6.8-1.6-.8-1.6.8-1.6-.8-1.2.8z"/><path d="M9.3 8h5.4"/><path d="M9.3 11h5.4"/><path d="M9.3 14h3.2"/>',
+  checkin:
+    '<rect x="4.5" y="9.5" width="11" height="10" rx="1.8"/><path d="M8 9.5V7.2a2.5 2.5 0 0 1 5 0v2.3"/><path d="M4.5 13.5h11"/><circle cx="18" cy="6.5" r="3.2"/><path d="M18 4.8v1.7l1.3.9"/>',
+  notepad:
+    '<path d="M9.5 4H16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7.5L9.5 4z"/><path d="M9.5 4v3.5H6"/><path d="M9.5 10.5h5"/><path d="M9.5 13.5h5"/><path d="M9.5 16.5h3"/>',
+  keypad:
+    '<rect x="6" y="3.5" width="12" height="8.5" rx="1.5"/><circle cx="9" cy="5.8" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="5.8" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="5.8" r=".65" fill="currentColor" stroke="none"/><circle cx="9" cy="9" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="9" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r=".65" fill="currentColor" stroke="none"/><circle cx="8" cy="17" r="2.5"/><path d="M10.3 17H20"/><path d="M16 17v-2"/><path d="M18.5 17v-2"/>',
+  vault:
+    '<rect x="5" y="4.5" width="14" height="15" rx="2"/><circle cx="11.5" cy="12" r="3"/><path d="M11.5 9v6"/><path d="M8.5 12h6"/><path d="M19 9.5v5"/>',
+  binoculars:
+    '<circle cx="8" cy="14.5" r="3.5"/><circle cx="16" cy="14.5" r="3.5"/><path d="M11.5 14.5h1"/><path d="M8 11V7.5"/><path d="M16 11V7.5"/><path d="M6.5 7.5h3"/><path d="M14.5 7.5h3"/>',
+  avatar:
+    '<circle cx="12" cy="13" r="7"/><circle cx="9.8" cy="12.5" r=".7" fill="currentColor" stroke="none"/><circle cx="14.2" cy="12.5" r=".7" fill="currentColor" stroke="none"/><path d="M9.5 15.5a5 5 0 0 0 5 0"/><path d="M7.5 8.5c1.2-2 2.8-3 4.5-3s3.3 1 4.5 3"/>',
 };
 
 const dom = {
