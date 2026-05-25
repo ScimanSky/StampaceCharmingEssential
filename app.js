@@ -73,7 +73,7 @@ const iconPaths = {
   notepad:
     '<circle cx="6" cy="7.5" r="1.5"/><circle cx="6" cy="7.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M6 6h11.5A1.5 1.5 0 0 1 19 7.5v8.5"/><path d="M6 9h11.5"/><path d="M7.5 9v7.5"/><circle cx="18" cy="17.5" r="1.5"/><circle cx="18" cy="17.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M18 19H6.5A1.5 1.5 0 0 1 5 17.5v-8.5"/><path d="M18 16H6.5"/><path d="M9.5 10.5h6M9.5 12.2h6M9.5 13.9h4.5M9.5 15.6h2.5"/>',
   keypad:
-    '<circle cx="6.5" cy="15" r="2.5"/><circle cx="6.5" cy="15" r="0.8"/><path d="M9 15h11 M16 15v2.5 M18 15v2.5"/><path d="M11 5h2v2h-2zm3.5 0h2v2h-2zm3.5 0h2v2h-2zm-7 3h2v2h-2zm3.5 0h2v2h-2zm3.5 0h2v2h-2z"/>',
+    '<circle cx="6.5" cy="15" r="3"/><circle cx="6.5" cy="15" r="0.8"/><path d="M9.5 13.5h7.5l2.5 1.5-2.5 1.5h-1.5v1.5h-1.5v-1.5h-2v1.5h-1.5v-1.5h-1"/><rect x="11.5" y="5.5" width="2" height="2" rx="0.5"/><rect x="14.5" y="5.5" width="2" height="2" rx="0.5"/><rect x="17.5" y="5.5" width="2" height="2" rx="0.5"/><rect x="11.5" y="8.5" width="2" height="2" rx="0.5"/><rect x="14.5" y="8.5" width="2" height="2" rx="0.5"/><rect x="17.5" y="8.5" width="2" height="2" rx="0.5"/>',
   vault:
     '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="6.5" y="6.5" width="11" height="11" rx="1"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1"/><path d="M12 9v6 M9.5 12h5 M10.25 10.25l3.5 3.5 M10.25 13.75l3.5-3.5"/><path d="M4 8v2 M4 14v2"/>',
   binoculars:
