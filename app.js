@@ -161,7 +161,6 @@ function renderSectionItems(items, sectionId) {
       if (isImageItem(item)) {
         return `
           <article class="sheet-card sheet-card-media">
-            <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>
             <div class="sheet-card-media-body">
               <img class="sheet-image" src="${item.src}" alt="${item.alt ?? ""}" loading="lazy" />
               ${
