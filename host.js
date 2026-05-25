@@ -96,7 +96,9 @@ function renderLanguageOptions() {
     return `
       <label class="host-language-option${language.fixed ? " is-fixed" : ""}">
         <input type="checkbox" data-locale-toggle value="${language.code}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""} />
-        <span class="host-language-flag" aria-hidden="true">${language.flag}</span>
+        <span class="host-language-flag" aria-hidden="true">
+          <img src="${language.flagSrc}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+        </span>
         <span class="host-language-copy">
           <strong>${language.label}</strong>
           <span>${language.nativeLabel}</span>

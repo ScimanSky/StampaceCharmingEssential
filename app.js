@@ -176,7 +176,7 @@ function renderLocaleBar() {
           aria-label="${language.label}"
           title="${language.label}"
         >
-          <span aria-hidden="true">${language.flag}</span>
+          <img src="${language.flagSrc}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
         </button>
       `,
     )
