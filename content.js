@@ -619,7 +619,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "Cofre",
         sectionTitle: "Cofre",
         lead: "Instruções simples para usar, abrir e fechar o cofre.",
@@ -631,7 +631,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "Arredores",
         sectionTitle: "Arredores",
         lead: "Locais úteis e referências próximas do alojamento.",
@@ -643,7 +643,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "Anfitrião",
         sectionTitle: "Anfitrião",
         lead: "Contactos rápidos do anfitrião e referências úteis.",
@@ -661,7 +661,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
     sections: [
       {
         id: "checkin",
-        icon: "shield",
+        icon: "checkin",
         menuTitle: "Check-in i Check-out",
         sectionTitle: "Check-in i Check-out",
         lead: "Wszystkie najważniejsze informacje potrzebne do przyjazdu, wejścia do apartamentu i wyjazdu.",
@@ -675,7 +675,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "rules",
-        icon: "spark",
+        icon: "notepad",
         menuTitle: "Zasady domu",
         sectionTitle: "Zasady domu",
         lead: "Kilka jasnych zasad, aby pobyt był prosty i przyjemny.",
@@ -699,7 +699,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "access",
-        icon: "key",
+        icon: "keypad",
         menuTitle: "Drzwi i kody",
         sectionTitle: "Drzwi i kody",
         lead: "Kody, otwieranie drzwi i przydatne informacje o dostępie podczas pobytu.",
@@ -711,7 +711,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "Sejf",
         sectionTitle: "Sejf",
         lead: "Proste instrukcje dotyczące używania, otwierania i zamykania sejfu.",
@@ -723,7 +723,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "Okolica",
         sectionTitle: "Okolica",
         lead: "Przydatne miejsca i punkty orientacyjne w pobliżu obiektu.",
@@ -735,7 +735,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "Host",
         sectionTitle: "Host",
         lead: "Szybkie kontakty do gospodarza i przydatne informacje.",
@@ -753,7 +753,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
     sections: [
       {
         id: "checkin",
-        icon: "shield",
+        icon: "checkin",
         menuTitle: "Check-in a Check-out",
         sectionTitle: "Check-in a Check-out",
         lead: "Všechny důležité informace pro příjezd, vstup do apartmánu a odjezd.",
@@ -767,7 +767,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "rules",
-        icon: "spark",
+        icon: "notepad",
         menuTitle: "Pravidla domu",
         sectionTitle: "Pravidla domu",
         lead: "Několik jasných pravidel, aby byl pobyt jednoduchý a příjemný.",
@@ -791,7 +791,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "access",
-        icon: "key",
+        icon: "keypad",
         menuTitle: "Dveře a kódy",
         sectionTitle: "Dveře a kódy",
         lead: "Kódy, otevírání dveří a užitečné informace o přístupu během pobytu.",
@@ -803,7 +803,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "Trezor",
         sectionTitle: "Trezor",
         lead: "Jednoduché pokyny pro používání, otevření a zavření trezoru.",
@@ -815,7 +815,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "V okolí",
         sectionTitle: "V okolí",
         lead: "Užitečná místa a body v blízkosti ubytování.",
@@ -827,7 +827,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "Hostitel",
         sectionTitle: "Hostitel",
         lead: "Rychlé kontakty na hostitele a užitečné informace.",
@@ -845,7 +845,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
     sections: [
       {
         id: "checkin",
-        icon: "shield",
+        icon: "checkin",
         menuTitle: "Заезд и выезд",
         sectionTitle: "Заезд и выезд",
         lead: "Вся важная информация для прибытия, входа в апартаменты и выезда.",
@@ -859,7 +859,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "rules",
-        icon: "spark",
+        icon: "notepad",
         menuTitle: "Правила дома",
         sectionTitle: "Правила дома",
         lead: "Несколько понятных правил, чтобы проживание было простым и приятным.",
@@ -883,7 +883,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "access",
-        icon: "key",
+        icon: "keypad",
         menuTitle: "Дверь и коды",
         sectionTitle: "Дверь и коды",
         lead: "Коды, открытие двери и полезная информация о доступе во время проживания.",
@@ -895,7 +895,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "Сейф",
         sectionTitle: "Сейф",
         lead: "Простые инструкции по использованию, открытию и закрытию сейфа.",
@@ -907,7 +907,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "Рядом",
         sectionTitle: "Рядом",
         lead: "Полезные места и ориентиры рядом с объектом.",
@@ -919,7 +919,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "Хозяин",
         sectionTitle: "Хозяин",
         lead: "Быстрые контакты хозяина и полезная информация.",
@@ -937,7 +937,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
     sections: [
       {
         id: "checkin",
-        icon: "shield",
+        icon: "checkin",
         menuTitle: "入住与退房",
         sectionTitle: "入住与退房",
         lead: "关于到达、进入公寓和离开的所有重要信息。",
@@ -951,7 +951,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "rules",
-        icon: "spark",
+        icon: "notepad",
         menuTitle: "房屋规则",
         sectionTitle: "房屋规则",
         lead: "几条清晰的规则，让住宿更简单舒适。",
@@ -975,7 +975,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "access",
-        icon: "key",
+        icon: "keypad",
         menuTitle: "门禁与代码",
         sectionTitle: "门禁与代码",
         lead: "入住期间所需的代码、开门说明和有用的出入信息。",
@@ -987,7 +987,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "保险箱",
         sectionTitle: "保险箱",
         lead: "关于保险箱使用、开启和关闭的简单说明。",
@@ -999,7 +999,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "周边",
         sectionTitle: "周边",
         lead: "住宿附近的实用地点和参考信息。",
@@ -1011,7 +1011,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "房东",
         sectionTitle: "房东",
         lead: "房东的快速联系方式和有用信息。",
@@ -1029,7 +1029,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
     sections: [
       {
         id: "checkin",
-        icon: "shield",
+        icon: "checkin",
         menuTitle: "चेक-इन और चेक-आउट",
         sectionTitle: "चेक-इन और चेक-आउट",
         lead: "आगमन, अपार्टमेंट में प्रवेश और प्रस्थान के लिए सभी आवश्यक जानकारी।",
@@ -1043,7 +1043,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "rules",
-        icon: "spark",
+        icon: "notepad",
         menuTitle: "घर के नियम",
         sectionTitle: "घर के नियम",
         lead: "कुछ स्पष्ट नियम ताकि ठहरना सरल और सुखद रहे।",
@@ -1067,7 +1067,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "access",
-        icon: "key",
+        icon: "keypad",
         menuTitle: "दरवाज़ा और कोड",
         sectionTitle: "दरवाज़ा और कोड",
         lead: "कोड, दरवाज़ा खोलने के निर्देश और ठहरने के दौरान उपयोगी प्रवेश जानकारी।",
@@ -1079,7 +1079,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "तिजोरी",
         sectionTitle: "तिजोरी",
         lead: "तिजोरी के उपयोग, खोलने और बंद करने के लिए सरल निर्देश।",
@@ -1091,7 +1091,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "आस-पास",
         sectionTitle: "आस-पास",
         lead: "आवास के पास उपयोगी स्थान और संदर्भ बिंदु।",
@@ -1103,7 +1103,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "होस्ट",
         sectionTitle: "होस्ट",
         lead: "होस्ट के त्वरित संपर्क और उपयोगी जानकारी।",
@@ -1121,7 +1121,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
     sections: [
       {
         id: "checkin",
-        icon: "shield",
+        icon: "checkin",
         menuTitle: "チェックインとチェックアウト",
         sectionTitle: "チェックインとチェックアウト",
         lead: "到着、入室、出発に必要なすべての基本情報です。",
@@ -1135,7 +1135,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "rules",
-        icon: "spark",
+        icon: "notepad",
         menuTitle: "ハウスルール",
         sectionTitle: "ハウスルール",
         lead: "滞在を快適でシンプルにするための、わかりやすいルールです。",
@@ -1159,7 +1159,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "access",
-        icon: "key",
+        icon: "keypad",
         menuTitle: "ドアとコード",
         sectionTitle: "ドアとコード",
         lead: "滞在中に必要なコード、ドアの開け方、アクセス情報です。",
@@ -1171,7 +1171,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "safe",
-        icon: "safe",
+        icon: "vault",
         menuTitle: "金庫",
         sectionTitle: "金庫",
         lead: "金庫の使用、開閉方法に関する簡単な案内です。",
@@ -1183,7 +1183,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "around",
-        icon: "pin",
+        icon: "binoculars",
         menuTitle: "周辺情報",
         sectionTitle: "周辺情報",
         lead: "宿泊施設の近くにある便利な場所や参考情報です。",
@@ -1195,7 +1195,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
       },
       {
         id: "host",
-        icon: "user",
+        icon: "avatar",
         menuTitle: "ホスト",
         sectionTitle: "ホスト",
         lead: "ホストの連絡先と役立つ情報です。",
@@ -1315,7 +1315,7 @@ function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
   return {
     id: baseSection.id,
-    icon: cleanString(section?.icon, baseSection.icon),
+    icon: baseSection.id.startsWith("custom-") ? cleanString(section?.icon, baseSection.icon) : baseSection.icon,
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
