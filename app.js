@@ -17,7 +17,7 @@ const iconPaths = {
   calendar:
     '<rect x="5" y="6" width="14" height="13" rx="2"/><path d="M8 4.8v2.4"/><path d="M16 4.8v2.4"/><path d="M5 9.5h14"/>',
   wifi:
-    '<path d="M2 8.5c6-6 14-6 20 0"/><path d="M5 12c4.2-4.2 9.8-4.2 14 0"/><path d="M8.5 15.5c2-2 5-2 7 0"/><circle cx="12" cy="19" r="1.2" style="fill: currentColor; stroke: none;"/>',
+    '<path d="M1 8 A 15.5 15.5 0 0 1 23 8"/><path d="M4.5 11.5 A 10.6 10.6 0 0 1 19.5 11.5"/><path d="M8 15 A 5.6 5.6 0 0 1 16 15"/><circle cx="12" cy="19.5" r="1.5" style="fill: currentColor; stroke: none;"/>',
   spark:
     '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
   key:
@@ -69,17 +69,17 @@ const iconPaths = {
   receipt:
     '<path d="M7 4.8h10v14.4l-1.4-.8-1.6.8-1.6-.8-1.6.8-1.6-.8-1.2.8z"/><path d="M9.3 8h5.4"/><path d="M9.3 11h5.4"/><path d="M9.3 14h3.2"/>',
   checkin:
-    '<rect x="3.5" y="9.5" width="10" height="10" rx="2"/><path d="M6.5 9.5v10M10.5 9.5v10"/><path d="M7 9.5V7a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v2.5"/><path d="M12.5 9.5 A 4 4 0 1 1 13.5 10.5"/><path d="M16 7.5V4.5M16 7.5l2.5 2.5"/><path d="M14.5 16.5h5.5M17.5 14L20 16.5l-2.5 2.5"/>',
+    '<rect x="1.5" y="9.5" width="12" height="11" rx="2"/><path d="M5 9.5v11M10 9.5v11"/><path d="M5.5 9.5V6a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v3.5"/><path d="M13 9 A 5 5 0 1 1 14.5 12"/><path d="M17.5 7.5V4M17.5 7.5l2.5 3"/><path d="M14 17.5h7.5M18.5 14.5L21.5 17.5L18.5 20.5"/>',
   notepad:
-    '<circle cx="6" cy="7.5" r="1.5"/><circle cx="6" cy="7.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M6 6h11.5A1.5 1.5 0 0 1 19 7.5v8.5"/><path d="M6 9h11.5"/><path d="M7.5 9v7.5"/><circle cx="18" cy="17.5" r="1.5"/><circle cx="18" cy="17.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M18 19H6.5A1.5 1.5 0 0 1 5 17.5v-8.5"/><path d="M18 16H6.5"/><path d="M9.5 10.5h6M9.5 12.2h6M9.5 13.9h4.5M9.5 15.6h2.5"/>',
+    '<circle cx="5" cy="5.5" r="1.8"/><circle cx="5" cy="5.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M5 3.7h12.2A1.8 1.8 0 0 1 19 5.5v11.2"/><path d="M5 7.3h12.2"/><circle cx="19" cy="18.5" r="1.8"/><circle cx="19" cy="18.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M19 20.3H6.8A1.8 1.8 0 0 1 5 18.5V7.3"/><path d="M19 16.7H6.8"/><path d="M6.8 7.3v9.4"/><path d="M17.2 7.3v9.4"/><path d="M9 8.5h6M9 10.5h6M9 12.5h6M9 14.5h4.5M9 16.5h2.5"/>',
   keypad:
-    '<circle cx="6.5" cy="15" r="3"/><circle cx="6.5" cy="15" r="0.8"/><path d="M9.5 13.5h7.5l2.5 1.5-2.5 1.5h-1.5v1.5h-1.5v-1.5h-2v1.5h-1.5v-1.5h-1"/><rect x="11.5" y="5.5" width="2" height="2" rx="0.5"/><rect x="14.5" y="5.5" width="2" height="2" rx="0.5"/><rect x="17.5" y="5.5" width="2" height="2" rx="0.5"/><rect x="11.5" y="8.5" width="2" height="2" rx="0.5"/><rect x="14.5" y="8.5" width="2" height="2" rx="0.5"/><rect x="17.5" y="8.5" width="2" height="2" rx="0.5"/>',
+    '<circle cx="5" cy="16" r="3.5"/><circle cx="5" cy="16" r="1"/><path d="M8.5 14.5h9.5l3.5 1.5-3.5 1.5h-2v2h-1.5v-2h-2.5v2h-1.5v-2h-3.5"/><rect x="10.5" y="4" width="2.8" height="2.8" rx="0.6"/><rect x="14.3" y="4" width="2.8" height="2.8" rx="0.6"/><rect x="18.1" y="4" width="2.8" height="2.8" rx="0.6"/><rect x="10.5" y="7.8" width="2.8" height="2.8" rx="0.6"/><rect x="14.3" y="7.8" width="2.8" height="2.8" rx="0.6"/><rect x="18.1" y="7.8" width="2.8" height="2.8" rx="0.6"/>',
   vault:
-    '<rect x="4" y="4" width="16" height="15" rx="2"/><path d="M6 19v1.5a1 1 0 0 0 1 1h0a1 1 0 0 0 1-1V19M16 19v1.5a1 1 0 0 0 1 1h0a1 1 0 0 0 1-1V19"/><rect x="6.5" y="6.5" width="11" height="10" rx="1"/><rect x="5" y="8" width="1.5" height="2.5" rx="0.75"/><rect x="5" y="13.5" width="1.5" height="2.5" rx="0.75"/><circle cx="12" cy="11.5" r="3.5"/><circle cx="12" cy="11.5" r="1"/><circle cx="14.3" cy="11.5" r="0.5"/><circle cx="13.6" cy="13.1" r="0.5"/><circle cx="12" cy="13.8" r="0.5"/><circle cx="10.4" cy="13.1" r="0.5"/><circle cx="9.7" cy="11.5" r="0.5"/><circle cx="10.4" cy="9.9" r="0.5"/><circle cx="12" cy="9.2" r="0.5"/><circle cx="13.6" cy="9.9" r="0.5"/>',
+    '<rect x="2" y="2" width="20" height="18" rx="2.5"/><path d="M5 20v2a1 1 0 0 0 1 1h0a1 1 0 0 0 1-1v-2M17 20v2a1 1 0 0 0 1 1h0a1 1 0 0 0 1-1v-2"/><rect x="5" y="5" width="14" height="12" rx="1.5"/><rect x="3" y="7" width="2" height="3" rx="1"/><rect x="3" y="14" width="2" height="3" rx="1"/><circle cx="12" cy="11" r="4.2"/><circle cx="12" cy="11" r="1.3"/><circle cx="14.8" cy="11" r="0.6"/><circle cx="14" cy="13" r="0.6"/><circle cx="12" cy="13.8" r="0.6"/><circle cx="10" cy="13" r="0.6"/><circle cx="9.2" cy="11" r="0.6"/><circle cx="10" cy="9" r="0.6"/><circle cx="12" cy="8.2" r="0.6"/><circle cx="14" cy="9" r="0.6"/>',
   binoculars:
-    '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z M9 3v15 M15 6v15"/>',
+    '<path d="M2 5.5l6.7-3.5 6.7 3.5 6.7-3.5v15l-6.7 3.5-6.7-3.5-6.7 3.5Z M8.7 2v15 M15.4 5.5v15"/>',
   avatar:
-    '<path d="M7 10.5c1.5-1.5 3.5-1.5 5-.5c1.5-1 3.5-1 5 .5C17.5 7, 16 5.5, 12 5.5C8 5.5, 6.5 7, 7 10.5z" style="fill: currentColor;"/><path d="M7 10.5a1.5 1.5 0 0 0 0 3M17 10.5a1.5 1.5 0 0 1 0 3"/><path d="M7 12v1.5a5 5 0 0 0 10 0V12"/><circle cx="10" cy="12" r="0.8" style="fill: currentColor; stroke: none;"/><circle cx="14" cy="12" r="0.8" style="fill: currentColor; stroke: none;"/><path d="M11.5 13.8a0.5 0.5 0 0 0 1 0"/><path d="M10 15.5a2 2 0 0 0 4 0"/>',
+    '<path d="M6.5 11c1.8-2 4-2 5.5-1c1.8-1 4-1 5.5.5c.5-4-1-6-5.5-6s-6 2-5.5 6.5z" style="fill: currentColor;"/><path d="M6.5 11a1.8 1.8 0 0 0 0 3.6M17.5 11a1.8 1.8 0 0 1 0 3.6"/><path d="M6.5 12.5v2.5a5.5 5.5 0 0 0 11 0v-2.5"/><circle cx="9.8" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><circle cx="14.2" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><path d="M11.5 14.2a0.5 0.5 0 0 0 1 0"/><path d="M9.5 16a2.5 2.5 0 0 0 5 0"/>',
 };
 
 const dom = {
