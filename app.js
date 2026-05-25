@@ -200,8 +200,21 @@ function renderSectionItems(items, sectionId) {
 
   // For Wi-Fi section, identify the network name and password by colon presence order
   let wifiColonStrings = [];
+  let italianWifiValues = {};
   if (sectionId === "wifi") {
     wifiColonStrings = items.filter(item => typeof item === "string" && /[:：]/.test(item));
+    if (template && template.locales && template.locales["it"]) {
+      const itWifi = template.locales["it"].sections.find(s => s.id === "wifi");
+      if (itWifi) {
+        const itColonStrings = itWifi.items.filter(item => typeof item === "string" && /[:：]/.test(item));
+        itColonStrings.forEach((itItem, idx) => {
+          const parts = itItem.split(/[:：]/);
+          const val = parts.length > 1 ? parts.slice(1).join(":").trim() : itItem.trim();
+          if (idx === 0) italianWifiValues.rete = val;
+          if (idx === 1) italianWifiValues.password = val;
+        });
+      }
+    }
   }
 
   return items
@@ -231,10 +244,13 @@ function renderSectionItems(items, sectionId) {
         if (sectionId === "wifi" && wifiColonStrings.includes(item)) {
           const index = wifiColonStrings.indexOf(item);
           const parts = item.split(/[:：]/);
-          const value = parts.length > 1 ? parts.slice(1).join(":").trim() : item.trim();
           
           const type = index === 0 ? "rete" : "password";
           const label = index === 0 ? "Rete" : "Password";
+          
+          // Use the Italian value if available to prevent translation of network name/password!
+          const value = (type === "rete" ? italianWifiValues.rete : italianWifiValues.password) || 
+                        (parts.length > 1 ? parts.slice(1).join(":").trim() : item.trim());
 
           return `
             <article class="sheet-card">
