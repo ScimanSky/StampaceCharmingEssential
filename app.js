@@ -184,9 +184,16 @@ function renderLocaleBar() {
 }
 
 function renderSectionItems(items, sectionId) {
+  let safeItemIndex = 0;
+
   return items
     .map((item) => {
       const itemIcon = renderIcon(iconForItem(item, sectionId));
+      const useSafeNumbers = sectionId === "safe" && !isImageItem(item);
+      const marker = useSafeNumbers
+        ? `<span class="sheet-card-index sheet-card-number" aria-hidden="true">${++safeItemIndex}</span>`
+        : `<span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>`;
+
       if (isImageItem(item)) {
         return `
           <article class="sheet-card sheet-card-media">
@@ -205,7 +212,7 @@ function renderSectionItems(items, sectionId) {
       if (typeof item === "string") {
         return `
           <article class="sheet-card">
-            <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>
+            ${marker}
             <p>${item}</p>
           </article>
         `;
@@ -213,7 +220,7 @@ function renderSectionItems(items, sectionId) {
 
       return `
         <article class="sheet-card sheet-card-link">
-          <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>
+          ${marker}
           <div class="sheet-card-copy">
             <strong>${item.title ?? ""}</strong>
             <p>${item.body ?? ""}</p>
