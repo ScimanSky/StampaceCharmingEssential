@@ -42,16 +42,6 @@ const iconPaths = {
     '<rect x="4.8" y="6.2" width="14.4" height="11.6" rx="2"/><circle cx="9.1" cy="10" r="1.3"/><path d="m6.7 15.6 3.2-3.3 2.4 2.4 2.2-2.1 2.8 3"/>',
 };
 
-const SECTION_ICON_OPTIONS = [
-  { value: "spark", label: "Generico" },
-  { value: "shield", label: "Check-in / sicurezza" },
-  { value: "wifi", label: "Wi-Fi" },
-  { value: "key", label: "Chiavi / codici" },
-  { value: "safe", label: "Cassaforte" },
-  { value: "pin", label: "Mappa / dintorni" },
-  { value: "user", label: "Host / contatti" },
-];
-
 const AUTO_PUBLISH_DELAY = 900;
 const EDITOR_HASH = "#editor";
 
@@ -302,12 +292,6 @@ function sectionBadge(section) {
   return section.id.startsWith("custom-") ? "Sezione personalizzata" : section.id;
 }
 
-function renderIconOptions(selectedIcon) {
-  return SECTION_ICON_OPTIONS.map(
-    (option) => `<option value="${option.value}" ${option.value === selectedIcon ? "selected" : ""}>${option.label}</option>`,
-  ).join("");
-}
-
 function renderLanguageOptions() {
   const activeSet = new Set(state.enabledLocales);
   const optionalCount = state.enabledLocales.filter((code) => !REQUIRED_LOCALES.includes(code)).length;
@@ -448,10 +432,6 @@ function renderSectionEditors() {
           <div class="host-section-body">
             <div class="host-section-grid">
               <label>
-                <span>Icona pulsante</span>
-                <select data-field="icon">${renderIconOptions(section.icon)}</select>
-              </label>
-              <label>
                 <span>Titolo nel menu</span>
                 <input data-field="menuTitle" type="text" value="${section.menuTitle}" />
               </label>
@@ -523,7 +503,7 @@ function collectTemplate() {
     }));
     return {
       id,
-      icon: card.querySelector('[data-field="icon"]').value,
+      icon: base.icon,
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
