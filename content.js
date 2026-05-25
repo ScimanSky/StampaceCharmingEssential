@@ -7,12 +7,12 @@ export const MAX_VISIBLE_LOCALES = 3;
 export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - 1;
 
 export const AVAILABLE_LANGUAGES = [
-  { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: "https://flagcdn.com/w80/it.png", fixed: true },
-  { code: "en", label: "English", nativeLabel: "English", flag: "🇬🇧", flagSrc: "https://flagcdn.com/w80/gb.png" },
-  { code: "fr", label: "French", nativeLabel: "Français", flag: "🇫🇷", flagSrc: "https://flagcdn.com/w80/fr.png" },
-  { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: "https://flagcdn.com/w80/es.png" },
-  { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: "https://flagcdn.com/w80/de.png" },
-  { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: "https://flagcdn.com/w80/pt.png" },
+  { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: "./img/flags/it.svg", fixed: true },
+  { code: "en", label: "English", nativeLabel: "English", flag: "🇬🇧", flagSrc: "./img/flags/gb.svg" },
+  { code: "fr", label: "French", nativeLabel: "Français", flag: "🇫🇷", flagSrc: "./img/flags/fr.svg" },
+  { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: "./img/flags/es.svg" },
+  { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: "./img/flags/de.svg" },
+  { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: "./img/flags/pt.svg" },
 ];
 
 const LANGUAGE_INDEX = Object.fromEntries(
