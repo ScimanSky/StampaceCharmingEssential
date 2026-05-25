@@ -67,6 +67,7 @@ let session = null;
 let latestRemoteUpdatedAt = null;
 let autoPublishTimer = null;
 let authBound = false;
+let editorBound = false;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -266,6 +267,22 @@ function updateAccessState() {
   dom.app.classList.toggle("hidden", !showEditor);
 }
 
+async function hydrateEditorState() {
+  state = await loadTemplate({ preferLocal: true });
+
+  try {
+    const remote = await fetchRemoteTemplateRow(supabase);
+    latestRemoteUpdatedAt = remote.updated_at ?? null;
+    if (remote.content) {
+      state = normalizeTemplate(remote.content);
+    }
+  } catch {
+    latestRemoteUpdatedAt = null;
+  }
+
+  syncFields();
+}
+
 function saveCurrentTemplate() {
   state = saveTemplate(collectTemplate());
   setStatus("Bozza locale salvata su questo browser.", "success");
@@ -428,6 +445,9 @@ async function logout() {
 }
 
 function bindEditorEvents() {
+  if (editorBound) return;
+  editorBound = true;
+
   dom.save.addEventListener("click", saveCurrentTemplate);
   dom.export.addEventListener("click", downloadTemplate);
   dom.reset.addEventListener("click", restoreDefaultTemplate);
@@ -484,29 +504,20 @@ function bindAuthEvents() {
 
 async function init() {
   dom.email.value = HOST_EMAIL;
-
-  state = await loadTemplate({ preferLocal: true });
-
-  try {
-    const remote = await fetchRemoteTemplateRow(supabase);
-    latestRemoteUpdatedAt = remote.updated_at ?? null;
-    if (remote.content) {
-      state = normalizeTemplate(remote.content);
-    }
-  } catch {
-    latestRemoteUpdatedAt = null;
-  }
+  bindAuthEvents();
 
   const { data } = await supabase.auth.getSession();
   session = data.session;
   updateAccessState();
-  syncFields();
-  bindAuthEvents();
-  bindEditorEvents();
 
   if (isAuthorizedSession(session) && window.location.hash === EDITOR_HASH) {
+    await hydrateEditorState();
+    bindEditorEvents();
     setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+    return;
   }
+
+  setStatus("", "");
 }
 
 init();
