@@ -195,6 +195,31 @@ function renderLocaleBar() {
     .join("");
 }
 
+function parseWifiItem(text) {
+  if (typeof text !== "string") return null;
+  if (!/[:：]/.test(text)) return null;
+
+  const isRete = /rete|network\s*name|nome\s*da\s*rede|nom\s*du\s*réseau|netzwerkname|nombre\s*de\s*la\s*red|nazwa\s*sieci|název\s*sítě|имя\s*сети|网络名称|नेविगेशन|नेविगेट|नेटवर्क\s*नाम|ネットワーク名/i.test(text) || 
+                 (!/password|pass|wpa|wep|wpa2/i.test(text) && /rete|network|réseau|netzwerk|red|sieci|sítě|сети|网络|नेटवर्क|ネットワーク/i.test(text));
+
+  const isPass = /password|pass|senha|contraseña|mot\s*de\s*passe|passwort|hasło|heslo|пароль|密码|पासवर्ड/i.test(text) ||
+                 /pass\s*:/i.test(text);
+
+  if (isRete && !isPass) {
+    const parts = text.split(/[:：]/);
+    const val = parts.length > 1 ? parts.slice(1).join(":").trim() : text.trim();
+    return { type: "rete", label: "Rete", value: val };
+  }
+
+  if (isPass) {
+    const parts = text.split(/[:：]/);
+    const val = parts.length > 1 ? parts.slice(1).join(":").trim() : text.trim();
+    return { type: "password", label: "Password", value: val };
+  }
+
+  return null;
+}
+
 function renderSectionItems(items, sectionId) {
   let safeItemIndex = 0;
 
@@ -222,6 +247,29 @@ function renderSectionItems(items, sectionId) {
       }
 
       if (typeof item === "string") {
+        if (sectionId === "wifi") {
+          const parsed = parseWifiItem(item);
+          if (parsed) {
+            return `
+              <article class="sheet-card">
+                ${marker}
+                <div class="sheet-wifi-field">
+                  <div class="sheet-wifi-label-value">
+                    <span class="sheet-wifi-label">${parsed.label}</span>
+                    <span class="sheet-wifi-value" id="wifi-value-${parsed.type}">${parsed.value}</span>
+                  </div>
+                  <button class="copy-btn" data-copy-id="wifi-value-${parsed.type}" title="Copia" type="button">
+                    <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                </div>
+              </article>
+            `;
+          }
+        }
+
         return `
           <article class="sheet-card">
             ${marker}
@@ -336,6 +384,33 @@ function bindSheet() {
   });
 }
 
+function bindCopyButtons() {
+  document.addEventListener("click", (event) => {
+    const copyBtn = event.target.closest(".copy-btn");
+    if (!copyBtn) return;
+
+    const targetId = copyBtn.dataset.copyId;
+    const targetEl = document.getElementById(targetId);
+    if (!targetEl) return;
+
+    const textToCopy = targetEl.textContent;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      const originalHTML = copyBtn.innerHTML;
+      copyBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      `;
+      setTimeout(() => {
+        copyBtn.innerHTML = originalHTML;
+      }, 1500);
+    }).catch(err => {
+      console.error("Copy failed: ", err);
+    });
+  });
+}
+
 function preventCopy() {
   ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((eventName) => {
     document.addEventListener(eventName, (event) => {
@@ -413,6 +488,7 @@ async function init() {
   bindMenu();
   bindLocaleBar();
   bindSheet();
+  bindCopyButtons();
   preventCopy();
   startLiveSync();
 }
