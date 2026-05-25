@@ -173,6 +173,39 @@ async function translateTexts(texts, targetLocale) {
   return results;
 }
 
+function preserveWifiValue(text, targetLocale) {
+  const separators = [":", "："];
+  const match = separators
+    .map((separator) => ({ separator, index: text.indexOf(separator) }))
+    .find((entry) => entry.index > -1);
+
+  if (!match) return null;
+
+  const label = text.slice(0, match.index).trim().toLowerCase();
+  const value = text.slice(match.index + 1).trim();
+  if (!value) return null;
+
+  const protectedLabels = ["nome rete", "network name", "ssid", "nome da rede", "nom du réseau", "nombre de la red", "netzwerkname"];
+  if (!protectedLabels.includes(label)) return null;
+
+  const localizedLabels = {
+    it: "Nome rete",
+    en: "Network name",
+    fr: "Nom du réseau",
+    es: "Nombre de la red",
+    de: "Netzwerkname",
+    pt: "Nome da rede",
+    pl: "Nazwa sieci",
+    cs: "Název sítě",
+    ru: "Имя сети",
+    zh: "网络名称",
+    hi: "नेटवर्क नाम",
+    ja: "ネットワーク名",
+  };
+
+  return `${localizedLabels[targetLocale] ?? localizedLabels.it}: ${value}`;
+}
+
 async function buildTranslatedLocale(italianLocale, targetLocale) {
   if (targetLocale === FIXED_LOCALE) {
     return JSON.parse(JSON.stringify(italianLocale));
@@ -229,10 +262,15 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
       if (typeof item === "string") {
         const nextIndex = targetSection.items.push("") - 1;
-        texts.push(item);
-        appliers.push((value) => {
-          targetSection.items[nextIndex] = value;
-        });
+        const preservedWifiEntry = section.id === "wifi" ? preserveWifiValue(item, targetLocale) : null;
+        if (preservedWifiEntry) {
+          targetSection.items[nextIndex] = preservedWifiEntry;
+        } else {
+          texts.push(item);
+          appliers.push((value) => {
+            targetSection.items[nextIndex] = value;
+          });
+        }
         return;
       }
 
