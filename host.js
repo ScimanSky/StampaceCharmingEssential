@@ -51,7 +51,7 @@ const iconPaths = {
   binoculars:
     '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z M9 3v15 M15 6v15"/>',
   avatar:
-    '<path d="M8.5 11v1.5a3.5 3.5 0 0 0 7 0V11"/><path d="M8 10a1.2 1.2 0 0 0-1.2 1.2 M16 10a1.2 1.2 0 0 1 1.2 1.2"/><path d="M7 10.5A5 5 0 0 1 12 5.5a5 5 0 0 1 5 5"/><path d="M7 10.5c1.5-1.5 3.5-1.5 5-.5c1.5-1 3.5-1 5 .5"/><path d="M10.5 14.5a1.5 1.5 0 0 0 3 0"/><circle cx="10.5" cy="12" r="0.6" style="fill: currentColor; stroke: none;"/><circle cx="13.5" cy="12" r="0.6" style="fill: currentColor; stroke: none;"/>',
+    '<path d="M7 10.5c1.5-1.5 3.5-1.5 5-.5c1.5-1 3.5-1 5 .5C17.5 7, 16 5.5, 12 5.5C8 5.5, 6.5 7, 7 10.5z" style="fill: currentColor;"/><path d="M7 10.5a1.5 1.5 0 0 0 0 3M17 10.5a1.5 1.5 0 0 1 0 3"/><path d="M7 12v1.5a5 5 0 0 0 10 0V12"/><circle cx="10" cy="12" r="0.8" style="fill: currentColor; stroke: none;"/><circle cx="14" cy="12" r="0.8" style="fill: currentColor; stroke: none;"/><path d="M11.5 13.8a0.5 0.5 0 0 0 1 0"/><path d="M10 15.5a2 2 0 0 0 4 0"/>',
 };
 
 const AUTO_PUBLISH_DELAY = 900;
