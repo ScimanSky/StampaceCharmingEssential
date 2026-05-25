@@ -38,6 +38,7 @@ const iconPaths = {
 };
 
 const AUTO_PUBLISH_DELAY = 900;
+const EDITOR_HASH = "#editor";
 
 const dom = {
   gate: document.querySelector("#host-gate"),
@@ -260,8 +261,9 @@ function isAuthorizedSession(nextSession) {
 
 function updateAccessState() {
   const allowed = isAuthorizedSession(session);
-  dom.gate.classList.toggle("hidden", allowed);
-  dom.app.classList.toggle("hidden", !allowed);
+  const showEditor = allowed && window.location.hash === EDITOR_HASH;
+  dom.gate.classList.toggle("hidden", showEditor);
+  dom.app.classList.toggle("hidden", !showEditor);
 }
 
 function saveCurrentTemplate() {
@@ -413,13 +415,14 @@ async function login() {
   }
 
   dom.password.value = "";
-  setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+  window.location.replace(`./host.html${EDITOR_HASH}`);
 }
 
 async function logout() {
   window.clearTimeout(autoPublishTimer);
   await supabase.auth.signOut();
   session = null;
+  window.location.replace("./host.html");
   updateAccessState();
   setStatus("Sessione host chiusa.", "success");
 }
@@ -472,6 +475,10 @@ function bindAuthEvents() {
     session = nextSession;
     updateAccessState();
     if (isAuthorizedSession(session)) {
+      if (window.location.hash !== EDITOR_HASH) {
+        window.location.replace(`./host.html${EDITOR_HASH}`);
+        return;
+      }
       setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
     }
   });
@@ -499,7 +506,12 @@ async function init() {
   bindAuthEvents();
   bindEditorEvents();
 
-  if (isAuthorizedSession(session)) {
+  if (isAuthorizedSession(session) && window.location.hash !== EDITOR_HASH) {
+    window.location.replace(`./host.html${EDITOR_HASH}`);
+    return;
+  }
+
+  if (isAuthorizedSession(session) && window.location.hash === EDITOR_HASH) {
     setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
   }
 }

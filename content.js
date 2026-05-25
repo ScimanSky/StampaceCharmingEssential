@@ -2,9 +2,9 @@ import { fetchRemoteTemplateRow } from "./supabase.js";
 
 export const STORAGE_KEY = "stampace_essential_template_v1";
 export const HOST_PRIVATE_ITEM = Object.freeze({
-  title: "Privato",
-  body: "Apri l'editor riservato all'host per modificare il template dell'app.",
-  label: "Apri editor host",
+  title: "Area Host",
+  body: "Accedi all'area riservata per gestire il template live dell'app.",
+  label: "Apri Area Host",
   href: "./host.html",
 });
 export const IMAGE_ITEM_TYPE = "image";
@@ -144,10 +144,16 @@ function normalizeItems(items, fallbackItems) {
 
 export function isHostPrivateItem(item) {
   if (!item || typeof item !== "object") return false;
+  const href = cleanString(item.href);
+  const title = cleanString(item.title);
+  const label = cleanString(item.label);
   return (
-    cleanString(item.title) === HOST_PRIVATE_ITEM.title &&
-    cleanString(item.label) === HOST_PRIVATE_ITEM.label &&
-    cleanString(item.href) === HOST_PRIVATE_ITEM.href
+    href === HOST_PRIVATE_ITEM.href &&
+    (
+      (title === HOST_PRIVATE_ITEM.title && label === HOST_PRIVATE_ITEM.label) ||
+      title === "Privato" ||
+      label === "Apri editor host"
+    )
   );
 }
 
