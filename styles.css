@@ -498,6 +498,7 @@ svg,
 .sheet-card-media-body {
   display: grid;
   gap: 0.65rem;
+  justify-items: stretch;
 }
 
 .sheet-image {
@@ -505,8 +506,11 @@ svg,
   border-radius: 0.8rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: block;
-  object-fit: cover;
-  max-height: 18rem;
+  height: auto;
+  max-height: min(62vh, 26rem);
+  object-fit: contain;
+  object-position: center;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .sheet-image-caption {
@@ -547,5 +551,21 @@ svg,
     gap: 0.8rem;
     padding-left: 0.85rem;
     padding-right: 0.85rem;
+  }
+
+  .sheet-image {
+    max-height: min(48vh, 17rem);
+  }
+}
+
+@media (min-width: 421px) and (max-width: 960px) {
+  .sheet-image {
+    max-height: min(54vh, 21rem);
+  }
+}
+
+@media (min-width: 961px) {
+  .sheet-image {
+    max-height: min(60vh, 26rem);
   }
 }

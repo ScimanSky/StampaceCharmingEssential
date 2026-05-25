@@ -293,10 +293,13 @@ button,
 
 .host-image-item img {
   width: 100%;
-  max-height: 14rem;
-  object-fit: cover;
+  height: auto;
+  max-height: min(42vh, 16rem);
+  object-fit: contain;
+  object-position: center;
   border-radius: 0.7rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .host-image-fields {
@@ -384,5 +387,9 @@ button,
   .host-card,
   .host-section-card {
     padding: 0.9rem;
+  }
+
+  .host-image-item img {
+    max-height: min(34vh, 11rem);
   }
 }
