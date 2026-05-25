@@ -320,6 +320,23 @@ button,
   gap: 0.95rem;
 }
 
+.host-sections-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+}
+
+.host-sections-head h2 {
+  margin: 0;
+}
+
+.host-sections-note {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .host-section-grid {
   margin-top: 0.9rem;
 }
@@ -332,6 +349,13 @@ button,
 
 .host-section-meta > div {
   min-width: 0;
+}
+
+.host-section-badge {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .host-section-media {
@@ -455,8 +479,10 @@ button,
     width: 100%;
   }
 
-  .host-section-media-head {
+  .host-section-media-head,
+  .host-sections-head {
     display: grid;
+    align-items: start;
   }
 
   .host-upload-button {

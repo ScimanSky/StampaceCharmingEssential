@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260527e";
+} from "./content.js?v=20260527g";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -42,6 +42,16 @@ const iconPaths = {
     '<rect x="4.8" y="6.2" width="14.4" height="11.6" rx="2"/><circle cx="9.1" cy="10" r="1.3"/><path d="m6.7 15.6 3.2-3.3 2.4 2.4 2.2-2.1 2.8 3"/>',
 };
 
+const SECTION_ICON_OPTIONS = [
+  { value: "spark", label: "Generico" },
+  { value: "shield", label: "Check-in / sicurezza" },
+  { value: "wifi", label: "Wi-Fi" },
+  { value: "key", label: "Chiavi / codici" },
+  { value: "safe", label: "Cassaforte" },
+  { value: "pin", label: "Mappa / dintorni" },
+  { value: "user", label: "Host / contatti" },
+];
+
 const AUTO_PUBLISH_DELAY = 900;
 const EDITOR_HASH = "#editor";
 
@@ -58,6 +68,7 @@ const dom = {
   export: document.querySelector("#host-export"),
   import: document.querySelector("#host-import"),
   publish: document.querySelector("#host-publish"),
+  addSection: document.querySelector("#host-add-section"),
   editorLocale: document.querySelector("#field-editor-locale"),
   enabledLocales: document.querySelector("#field-enabled-locales"),
   appName: document.querySelector("#field-app-name"),
@@ -276,6 +287,16 @@ function currentLocaleState() {
   return state.locales[selectedEditorLocale] ?? state.locales[FIXED_LOCALE];
 }
 
+function sectionBadge(section) {
+  return section.id.startsWith("custom-") ? "Sezione personalizzata" : section.id;
+}
+
+function renderIconOptions(selectedIcon) {
+  return SECTION_ICON_OPTIONS.map(
+    (option) => `<option value="${option.value}" ${option.value === selectedIcon ? "selected" : ""}>${option.label}</option>`,
+  ).join("");
+}
+
 function renderLanguageOptions() {
   const activeSet = new Set(state.enabledLocales);
   const optionalCount = state.enabledLocales.filter((code) => !REQUIRED_LOCALES.includes(code)).length;
@@ -401,9 +422,14 @@ function renderSectionEditors() {
             <div>
               <p class="host-kicker">${section.id}</p>
               <h2>${section.menuTitle}</h2>
+              <p class="host-section-badge">${sectionBadge(section)}</p>
             </div>
           </div>
           <div class="host-section-grid">
+            <label>
+              <span>Icona pulsante</span>
+              <select data-field="icon">${renderIconOptions(section.icon)}</select>
+            </label>
             <label>
               <span>Titolo nel menu</span>
               <input data-field="menuTitle" type="text" value="${section.menuTitle}" />
@@ -475,7 +501,7 @@ function collectTemplate() {
     }));
     return {
       id,
-      icon: base.icon,
+      icon: card.querySelector('[data-field="icon"]').value,
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
@@ -514,6 +540,31 @@ function updateEnabledLocales() {
   state = saveTemplate(collectTemplate());
   syncFields();
   queueAutoPublish();
+}
+
+function createSectionId() {
+  return `custom-${Date.now().toString(36)}`;
+}
+
+function addSection() {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Aggiungi nuovi pulsanti solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  currentLocaleState().sections.push({
+    id: createSectionId(),
+    icon: "spark",
+    menuTitle: "Nuovo pulsante",
+    sectionTitle: "Nuova sezione",
+    lead: "",
+    items: [],
+  });
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+  setStatus("Nuovo pulsante aggiunto. Ora compila i campi della nuova sezione.", "success");
 }
 
 function isAuthorizedSession(nextSession) {
@@ -737,6 +788,7 @@ function bindEditorEvents() {
   dom.export.addEventListener("click", downloadTemplate);
   dom.reset.addEventListener("click", restoreDefaultTemplate);
   dom.publish.addEventListener("click", () => publishNow({ silent: false }));
+  dom.addSection.addEventListener("click", addSection);
   dom.logout.addEventListener("click", logout);
   dom.import.addEventListener("change", (event) => {
     importTemplate(event.target.files?.[0]);

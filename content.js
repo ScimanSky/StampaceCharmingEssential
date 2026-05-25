@@ -705,6 +705,18 @@ function ensureHostPrivateItem(items, localeCode) {
   return [...editableItems, { ...getHostPrivateItem(localeCode) }];
 }
 
+function buildFallbackSection(section = {}, index = 0) {
+  const fallbackTitle = cleanString(section?.menuTitle, `Nuovo pulsante ${index + 1}`);
+  return {
+    id: cleanString(section?.id, `custom-${index + 1}`),
+    icon: cleanString(section?.icon, "spark"),
+    menuTitle: fallbackTitle,
+    sectionTitle: cleanString(section?.sectionTitle, fallbackTitle),
+    lead: cleanString(section?.lead, ""),
+    items: [],
+  };
+}
+
 function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
   return {
@@ -717,14 +729,28 @@ function normalizeSection(section, baseSection, localeCode) {
   };
 }
 
+function normalizeLocaleSections(rawSections, baseSections, localeCode) {
+  const normalizedBaseSections = baseSections.map((baseSection, index) => {
+    const matchingSection = rawSections.find((section) => section?.id === baseSection.id) ?? rawSections[index] ?? {};
+    return normalizeSection(matchingSection, baseSection, localeCode);
+  });
+
+  const knownIds = new Set(baseSections.map((section) => section.id));
+  const extraSections = rawSections
+    .filter((section) => {
+      const id = cleanString(section?.id);
+      return id && !knownIds.has(id);
+    })
+    .map((section, index) => normalizeSection(section, buildFallbackSection(section, index), localeCode));
+
+  return [...normalizedBaseSections, ...extraSections];
+}
+
 function normalizeLocaleContent(localeData, baseLocale, localeCode) {
   const rawSections = Array.isArray(localeData?.sections) ? localeData.sections : [];
   return {
     subtitle: cleanString(localeData?.subtitle, baseLocale.subtitle),
-    sections: baseLocale.sections.map((baseSection, index) => {
-      const matchingSection = rawSections.find((section) => section?.id === baseSection.id) ?? rawSections[index] ?? {};
-      return normalizeSection(matchingSection, baseSection, localeCode);
-    }),
+    sections: normalizeLocaleSections(rawSections, baseLocale.sections, localeCode),
   };
 }
 
@@ -755,9 +781,11 @@ function mirrorItalianContent(localeMap) {
           subtitle: pickLocalizedValue(localized?.subtitle, italian.subtitle, localizedDefaults.subtitle),
           sections: italian.sections.map((section, index) => {
             const localizedSection = localized?.sections?.[index];
-            const localizedDefaultSection = localizedDefaults.sections[index];
+            const localizedDefaultSection = localizedDefaults.sections[index] ?? section;
             const localizedItems = Array.isArray(localizedSection?.items) ? localizedSection.items : [];
-            const fallbackItems = Array.isArray(localizedDefaultSection?.items) ? localizedDefaultSection.items : [];
+            const fallbackItems = Array.isArray(localizedDefaultSection?.items)
+              ? localizedDefaultSection.items
+              : section.items;
             const resolvedItems = localizedItems.length
               ? itemsAreEquivalent(localizedItems, section.items)
                 ? fallbackItems.map(cloneItem)
