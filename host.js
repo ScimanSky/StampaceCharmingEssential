@@ -68,6 +68,8 @@ let latestRemoteUpdatedAt = null;
 let autoPublishTimer = null;
 let authBound = false;
 let editorBound = false;
+let editorReady = false;
+let editorLoading = false;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -262,7 +264,7 @@ function isAuthorizedSession(nextSession) {
 
 function updateAccessState() {
   const allowed = isAuthorizedSession(session);
-  const showEditor = allowed && window.location.hash === EDITOR_HASH;
+  const showEditor = allowed && window.location.hash === EDITOR_HASH && editorReady;
   dom.gate.classList.toggle("hidden", showEditor);
   dom.app.classList.toggle("hidden", !showEditor);
 }
@@ -281,6 +283,27 @@ async function hydrateEditorState() {
   }
 
   syncFields();
+}
+
+async function openEditor() {
+  if (!isAuthorizedSession(session) || editorLoading) return;
+
+  editorLoading = true;
+  setStatus("Caricamento editor...", "");
+  editorReady = false;
+  if (window.location.hash !== EDITOR_HASH) {
+    window.location.hash = EDITOR_HASH;
+  }
+  updateAccessState();
+  try {
+    await hydrateEditorState();
+    bindEditorEvents();
+    editorReady = true;
+    updateAccessState();
+    setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+  } finally {
+    editorLoading = false;
+  }
 }
 
 function saveCurrentTemplate() {
@@ -432,13 +455,14 @@ async function login() {
   }
 
   dom.password.value = "";
-  window.location.replace(`./host.html${EDITOR_HASH}`);
+  await openEditor();
 }
 
 async function logout() {
   window.clearTimeout(autoPublishTimer);
   await supabase.auth.signOut();
   session = null;
+  editorReady = false;
   window.location.replace("./host.html");
   updateAccessState();
   setStatus("Sessione host chiusa.", "success");
@@ -493,11 +517,37 @@ function bindAuthEvents() {
   });
   supabase.auth.onAuthStateChange((_event, nextSession) => {
     session = nextSession;
-    updateAccessState();
-    if (isAuthorizedSession(session)) {
-      if (window.location.hash === EDITOR_HASH) {
-        setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
-      }
+    if (!isAuthorizedSession(session)) {
+      editorReady = false;
+      editorLoading = false;
+      updateAccessState();
+      return;
+    }
+
+    if (window.location.hash === EDITOR_HASH && !editorReady) {
+      openEditor().catch(() => {
+        setStatus("Caricamento editor fallito.", "error");
+      });
+      return;
+    }
+
+    if (window.location.hash === EDITOR_HASH && editorReady) {
+      setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+    }
+  });
+
+  window.addEventListener("hashchange", () => {
+    if (isAuthorizedSession(session) && window.location.hash === EDITOR_HASH && !editorReady) {
+      openEditor().catch(() => {
+        setStatus("Caricamento editor fallito.", "error");
+      });
+      return;
+    }
+
+    if (window.location.hash !== EDITOR_HASH) {
+      editorReady = false;
+      editorLoading = false;
+      updateAccessState();
     }
   });
 }
@@ -511,9 +561,7 @@ async function init() {
   updateAccessState();
 
   if (isAuthorizedSession(session) && window.location.hash === EDITOR_HASH) {
-    await hydrateEditorState();
-    bindEditorEvents();
-    setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
+    await openEditor();
     return;
   }
 
