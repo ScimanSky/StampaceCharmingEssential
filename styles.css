@@ -422,4 +422,28 @@ svg,
   line-height: 1.5;
   color: var(--muted-strong);
   font-size: 0.96rem;
+  white-space: pre-line;
+}
+
+.sheet-card-media {
+  align-items: center;
+}
+
+.sheet-card-media-body {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.sheet-image {
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: block;
+  object-fit: cover;
+  max-height: 18rem;
+}
+
+.sheet-image-caption {
+  font-size: 0.9rem;
+  color: var(--muted);
 }

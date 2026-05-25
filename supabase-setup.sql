@@ -1,5 +1,18 @@
 begin;
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'images',
+  'images',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp']
+)
+on conflict (id) do update
+set public = true,
+    file_size_limit = 5242880,
+    allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
+
 create table if not exists public.app_templates (
   id text primary key,
   content jsonb not null,
@@ -55,113 +68,60 @@ with check (
   and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
 );
 
+drop policy if exists "public can view images" on storage.objects;
+create policy "public can view images"
+on storage.objects
+for select
+to anon, authenticated
+using (bucket_id = 'images');
+
+drop policy if exists "host can upload images" on storage.objects;
+create policy "host can upload images"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'images'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+drop policy if exists "host can update images" on storage.objects;
+create policy "host can update images"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'images'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+)
+with check (
+  bucket_id = 'images'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+drop policy if exists "host can delete images" on storage.objects;
+create policy "host can delete images"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'images'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
 insert into public.app_templates (id, content)
-values (
+select
   'live',
-  $${
+  '{
     "appName": "Stampace Charming",
     "subtitle": "Luxury apartment",
     "address": "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
     "license": "CIN: IT092009C2000R8066",
-    "sections": [
-      {
-        "id": "checkin",
-        "icon": "shield",
-        "menuTitle": "Check-in & Check-out",
-        "sectionTitle": "Check-in & Check-out",
-        "lead": "Tutte le informazioni essenziali per arrivare, entrare in appartamento e lasciare la struttura in modo semplice.",
-        "items": [
-          "Check-in: inserire qui l'orario di arrivo consentito e le eventuali istruzioni per il self check-in o per l'incontro con l'host.",
-          "Prima dell'arrivo: chiedere all'ospite di comunicare l'orario indicativo di arrivo con un po' di anticipo, così da organizzare al meglio l'accoglienza.",
-          "Accesso alla struttura: inserire qui il percorso corretto, eventuali riferimenti utili e dove recuperare chiavi o codici.",
-          "Check-out: inserire qui l'orario entro cui lasciare l'appartamento e indicare se le chiavi devono essere lasciate in casa, in cassetta o consegnate all'host.",
-          "Prima di partire: ricordare agli ospiti di spegnere luci e climatizzazione, chiudere porte e finestre e verificare di non aver dimenticato effetti personali."
-        ]
-      },
-      {
-        "id": "rules",
-        "icon": "spark",
-        "menuTitle": "Regole della casa",
-        "sectionTitle": "Regole della casa",
-        "lead": "Poche regole chiare per rendere il soggiorno semplice e piacevole.",
-        "items": [
-          "Aggiungere qui le regole principali della struttura.",
-          "Specificare se è consentito fumare o meno.",
-          "Inserire eventuali indicazioni su rumore, rifiuti e uso degli spazi."
-        ]
-      },
-      {
-        "id": "wifi",
-        "icon": "wifi",
-        "menuTitle": "Wi-Fi",
-        "sectionTitle": "Wi-Fi",
-        "lead": "Rete, password e suggerimenti rapidi per connettersi.",
-        "items": [
-          "Nome rete: da inserire",
-          "Password: da inserire",
-          "Se hai problemi di connessione, contatta l'host."
-        ]
-      },
-      {
-        "id": "access",
-        "icon": "key",
-        "menuTitle": "Porta e codici",
-        "sectionTitle": "Porta e codici",
-        "lead": "Codici, apertura porta e accessi utili durante il soggiorno.",
-        "items": [
-          "Inserire il codice del portone o della cassetta chiavi.",
-          "Aggiungere eventuali istruzioni per serrature smart o tastiere.",
-          "Specificare cosa fare in caso di smarrimento o blocco."
-        ]
-      },
-      {
-        "id": "safe",
-        "icon": "safe",
-        "menuTitle": "Cassaforte",
-        "sectionTitle": "Cassaforte",
-        "lead": "Istruzioni semplici per uso, apertura e chiusura della cassaforte.",
-        "items": [
-          "Inserire dove si trova la cassaforte all'interno dell'appartamento.",
-          "Aggiungere qui la procedura corretta per apertura e chiusura.",
-          "Specificare cosa fare in caso di blocco o difficoltà."
-        ]
-      },
-      {
-        "id": "around",
-        "icon": "pin",
-        "menuTitle": "Dintorni",
-        "sectionTitle": "Dintorni",
-        "lead": "Luoghi utili e riferimenti vicini alla struttura.",
-        "items": [
-          "Aggiungere supermercato, farmacia e parcheggio più vicini.",
-          "Inserire 2 o 3 consigli affidabili su bar o ristoranti.",
-          "Aggiungere eventuali indicazioni per spiagge o mezzi pubblici."
-        ]
-      },
-      {
-        "id": "host",
-        "icon": "user",
-        "menuTitle": "Host",
-        "sectionTitle": "Host",
-        "lead": "Contatti rapidi e riferimenti utili dell'host.",
-        "items": [
-          "Nome host: da inserire",
-          "Telefono / WhatsApp: da inserire",
-          "Email: da inserire",
-          {
-            "title": "Privato",
-            "body": "Apri l'editor riservato all'host per modificare il template dell'app.",
-            "label": "Apri editor host",
-            "href": "./host.html"
-          }
-        ]
-      }
-    ]
-  }$$::jsonb
-)
-on conflict (id) do update
-set content = excluded.content,
-    updated_at = timezone('utc', now());
+    "sections": []
+  }'::jsonb
+where not exists (
+  select 1 from public.app_templates where id = 'live'
+);
 
 do $$
 begin

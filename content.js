@@ -7,6 +7,7 @@ export const HOST_PRIVATE_ITEM = Object.freeze({
   label: "Apri editor host",
   href: "./host.html",
 });
+export const IMAGE_ITEM_TYPE = "image";
 
 export const defaultTemplate = {
   appName: "Stampace Charming",
@@ -114,6 +115,15 @@ function normalizeItems(items, fallbackItems) {
     .map((item) => {
       if (typeof item === "string") return item.trim();
       if (item && typeof item === "object") {
+        if (item.type === IMAGE_ITEM_TYPE || item.src) {
+          return {
+            type: IMAGE_ITEM_TYPE,
+            src: cleanString(item.src),
+            path: cleanString(item.path),
+            alt: cleanString(item.alt),
+            caption: cleanString(item.caption),
+          };
+        }
         return {
           title: cleanString(item.title),
           body: cleanString(item.body),
@@ -125,6 +135,7 @@ function normalizeItems(items, fallbackItems) {
     })
     .filter((item) => {
       if (typeof item === "string") return Boolean(item);
+      if (item.type === IMAGE_ITEM_TYPE) return Boolean(item.src);
       return Boolean(item.title || item.body || item.href || item.label);
     });
 
@@ -138,6 +149,10 @@ export function isHostPrivateItem(item) {
     cleanString(item.label) === HOST_PRIVATE_ITEM.label &&
     cleanString(item.href) === HOST_PRIVATE_ITEM.href
   );
+}
+
+export function isImageItem(item) {
+  return Boolean(item && typeof item === "object" && item.type === IMAGE_ITEM_TYPE && item.src);
 }
 
 function ensureHostPrivateItem(items) {

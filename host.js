@@ -2,16 +2,20 @@ import {
   clearTemplate,
   defaultTemplate,
   HOST_PRIVATE_ITEM,
+  isImageItem,
   isHostPrivateItem,
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
 } from "./content.js";
 import {
+  deleteSectionImage,
   fetchRemoteTemplateRow,
   getHostSupabase,
   HOST_EMAIL,
+  IMAGE_MAX_BYTES,
   publishRemoteTemplate,
+  uploadSectionImage,
 } from "./supabase.js";
 
 const iconPaths = {
@@ -29,6 +33,8 @@ const iconPaths = {
     '<path d="M12 20s5-4.7 5-9a5 5 0 1 0-10 0c0 4.3 5 9 5 9z"/><circle cx="12" cy="11" r="1.8"/>',
   user:
     '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
+  image:
+    '<rect x="4.8" y="6.2" width="14.4" height="11.6" rx="2"/><circle cx="9.1" cy="10" r="1.3"/><path d="m6.7 15.6 3.2-3.3 2.4 2.4 2.2-2.1 2.8 3"/>',
 };
 
 const AUTO_PUBLISH_DELAY = 900;
@@ -72,29 +78,84 @@ function setStatus(message, variant = "") {
 
 function serializeItems(items) {
   return items
-    .filter((item) => !isHostPrivateItem(item))
+    .filter((item) => !isHostPrivateItem(item) && !isImageItem(item))
     .map((item) => {
       if (typeof item === "string") return item;
       return JSON.stringify(item);
     })
-    .join("\n");
+    .map((item) => `+ ${item}`)
+    .join("\n\n");
 }
 
 function parseItems(value) {
-  return value
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .map((item) => {
-      if (item.startsWith("{") && item.endsWith("}")) {
-        try {
-          return JSON.parse(item);
-        } catch {
-          return item;
-        }
+  const lines = value.replace(/\r/g, "").split("\n");
+  const blocks = [];
+  let current = [];
+
+  const flush = () => {
+    const joined = current.join("\n").trim();
+    if (joined) blocks.push(joined);
+    current = [];
+  };
+
+  lines.forEach((line) => {
+    const plusMatch = line.match(/^\s*\+\s?(.*)$/);
+    if (plusMatch) {
+      flush();
+      current.push(plusMatch[1]);
+      return;
+    }
+
+    if (!current.length && line.trim()) {
+      current.push(line.trim());
+      return;
+    }
+
+    if (current.length) {
+      current.push(line);
+    }
+  });
+
+  flush();
+
+  return blocks.map((item) => {
+    if (item.startsWith("{") && item.endsWith("}")) {
+      try {
+        return JSON.parse(item);
+      } catch {
+        return item;
       }
-      return item;
-    });
+    }
+    return item;
+  });
+}
+
+function renderSectionImages(section) {
+  const images = section.items.filter(isImageItem);
+  if (!images.length) {
+    return `<p class="host-image-empty">Nessuna immagine caricata.</p>`;
+  }
+
+  return images
+    .map(
+      (item, index) => `
+        <article class="host-image-item" data-image-item data-image-index="${index}" data-image-path="${item.path ?? ""}" data-image-src="${item.src}">
+          <img src="${item.src}" alt="${item.alt || ""}" loading="lazy" />
+          <div class="host-image-fields">
+            <label>
+              <span>Alt text</span>
+              <input data-image-field="alt" type="text" value="${item.alt ?? ""}" />
+            </label>
+            <label>
+              <span>Didascalia</span>
+              <input data-image-field="caption" type="text" value="${item.caption ?? ""}" />
+            </label>
+          </div>
+          <button class="ghost-button host-image-remove" type="button" data-action="remove-image">Rimuovi</button>
+        </article>
+      `,
+    )
+    .join("");
 }
 
 function renderSectionEditors() {
@@ -123,9 +184,24 @@ function renderSectionEditors() {
               <textarea data-field="lead">${section.lead}</textarea>
             </label>
             <label>
-              <span>Contenuti, una riga per voce</span>
+              <span>Contenuti: usa "+" all'inizio di una riga per creare un nuovo paragrafo</span>
               <textarea data-field="items">${serializeItems(section.items)}</textarea>
             </label>
+          </div>
+          <div class="host-section-media">
+            <div class="host-section-media-head">
+              <div>
+                <p class="host-kicker">Immagini sezione</p>
+                <p class="host-media-note">JPEG, PNG o WEBP. Max ${Math.round(IMAGE_MAX_BYTES / (1024 * 1024))} MB.</p>
+              </div>
+              <label class="ghost-button file-button host-upload-button">
+                <span>Aggiungi immagine</span>
+                <input data-image-upload type="file" accept="image/jpeg,image/png,image/webp" />
+              </label>
+            </div>
+            <div class="host-image-list">
+              ${renderSectionImages(section)}
+            </div>
           </div>
           ${
             section.id === "host"
@@ -151,13 +227,20 @@ function collectTemplate() {
   const sections = sectionCards.map((card) => {
     const id = card.dataset.sectionId;
     const base = state.sections.find((section) => section.id === id);
+    const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
+      type: "image",
+      path: item.dataset.imagePath || "",
+      src: item.dataset.imageSrc || "",
+      alt: item.querySelector('[data-image-field="alt"]').value,
+      caption: item.querySelector('[data-image-field="caption"]').value,
+    }));
     return {
       id,
       icon: base.icon,
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
-      items: parseItems(card.querySelector('[data-field="items"]').value),
+      items: [...parseItems(card.querySelector('[data-field="items"]').value), ...imageItems],
     };
   });
 
@@ -256,6 +339,61 @@ async function importTemplate(file) {
   reader.readAsText(file);
 }
 
+async function handleImageUpload(sectionId, file) {
+  if (!file) return;
+  if (!isAuthorizedSession(session)) {
+    setStatus("Accedi come host per caricare immagini.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  setStatus("Upload immagine in corso...", "");
+
+  try {
+    const uploaded = await uploadSectionImage(file, sectionId, supabase);
+    const section = state.sections.find((item) => item.id === sectionId);
+    if (!section) return;
+
+    section.items.push({
+      type: "image",
+      path: uploaded.path,
+      src: uploaded.src,
+      alt: file.name.replace(/\.[^.]+$/, ""),
+      caption: "",
+    });
+
+    state = saveTemplate(state);
+    syncFields();
+    setStatus("Immagine caricata. La sincronizzazione live parte ora.", "success");
+    queueAutoPublish();
+  } catch (error) {
+    setStatus(error.message || "Upload immagine fallito.", "error");
+  }
+}
+
+async function removeImage(sectionId, imageIndex) {
+  state = collectTemplate();
+  const section = state.sections.find((item) => item.id === sectionId);
+  if (!section) return;
+  const imageItems = section.items.filter(isImageItem);
+  const target = imageItems[imageIndex];
+  if (!target) return;
+
+  try {
+    if (target.path && isAuthorizedSession(session)) {
+      await deleteSectionImage(target.path, supabase);
+    }
+
+    section.items = section.items.filter((item) => item !== target);
+    state = saveTemplate(state);
+    syncFields();
+    setStatus("Immagine rimossa dalla sezione.", "success");
+    queueAutoPublish();
+  } catch (error) {
+    setStatus(error.message || "Rimozione immagine fallita.", "error");
+  }
+}
+
 async function login() {
   const password = dom.password.value.trim();
   if (!password) {
@@ -300,6 +438,22 @@ function bindEditorEvents() {
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
     queueAutoPublish();
+  });
+
+  dom.sections.addEventListener("change", (event) => {
+    const uploader = event.target.closest("[data-image-upload]");
+    if (!uploader) return;
+    const sectionCard = event.target.closest("[data-section-id]");
+    handleImageUpload(sectionCard?.dataset.sectionId, event.target.files?.[0]);
+    event.target.value = "";
+  });
+
+  dom.sections.addEventListener("click", (event) => {
+    const removeTrigger = event.target.closest('[data-action="remove-image"]');
+    if (!removeTrigger) return;
+    const imageItem = event.target.closest("[data-image-item]");
+    const sectionCard = event.target.closest("[data-section-id]");
+    removeImage(sectionCard?.dataset.sectionId, Number.parseInt(imageItem?.dataset.imageIndex ?? "-1", 10));
   });
 }
 

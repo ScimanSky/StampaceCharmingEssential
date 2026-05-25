@@ -6,6 +6,9 @@ export const SUPABASE_ANON_KEY =
 export const HOST_EMAIL = "stampacecharming@gmail.com";
 export const TEMPLATE_TABLE = "app_templates";
 export const TEMPLATE_ROW_ID = "live";
+export const IMAGE_BUCKET = "images";
+export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 let guestClient = null;
 let hostClient = null;
@@ -88,4 +91,51 @@ export async function publishRemoteTemplate(content, client = getHostSupabase())
   }
 
   return data;
+}
+
+function slugifyFileName(fileName) {
+  return fileName
+    .toLowerCase()
+    .replace(/[^a-z0-9.\-_]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+export async function uploadSectionImage(file, sectionId, client = getHostSupabase()) {
+  if (!IMAGE_ALLOWED_TYPES.includes(file.type)) {
+    throw new Error("Formato immagine non consentito.");
+  }
+
+  if (file.size > IMAGE_MAX_BYTES) {
+    throw new Error("Immagine oltre il limite di 5 MB.");
+  }
+
+  const safeName = slugifyFileName(file.name || "image");
+  const path = `${sectionId}/${Date.now()}-${safeName}`;
+  const { error } = await client.storage.from(IMAGE_BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+    contentType: file.type,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const { data } = client.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+
+  return {
+    path,
+    src: data.publicUrl,
+  };
+}
+
+export async function deleteSectionImage(path, client = getHostSupabase()) {
+  if (!path) return;
+
+  const { error } = await client.storage.from(IMAGE_BUCKET).remove([path]);
+
+  if (error) {
+    throw error;
+  }
 }

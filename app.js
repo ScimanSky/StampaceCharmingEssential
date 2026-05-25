@@ -1,4 +1,9 @@
-import { fetchRemoteTemplateEnvelope, loadTemplate, normalizeTemplate } from "./content.js";
+import {
+  fetchRemoteTemplateEnvelope,
+  isImageItem,
+  loadTemplate,
+  normalizeTemplate,
+} from "./content.js";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -22,6 +27,8 @@ const iconPaths = {
     '<path d="M12 20s5-4.7 5-9a5 5 0 1 0-10 0c0 4.3 5 9 5 9z"/><circle cx="12" cy="11" r="1.8"/>',
   user:
     '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
+  image:
+    '<rect x="4.8" y="6.2" width="14.4" height="11.6" rx="2"/><circle cx="9.1" cy="10" r="1.3"/><path d="m6.7 15.6 3.2-3.3 2.4 2.4 2.2-2.1 2.8 3"/>',
   phone:
     '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
   mail:
@@ -92,6 +99,7 @@ function getItemText(item) {
 }
 
 function iconForItem(item, sectionId) {
+  if (isImageItem(item)) return "image";
   const text = getItemText(item);
 
   if (/wifi|rete|password|connession/.test(text)) return "wifi";
@@ -150,6 +158,22 @@ function renderSectionItems(items, sectionId) {
   return items
     .map((item) => {
       const itemIcon = renderIcon(iconForItem(item, sectionId));
+      if (isImageItem(item)) {
+        return `
+          <article class="sheet-card sheet-card-media">
+            <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>
+            <div class="sheet-card-media-body">
+              <img class="sheet-image" src="${item.src}" alt="${item.alt ?? ""}" loading="lazy" />
+              ${
+                item.caption
+                  ? `<p class="sheet-image-caption">${item.caption}</p>`
+                  : ""
+              }
+            </div>
+          </article>
+        `;
+      }
+
       if (typeof item === "string") {
         return `
           <article class="sheet-card">
