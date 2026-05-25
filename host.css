@@ -15,9 +15,12 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   background:
     linear-gradient(180deg, rgba(9, 7, 5, 0.88), rgba(9, 7, 5, 0.96)),
     url("./img/patternlegn.png") center top / 42rem auto repeat;
@@ -29,6 +32,7 @@ button,
 input,
 textarea {
   font: inherit;
+  max-width: 100%;
 }
 
 .hidden {
@@ -39,6 +43,7 @@ textarea {
   width: min(100%, 56rem);
   margin: 0 auto;
   padding: max(1.2rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
+  overflow-x: clip;
 }
 
 .host-gate,
@@ -76,6 +81,8 @@ textarea {
   margin: 0.7rem 0 0;
   color: var(--muted);
   line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .host-gate-form {
@@ -96,6 +103,7 @@ textarea {
 .host-section-grid span {
   color: rgba(231, 216, 193, 0.8);
   font-size: 0.88rem;
+  overflow-wrap: anywhere;
 }
 
 input,
@@ -107,6 +115,7 @@ textarea {
   color: var(--text);
   padding: 0.85rem 0.9rem;
   outline: none;
+  overflow-wrap: anywhere;
 }
 
 textarea {
@@ -123,6 +132,9 @@ button,
   padding: 0.85rem 1rem;
   cursor: pointer;
   text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .ghost-button {
@@ -161,6 +173,7 @@ button,
   flex-wrap: wrap;
   gap: 0.55rem;
   justify-content: end;
+  min-width: 0;
 }
 
 .host-status {
@@ -180,6 +193,17 @@ button,
 .host-card,
 .host-section-card {
   padding: 1rem;
+}
+
+.host-header h1,
+.host-card h2,
+.host-section-card h2,
+.host-kicker,
+.host-status,
+.host-lock-note,
+.host-media-note {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .host-live-actions {
@@ -217,6 +241,10 @@ button,
   display: flex;
   align-items: center;
   gap: 0.7rem;
+}
+
+.host-section-meta > div {
+  min-width: 0;
 }
 
 .host-section-media {
@@ -339,5 +367,22 @@ button,
 
   .host-upload-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .host-shell {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .host-gate {
+    margin-top: 5vh;
+    padding: 1rem;
+  }
+
+  .host-card,
+  .host-section-card {
+    padding: 0.9rem;
   }
 }

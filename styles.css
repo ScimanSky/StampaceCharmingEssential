@@ -24,11 +24,15 @@
 
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   position: relative;
   background: var(--bg);
   color: var(--text);
@@ -86,6 +90,7 @@ svg,
   margin: 0 auto;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   position: relative;
+  overflow-x: clip;
 }
 
 .topbar {
@@ -111,11 +116,14 @@ svg,
 .topbar-name {
   display: block;
   font-family: "Roboto", sans-serif;
-  font-size: 1.18rem;
+  font-size: clamp(1rem, 3.9vw, 1.18rem);
   line-height: 1.1;
-  letter-spacing: 0.08em;
+  letter-spacing: clamp(0.03em, 0.3vw, 0.08em);
   color: var(--muted-strong);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-wrap: balance;
   text-shadow: none;
   transform: none;
   transform-origin: center;
@@ -151,13 +159,15 @@ svg,
 .hero-subtitle {
   margin: 0;
   color: var(--copy);
-  font-size: 0.98rem;
+  font-size: clamp(0.9rem, 3.4vw, 0.98rem);
   line-height: 1.2;
-  letter-spacing: 0.14em;
+  letter-spacing: clamp(0.08em, 0.45vw, 0.14em);
   text-transform: uppercase;
   text-align: center;
   font-family: "Roboto", sans-serif;
   font-weight: 400;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .hero-meta {
@@ -175,6 +185,10 @@ svg,
 
 .hero-meta span {
   display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: pretty;
 }
 
 .main-menu {
@@ -185,7 +199,7 @@ svg,
 
 .menu-row {
   display: grid;
-  grid-template-columns: 2.85rem 1fr 0.9rem;
+  grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
   align-items: center;
   gap: 0.95rem;
   min-height: 3.7rem;
@@ -256,11 +270,14 @@ svg,
 }
 
 .menu-copy strong {
-  font-size: 1.08rem;
+  font-size: clamp(0.98rem, 3.7vw, 1.08rem);
   font-weight: 400;
   color: var(--text);
   line-height: 1.1;
   text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
 }
 
 .menu-copy span {
@@ -305,7 +322,7 @@ svg,
 
 .sheet-header {
   display: grid;
-  grid-template-columns: 3rem 1fr 2.7rem;
+  grid-template-columns: 3rem minmax(0, 1fr) 2.7rem;
   align-items: start;
   gap: 0.95rem;
   margin: 0 auto;
@@ -343,13 +360,17 @@ svg,
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .sheet-title-block h2 {
   margin: 0.3rem 0 0;
-  font-size: 1.42rem;
+  font-size: clamp(1.16rem, 5vw, 1.42rem);
   line-height: 1.1;
   font-weight: 400;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
 }
 
 .sheet-lead {
@@ -357,6 +378,8 @@ svg,
   color: var(--muted);
   line-height: 1.45;
   font-size: 0.94rem;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .sheet-close {
@@ -381,11 +404,12 @@ svg,
   gap: 0.8rem;
   margin: 1rem auto 0;
   width: min(100%, 34rem);
+  min-width: 0;
 }
 
 .sheet-card {
   display: grid;
-  grid-template-columns: 2.8rem 1fr;
+  grid-template-columns: 2.8rem minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
   padding: 0.95rem 1rem;
@@ -393,6 +417,7 @@ svg,
   border-radius: 0.9rem;
   background: rgba(17, 14, 11, 0.42);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+  min-width: 0;
 }
 
 .sheet-card-index {
@@ -423,6 +448,45 @@ svg,
   color: var(--muted-strong);
   font-size: 0.96rem;
   white-space: pre-line;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: pretty;
+}
+
+.sheet-card-copy {
+  min-width: 0;
+}
+
+.sheet-card-copy strong {
+  display: block;
+  margin: 0 0 0.2rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
+}
+
+.sheet-card > *,
+.sheet-card-copy > *,
+.sheet-card-media-body > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sheet-card-copy p,
+.sheet-card-copy strong,
+.sheet-link,
+.sheet-image-caption {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sheet-link {
+  display: inline-block;
+  max-width: 100%;
+  margin-top: 0.45rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .sheet-card-media {
@@ -446,4 +510,40 @@ svg,
 .sheet-image-caption {
   font-size: 0.9rem;
   color: var(--muted);
+}
+
+@media (max-width: 420px) {
+  .page-shell {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .topbar {
+    margin-bottom: 0.8rem;
+  }
+
+  .hero-block {
+    min-height: 13.8rem;
+  }
+
+  .menu-row {
+    gap: 0.75rem;
+    padding-left: 0.72rem;
+    padding-right: 0.78rem;
+  }
+
+  .sheet-panel {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .sheet-header {
+    gap: 0.8rem;
+  }
+
+  .sheet-card {
+    gap: 0.8rem;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
 }
