@@ -93,6 +93,7 @@ const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single"
 const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
 const TRANSLATE_CHUNK_LIMIT = 2400;
 const translationCache = new Map();
+const expandedSectionIds = new Set();
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -287,6 +288,16 @@ function currentLocaleState() {
   return state.locales[selectedEditorLocale] ?? state.locales[FIXED_LOCALE];
 }
 
+function syncExpandedSections() {
+  const sectionIds = currentLocaleState().sections.map((section) => section.id);
+  [...expandedSectionIds].forEach((id) => {
+    if (!sectionIds.includes(id)) expandedSectionIds.delete(id);
+  });
+  if (!expandedSectionIds.size && sectionIds.length) {
+    expandedSectionIds.add(sectionIds[0]);
+  }
+}
+
 function sectionBadge(section) {
   return section.id.startsWith("custom-") ? "Sezione personalizzata" : section.id;
 }
@@ -409,6 +420,7 @@ function renderSectionImages(section) {
 
 function renderSectionEditors() {
   const localeState = currentLocaleState();
+  syncExpandedSections();
   const localeHostPrivateItem = localeState.sections
     .find((section) => section.id === "host")
     ?.items.find(isHostPrivateItem) ?? HOST_PRIVATE_ITEM;
@@ -416,60 +428,67 @@ function renderSectionEditors() {
   dom.sections.innerHTML = localeState.sections
     .map(
       (section) => `
-        <section class="host-section-card" data-section-id="${section.id}">
+        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}" data-section-id="${section.id}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
-              <div class="host-section-icon">${renderIcon(section.icon)}</div>
-              <div>
-                <p class="host-kicker">${section.id}</p>
-                <h2>${section.menuTitle}</h2>
-                <p class="host-section-badge">${sectionBadge(section)}</p>
-              </div>
+              <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
+                <span class="host-section-icon">${renderIcon(section.icon)}</span>
+                <span class="host-section-heading">
+                  <span>
+                    <p class="host-kicker">${section.id}</p>
+                    <h2>${section.menuTitle}</h2>
+                    <p class="host-section-badge">${sectionBadge(section)}</p>
+                  </span>
+                  <span class="host-section-chevron" aria-hidden="true">⌄</span>
+                </span>
+              </button>
             </div>
             <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
           </div>
-          <div class="host-section-grid">
-            <label>
-              <span>Icona pulsante</span>
-              <select data-field="icon">${renderIconOptions(section.icon)}</select>
-            </label>
-            <label>
-              <span>Titolo nel menu</span>
-              <input data-field="menuTitle" type="text" value="${section.menuTitle}" />
-            </label>
-            <label>
-              <span>Titolo sezione</span>
-              <input data-field="sectionTitle" type="text" value="${section.sectionTitle}" />
-            </label>
-            <label>
-              <span>Testo introduttivo</span>
-              <textarea data-field="lead">${section.lead}</textarea>
-            </label>
-            <label>
-              <span>Contenuti: usa "+" all'inizio di una riga per creare un nuovo paragrafo</span>
-              <textarea data-field="items">${serializeItems(section.items)}</textarea>
-            </label>
-          </div>
-          <div class="host-section-media">
-            <div class="host-section-media-head">
-              <div>
-                <p class="host-kicker">Immagini sezione</p>
-                <p class="host-media-note">JPEG, PNG o WEBP. Max ${Math.round(IMAGE_MAX_BYTES / (1024 * 1024))} MB.</p>
-              </div>
-              <label class="ghost-button file-button host-upload-button">
-                <span>Aggiungi immagine</span>
-                <input data-image-upload type="file" accept="image/jpeg,image/png,image/webp" />
+          <div class="host-section-body">
+            <div class="host-section-grid">
+              <label>
+                <span>Icona pulsante</span>
+                <select data-field="icon">${renderIconOptions(section.icon)}</select>
+              </label>
+              <label>
+                <span>Titolo nel menu</span>
+                <input data-field="menuTitle" type="text" value="${section.menuTitle}" />
+              </label>
+              <label>
+                <span>Titolo sezione</span>
+                <input data-field="sectionTitle" type="text" value="${section.sectionTitle}" />
+              </label>
+              <label>
+                <span>Testo introduttivo</span>
+                <textarea data-field="lead">${section.lead}</textarea>
+              </label>
+              <label>
+                <span>Contenuti: usa "+" all'inizio di una riga per creare un nuovo paragrafo</span>
+                <textarea data-field="items">${serializeItems(section.items)}</textarea>
               </label>
             </div>
-            <div class="host-image-list">
-              ${renderSectionImages(section)}
+            <div class="host-section-media">
+              <div class="host-section-media-head">
+                <div>
+                  <p class="host-kicker">Immagini sezione</p>
+                  <p class="host-media-note">JPEG, PNG o WEBP. Max ${Math.round(IMAGE_MAX_BYTES / (1024 * 1024))} MB.</p>
+                </div>
+                <label class="ghost-button file-button host-upload-button">
+                  <span>Aggiungi immagine</span>
+                  <input data-image-upload type="file" accept="image/jpeg,image/png,image/webp" />
+                </label>
+              </div>
+              <div class="host-image-list">
+                ${renderSectionImages(section)}
+              </div>
             </div>
+            ${
+              section.id === "host"
+                ? `<p class="host-lock-note">La voce "${localeHostPrivateItem.title}" viene reinserita automaticamente e non può essere eliminata.</p>`
+                : ""
+            }
           </div>
-          ${
-            section.id === "host"
-              ? `<p class="host-lock-note">La voce "${localeHostPrivateItem.title}" viene reinserita automaticamente e non può essere eliminata.</p>`
-              : ""
-          }
         </section>
       `,
     )
@@ -564,10 +583,21 @@ function addSection() {
     lead: "",
     items: [],
   });
+  expandedSectionIds.add(currentLocaleState().sections.at(-1).id);
   state = saveTemplate(state);
   syncFields();
   queueAutoPublish();
   setStatus("Nuovo pulsante aggiunto. Ora compila i campi della nuova sezione.", "success");
+}
+
+function toggleSection(sectionId) {
+  if (!sectionId) return;
+  if (expandedSectionIds.has(sectionId)) {
+    expandedSectionIds.delete(sectionId);
+  } else {
+    expandedSectionIds.add(sectionId);
+  }
+  renderSectionEditors();
 }
 
 function removeSection(sectionId) {
@@ -585,6 +615,7 @@ function removeSection(sectionId) {
   if (!confirmed) return;
 
   currentLocaleState().sections = sections.filter((section) => section.id !== sectionId);
+  expandedSectionIds.delete(sectionId);
   state = saveTemplate(state);
   syncFields();
   queueAutoPublish();
@@ -842,6 +873,13 @@ function bindEditorEvents() {
   });
 
   dom.sections.addEventListener("click", (event) => {
+    const toggleTrigger = event.target.closest('[data-action="toggle-section"]');
+    if (toggleTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      toggleSection(sectionCard?.dataset.sectionId);
+      return;
+    }
+
     const removeSectionTrigger = event.target.closest('[data-action="remove-section"]');
     if (removeSectionTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");

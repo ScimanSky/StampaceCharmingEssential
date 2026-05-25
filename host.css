@@ -349,15 +349,8 @@ button,
 }
 
 .host-section-meta-main {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
   min-width: 0;
   flex: 1 1 auto;
-}
-
-.host-section-meta-main > div {
-  min-width: 0;
 }
 
 .host-section-badge {
@@ -369,6 +362,50 @@ button,
 
 .host-remove-section {
   flex: 0 0 auto;
+}
+
+.host-section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.host-section-heading {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.host-section-heading > span:first-child {
+  min-width: 0;
+}
+
+.host-section-chevron {
+  color: var(--muted);
+  font-size: 1.15rem;
+  line-height: 1;
+  transform: rotate(180deg);
+  transition: transform 180ms ease;
+}
+
+.host-section-card.is-collapsed .host-section-chevron {
+  transform: rotate(0deg);
+}
+
+.host-section-body {
+  margin-top: 1rem;
+}
+
+.host-section-card.is-collapsed .host-section-body {
+  display: none;
 }
 
 .host-section-media {
@@ -499,7 +536,7 @@ button,
   }
 
   .host-section-meta,
-  .host-section-meta-main {
+  .host-section-heading {
     display: grid;
     align-items: start;
   }
