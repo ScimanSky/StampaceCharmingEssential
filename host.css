@@ -344,10 +344,19 @@ button,
 .host-section-meta {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.7rem;
 }
 
-.host-section-meta > div {
+.host-section-meta-main {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.host-section-meta-main > div {
   min-width: 0;
 }
 
@@ -356,6 +365,10 @@ button,
   color: var(--muted);
   font-size: 0.8rem;
   line-height: 1.35;
+}
+
+.host-remove-section {
+  flex: 0 0 auto;
 }
 
 .host-section-media {
@@ -483,6 +496,16 @@ button,
   .host-sections-head {
     display: grid;
     align-items: start;
+  }
+
+  .host-section-meta,
+  .host-section-meta-main {
+    display: grid;
+    align-items: start;
+  }
+
+  .host-remove-section {
+    width: 100%;
   }
 
   .host-upload-button {

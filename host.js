@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260527g";
+} from "./content.js?v=20260527h";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -418,12 +418,15 @@ function renderSectionEditors() {
       (section) => `
         <section class="host-section-card" data-section-id="${section.id}">
           <div class="host-section-meta">
-            <div class="host-section-icon">${renderIcon(section.icon)}</div>
-            <div>
-              <p class="host-kicker">${section.id}</p>
-              <h2>${section.menuTitle}</h2>
-              <p class="host-section-badge">${sectionBadge(section)}</p>
+            <div class="host-section-meta-main">
+              <div class="host-section-icon">${renderIcon(section.icon)}</div>
+              <div>
+                <p class="host-kicker">${section.id}</p>
+                <h2>${section.menuTitle}</h2>
+                <p class="host-section-badge">${sectionBadge(section)}</p>
+              </div>
             </div>
+            <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
           </div>
           <div class="host-section-grid">
             <label>
@@ -565,6 +568,27 @@ function addSection() {
   syncFields();
   queueAutoPublish();
   setStatus("Nuovo pulsante aggiunto. Ora compila i campi della nuova sezione.", "success");
+}
+
+function removeSection(sectionId) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Rimuovi sezioni solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  const sections = currentLocaleState().sections;
+  const target = sections.find((section) => section.id === sectionId);
+  if (!target) return;
+
+  const confirmed = window.confirm(`Vuoi rimuovere il pulsante "${target.menuTitle}"?`);
+  if (!confirmed) return;
+
+  currentLocaleState().sections = sections.filter((section) => section.id !== sectionId);
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+  setStatus(`Pulsante "${target.menuTitle}" rimosso.`, "success");
 }
 
 function isAuthorizedSession(nextSession) {
@@ -818,6 +842,13 @@ function bindEditorEvents() {
   });
 
   dom.sections.addEventListener("click", (event) => {
+    const removeSectionTrigger = event.target.closest('[data-action="remove-section"]');
+    if (removeSectionTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      removeSection(sectionCard?.dataset.sectionId);
+      return;
+    }
+
     const removeTrigger = event.target.closest('[data-action="remove-image"]');
     if (!removeTrigger) return;
     const imageItem = event.target.closest("[data-image-item]");

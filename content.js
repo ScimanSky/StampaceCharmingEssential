@@ -748,9 +748,18 @@ function normalizeLocaleSections(rawSections, baseSections, localeCode) {
 
 function normalizeLocaleContent(localeData, baseLocale, localeCode) {
   const rawSections = Array.isArray(localeData?.sections) ? localeData.sections : [];
+  const structureSections =
+    localeCode === FIXED_LOCALE && rawSections.length
+      ? rawSections.map(
+          (section, index) =>
+            baseLocale.sections.find((baseSection) => baseSection.id === cleanString(section?.id)) ??
+            buildFallbackSection(section, index),
+        )
+      : baseLocale.sections;
+
   return {
     subtitle: cleanString(localeData?.subtitle, baseLocale.subtitle),
-    sections: normalizeLocaleSections(rawSections, baseLocale.sections, localeCode),
+    sections: normalizeLocaleSections(rawSections, structureSections, localeCode),
   };
 }
 

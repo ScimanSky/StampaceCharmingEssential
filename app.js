@@ -6,7 +6,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260527g";
+} from "./content.js?v=20260527h";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
