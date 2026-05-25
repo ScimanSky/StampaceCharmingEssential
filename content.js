@@ -721,6 +721,43 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
   };
 }
 
+function cloneItem(item) {
+  if (typeof item === "string") return item;
+  if (item && typeof item === "object") return JSON.parse(JSON.stringify(item));
+  return item;
+}
+
+function mirrorItalianContent(localeMap) {
+  const italian = localeMap[FIXED_LOCALE];
+  if (!italian) return localeMap;
+
+  return Object.fromEntries(
+    AVAILABLE_LANGUAGES.map((language) => {
+      if (language.code === FIXED_LOCALE) {
+        return [language.code, italian];
+      }
+
+      return [
+        language.code,
+        {
+          subtitle: italian.subtitle,
+          sections: italian.sections.map((section) => ({
+            id: section.id,
+            icon: section.icon,
+            menuTitle: section.menuTitle,
+            sectionTitle: section.sectionTitle,
+            lead: section.lead,
+            items:
+              section.id === "host"
+                ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)
+                : section.items.map(cloneItem),
+          })),
+        },
+      ];
+    }),
+  );
+}
+
 function buildLocaleMap(rawTemplate = {}) {
   const rawLocales = rawTemplate.locales && typeof rawTemplate.locales === "object" ? rawTemplate.locales : {};
   const legacyItLocale = {
@@ -728,7 +765,7 @@ function buildLocaleMap(rawTemplate = {}) {
     sections: rawTemplate.sections,
   };
 
-  return Object.fromEntries(
+  const localeMap = Object.fromEntries(
     AVAILABLE_LANGUAGES.map((language) => {
       const baseLocale = DEFAULT_LOCALE_CONTENT[language.code];
       const rawLocale =
@@ -737,6 +774,8 @@ function buildLocaleMap(rawTemplate = {}) {
       return [language.code, normalizeLocaleContent(rawLocale, baseLocale, language.code)];
     }),
   );
+
+  return mirrorItalianContent(localeMap);
 }
 
 export function normalizeTemplate(rawTemplate = {}) {
