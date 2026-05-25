@@ -17,7 +17,7 @@ const iconPaths = {
   calendar:
     '<rect x="5" y="6" width="14" height="13" rx="2"/><path d="M8 4.8v2.4"/><path d="M16 4.8v2.4"/><path d="M5 9.5h14"/>',
   wifi:
-    '<path d="M3.5 8.8a13.5 13.5 0 0 1 17 0"/><path d="M6.5 12.1a9.3 9.3 0 0 1 11 0"/><path d="M9.8 15.3a4.7 4.7 0 0 1 4.4 0"/><circle cx="12" cy="18.5" r="1" fill="currentColor" stroke="none"/>',
+    '<path d="M2 8.5c6-6 14-6 20 0"/><path d="M5 12c4.2-4.2 9.8-4.2 14 0"/><path d="M8.5 15.5c2-2 5-2 7 0"/><circle cx="12" cy="19" r="1.2" style="fill: currentColor; stroke: none;"/>',
   spark:
     '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
   key:
@@ -69,17 +69,17 @@ const iconPaths = {
   receipt:
     '<path d="M7 4.8h10v14.4l-1.4-.8-1.6.8-1.6-.8-1.6.8-1.6-.8-1.2.8z"/><path d="M9.3 8h5.4"/><path d="M9.3 11h5.4"/><path d="M9.3 14h3.2"/>',
   checkin:
-    '<rect x="4.5" y="9.5" width="11" height="10" rx="1.8"/><path d="M8 9.5V7.2a2.5 2.5 0 0 1 5 0v2.3"/><path d="M4.5 13.5h11"/><circle cx="18" cy="6.5" r="3.2"/><path d="M18 4.8v1.7l1.3.9"/>',
+    '<rect x="3.5" y="9.5" width="10.5" height="10" rx="2"/><path d="M6.5 9.5V6.5a1.5 1.5 0 0 1 1.5-1.5h1.5a1.5 1.5 0 0 1 1.5 1.5v3"/><circle cx="16.5" cy="7.5" r="4.5"/><path d="M16.5 4.5v3l2 1"/><path d="M12 16.5h8m-2.5-2.5 2.5 2.5-2.5 2.5"/>',
   notepad:
-    '<path d="M9.5 4H16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7.5L9.5 4z"/><path d="M9.5 4v3.5H6"/><path d="M9.5 10.5h5"/><path d="M9.5 13.5h5"/><path d="M9.5 16.5h3"/>',
+    '<path d="M6 8.5v7"/><path d="M18 8.5v7"/><path d="M5 8.5C5 7 6.5 6 8 6h8c1.5 0 3 1 3 2.5S17.5 11 16 11H8C6.5 11 5 10 5 8.5z"/><path d="M19 15.5c0 1.5-1.5 2.5-3 2.5H8c-1.5 0-3-1-3-2.5s1.5-2.5 3-2.5h8c1.5 0 3 1 3 2.5z"/><path d="M9 11.5h6M9 13.5h6"/>',
   keypad:
-    '<rect x="6" y="3.5" width="12" height="8.5" rx="1.5"/><circle cx="9" cy="5.8" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="5.8" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="5.8" r=".65" fill="currentColor" stroke="none"/><circle cx="9" cy="9" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="9" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r=".65" fill="currentColor" stroke="none"/><circle cx="8" cy="17" r="2.5"/><path d="M10.3 17H20"/><path d="M16 17v-2"/><path d="M18.5 17v-2"/>',
+    '<circle cx="6.5" cy="15" r="2.5"/><circle cx="6.5" cy="15" r="0.8"/><path d="M9 15h11 M16 15v2.5 M18 15v2.5"/><path d="M11 5h2v2h-2zm3.5 0h2v2h-2zm3.5 0h2v2h-2zm-7 3h2v2h-2zm3.5 0h2v2h-2zm3.5 0h2v2h-2z"/>',
   vault:
-    '<rect x="5" y="4.5" width="14" height="15" rx="2"/><circle cx="11.5" cy="12" r="3"/><path d="M11.5 9v6"/><path d="M8.5 12h6"/><path d="M19 9.5v5"/>',
+    '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="6.5" y="6.5" width="11" height="11" rx="1"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1"/><path d="M12 9v6 M9.5 12h5 M10.25 10.25l3.5 3.5 M10.25 13.75l3.5-3.5"/><path d="M4 8v2 M4 14v2"/>',
   binoculars:
-    '<circle cx="8" cy="14.5" r="3.5"/><circle cx="16" cy="14.5" r="3.5"/><path d="M11.5 14.5h1"/><path d="M8 11V7.5"/><path d="M16 11V7.5"/><path d="M6.5 7.5h3"/><path d="M14.5 7.5h3"/>',
+    '<path d="M4.5 16.5 L8.5 14.5 L12 16.5 L15.5 14.5 L19.5 16.5 v5 L15.5 19.5 L12 21.5 L8.5 19.5 L4.5 21.5 Z M8.5 14.5v5 M12 16.5v5 M15.5 14.5v5"/><path d="M12 17.5l2-2.5 0 2.5-1-.25z"/><circle cx="8.5" cy="10.5" r="2.2"/><circle cx="15.5" cy="10.5" r="2.2"/><circle cx="8.5" cy="10.5" r="0.8"/><circle cx="15.5" cy="10.5" r="0.8"/><path d="M7 9.5 L8 5 h2 L9.5 9.5 M17 9.5 L16 5 h-2 L14.5 9.5"/><path d="M9.5 6.5h5 M9.5 8.5h5"/>',
   avatar:
-    '<circle cx="12" cy="13" r="7"/><circle cx="9.8" cy="12.5" r=".7" fill="currentColor" stroke="none"/><circle cx="14.2" cy="12.5" r=".7" fill="currentColor" stroke="none"/><path d="M9.5 15.5a5 5 0 0 0 5 0"/><path d="M7.5 8.5c1.2-2 2.8-3 4.5-3s3.3 1 4.5 3"/>',
+    '<path d="M8.5 11v1.5a3.5 3.5 0 0 0 7 0V11"/><path d="M8 10a1.2 1.2 0 0 0-1.2 1.2 M16 10a1.2 1.2 0 0 1 1.2 1.2"/><path d="M7 10.5A5 5 0 0 1 12 5.5a5 5 0 0 1 5 5"/><path d="M7 10.5c1.5-1.5 3.5-1.5 5-.5c1.5-1 3.5-1 5 .5"/><path d="M10.5 14.5a1.5 1.5 0 0 0 3 0"/><circle cx="10.5" cy="12" r="0.6" style="fill: currentColor; stroke: none;"/><circle cx="13.5" cy="12" r="0.6" style="fill: currentColor; stroke: none;"/>',
 };
 
 const dom = {
