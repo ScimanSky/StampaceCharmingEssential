@@ -475,11 +475,9 @@ function bindAuthEvents() {
     session = nextSession;
     updateAccessState();
     if (isAuthorizedSession(session)) {
-      if (window.location.hash !== EDITOR_HASH) {
-        window.location.replace(`./host.html${EDITOR_HASH}`);
-        return;
+      if (window.location.hash === EDITOR_HASH) {
+        setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
       }
-      setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
     }
   });
 }
@@ -505,11 +503,6 @@ async function init() {
   syncFields();
   bindAuthEvents();
   bindEditorEvents();
-
-  if (isAuthorizedSession(session) && window.location.hash !== EDITOR_HASH) {
-    window.location.replace(`./host.html${EDITOR_HASH}`);
-    return;
-  }
 
   if (isAuthorizedSession(session) && window.location.hash === EDITOR_HASH) {
     setStatus("Accesso host attivo. Le modifiche si sincronizzano live.", "success");
