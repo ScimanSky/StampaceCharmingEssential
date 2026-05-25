@@ -71,7 +71,7 @@ const iconPaths = {
   checkin:
     '<rect x="3.5" y="9.5" width="10" height="10" rx="2"/><path d="M6.5 9.5v10M10.5 9.5v10"/><path d="M7 9.5V7a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1v2.5"/><path d="M12.5 9.5 A 4 4 0 1 1 13.5 10.5"/><path d="M16 7.5V4.5M16 7.5l2.5 2.5"/><path d="M14.5 16.5h5.5M17.5 14L20 16.5l-2.5 2.5"/>',
   notepad:
-    '<path d="M6 8.5v7"/><path d="M18 8.5v7"/><path d="M5 8.5C5 7 6.5 6 8 6h8c1.5 0 3 1 3 2.5S17.5 11 16 11H8C6.5 11 5 10 5 8.5z"/><path d="M19 15.5c0 1.5-1.5 2.5-3 2.5H8c-1.5 0-3-1-3-2.5s1.5-2.5 3-2.5h8c1.5 0 3 1 3 2.5z"/><path d="M9 11.5h6M9 13.5h6"/>',
+    '<circle cx="6" cy="7.5" r="1.5"/><circle cx="6" cy="7.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M6 6h11.5A1.5 1.5 0 0 1 19 7.5v8.5"/><path d="M6 9h11.5"/><path d="M7.5 9v7.5"/><circle cx="18" cy="17.5" r="1.5"/><circle cx="18" cy="17.5" r="0.2" style="fill: currentColor; stroke: none;"/><path d="M18 19H6.5A1.5 1.5 0 0 1 5 17.5v-8.5"/><path d="M18 16H6.5"/><path d="M9.5 10.5h6M9.5 12.2h6M9.5 13.9h4.5M9.5 15.6h2.5"/>',
   keypad:
     '<circle cx="6.5" cy="15" r="2.5"/><circle cx="6.5" cy="15" r="0.8"/><path d="M9 15h11 M16 15v2.5 M18 15v2.5"/><path d="M11 5h2v2h-2zm3.5 0h2v2h-2zm3.5 0h2v2h-2zm-7 3h2v2h-2zm3.5 0h2v2h-2zm3.5 0h2v2h-2z"/>',
   vault:
