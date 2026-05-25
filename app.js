@@ -77,7 +77,7 @@ const iconPaths = {
   vault:
     '<rect x="4" y="4" width="16" height="15" rx="2"/><path d="M6 19v1.5a1 1 0 0 0 1 1h0a1 1 0 0 0 1-1V19M16 19v1.5a1 1 0 0 0 1 1h0a1 1 0 0 0 1-1V19"/><rect x="6.5" y="6.5" width="11" height="10" rx="1"/><rect x="5" y="8" width="1.5" height="2.5" rx="0.75"/><rect x="5" y="13.5" width="1.5" height="2.5" rx="0.75"/><circle cx="12" cy="11.5" r="3.5"/><circle cx="12" cy="11.5" r="1"/><circle cx="14.3" cy="11.5" r="0.5"/><circle cx="13.6" cy="13.1" r="0.5"/><circle cx="12" cy="13.8" r="0.5"/><circle cx="10.4" cy="13.1" r="0.5"/><circle cx="9.7" cy="11.5" r="0.5"/><circle cx="10.4" cy="9.9" r="0.5"/><circle cx="12" cy="9.2" r="0.5"/><circle cx="13.6" cy="9.9" r="0.5"/>',
   binoculars:
-    '<path d="M4.5 16.5 L8.5 14.5 L12 16.5 L15.5 14.5 L19.5 16.5 v5 L15.5 19.5 L12 21.5 L8.5 19.5 L4.5 21.5 Z M8.5 14.5v5 M12 16.5v5 M15.5 14.5v5"/><path d="M12 17.5l2-2.5 0 2.5-1-.25z"/><circle cx="8.5" cy="10.5" r="2.2"/><circle cx="15.5" cy="10.5" r="2.2"/><circle cx="8.5" cy="10.5" r="0.8"/><circle cx="15.5" cy="10.5" r="0.8"/><path d="M7 9.5 L8 5 h2 L9.5 9.5 M17 9.5 L16 5 h-2 L14.5 9.5"/><path d="M9.5 6.5h5 M9.5 8.5h5"/>',
+    '<path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3V6z M9 3v15 M15 6v15"/>',
   avatar:
     '<path d="M8.5 11v1.5a3.5 3.5 0 0 0 7 0V11"/><path d="M8 10a1.2 1.2 0 0 0-1.2 1.2 M16 10a1.2 1.2 0 0 1 1.2 1.2"/><path d="M7 10.5A5 5 0 0 1 12 5.5a5 5 0 0 1 5 5"/><path d="M7 10.5c1.5-1.5 3.5-1.5 5-.5c1.5-1 3.5-1 5 .5"/><path d="M10.5 14.5a1.5 1.5 0 0 0 3 0"/><circle cx="10.5" cy="12" r="0.6" style="fill: currentColor; stroke: none;"/><circle cx="13.5" cy="12" r="0.6" style="fill: currentColor; stroke: none;"/>',
 };
