@@ -624,12 +624,15 @@ svg,
   justify-content: space-between;
   width: 100%;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .sheet-wifi-label-value {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .sheet-wifi-label {
@@ -644,6 +647,8 @@ svg,
   font-size: 1rem;
   color: var(--text);
   font-weight: 500;
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .copy-btn {
