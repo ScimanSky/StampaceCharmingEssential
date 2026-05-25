@@ -84,6 +84,7 @@ const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
 const TRANSLATE_CHUNK_LIMIT = 2400;
 const translationCache = new Map();
 const expandedSectionIds = new Set();
+const expandedPanelIds = new Set(["general", "sections"]);
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -288,6 +289,35 @@ function syncExpandedSections() {
   }
 }
 
+function isPanelExpanded(panelId) {
+  return expandedPanelIds.has(panelId);
+}
+
+function togglePanel(panelId) {
+  if (!panelId) return;
+  if (expandedPanelIds.has(panelId)) {
+    expandedPanelIds.delete(panelId);
+  } else {
+    expandedPanelIds.add(panelId);
+  }
+  dom.app.querySelectorAll("[data-panel-id]").forEach((panel) => {
+    if (panel.dataset.panelId !== panelId) return;
+    const expanded = isPanelExpanded(panelId);
+    panel.classList.toggle("is-collapsed", !expanded);
+    const toggle = panel.querySelector('[data-action="toggle-panel"]');
+    if (toggle) toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+  });
+}
+
+function syncPanelState() {
+  dom.app.querySelectorAll("[data-panel-id]").forEach((panel) => {
+    const expanded = isPanelExpanded(panel.dataset.panelId);
+    panel.classList.toggle("is-collapsed", !expanded);
+    const toggle = panel.querySelector('[data-action="toggle-panel"]');
+    if (toggle) toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+  });
+}
+
 function sectionBadge(section) {
   return section.id.startsWith("custom-") ? "Sezione personalizzata" : section.id;
 }
@@ -484,6 +514,7 @@ function syncFields() {
   dom.editorLocale.innerHTML = AVAILABLE_LANGUAGES.map(
     (language) => `<option value="${language.code}" ${language.code === selectedEditorLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
   ).join("");
+  syncPanelState();
   renderLanguageOptions();
   renderSectionEditors();
 }
@@ -872,6 +903,13 @@ function bindEditorEvents() {
     const imageItem = event.target.closest("[data-image-item]");
     const sectionCard = event.target.closest("[data-section-id]");
     removeImage(sectionCard?.dataset.sectionId, Number.parseInt(imageItem?.dataset.imageIndex ?? "-1", 10));
+  });
+
+  dom.app.addEventListener("click", (event) => {
+    const panelTrigger = event.target.closest('[data-action="toggle-panel"]');
+    if (!panelTrigger) return;
+    const panel = event.target.closest("[data-panel-id]");
+    togglePanel(panel?.dataset.panelId);
   });
 }
 

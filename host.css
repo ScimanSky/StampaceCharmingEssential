@@ -207,6 +207,41 @@ button,
   padding: 1rem;
 }
 
+.host-panel-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.host-panel-heading {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.host-panel-heading > span:first-child {
+  min-width: 0;
+}
+
+.host-panel-body {
+  margin-top: 1rem;
+}
+
+.host-panel.is-collapsed .host-panel-body {
+  display: none;
+}
+
+.host-panel.is-collapsed .host-panel-toggle .host-section-chevron {
+  transform: rotate(0deg);
+}
+
 .host-header h1,
 .host-card h2,
 .host-section-card h2,
@@ -530,7 +565,8 @@ button,
   }
 
   .host-section-media-head,
-  .host-sections-head {
+  .host-sections-head,
+  .host-panel-heading {
     display: grid;
     align-items: start;
   }

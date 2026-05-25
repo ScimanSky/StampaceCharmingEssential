@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./host.css?v=20260527i" />
+    <link rel="stylesheet" href="./host.css?v=20260527k" />
   </head>
   <body>
     <main class="host-shell">
@@ -56,46 +56,66 @@
           </div>
         </header>
 
-        <section class="host-card">
-          <h2>Dati generali</h2>
-          <div class="host-grid">
-            <label class="host-grid-wide">
-              <span>Lingua in modifica</span>
-              <select id="field-editor-locale"></select>
-            </label>
-            <div class="host-grid-wide host-language-card">
-              <span>Lingue visibili nell'app ospiti</span>
-              <p class="host-language-note">Italiano e inglese sempre attivi. Puoi selezionare al massimo 1 lingua extra.</p>
-              <div class="host-language-options" id="field-enabled-locales"></div>
+        <section class="host-card host-panel" data-panel-id="general">
+          <button class="host-panel-toggle" type="button" data-action="toggle-panel" aria-expanded="true">
+            <span class="host-panel-heading">
+              <span>
+                <p class="host-kicker">Template</p>
+                <h2>Dati generali</h2>
+              </span>
+              <span class="host-section-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </button>
+          <div class="host-panel-body">
+            <div class="host-grid">
+              <label class="host-grid-wide">
+                <span>Lingua in modifica</span>
+                <select id="field-editor-locale"></select>
+              </label>
+              <div class="host-grid-wide host-language-card">
+                <span>Lingue visibili nell'app ospiti</span>
+                <p class="host-language-note">Italiano e inglese sempre attivi. Puoi selezionare al massimo 1 lingua extra.</p>
+                <div class="host-language-options" id="field-enabled-locales"></div>
+              </div>
+              <label>
+                <span>Nome struttura</span>
+                <input id="field-app-name" type="text" />
+              </label>
+              <label>
+                <span>Sottotitolo della lingua selezionata</span>
+                <input id="field-subtitle" type="text" />
+              </label>
+              <label class="host-grid-wide">
+                <span>Indirizzo</span>
+                <input id="field-address" type="text" />
+              </label>
+              <label class="host-grid-wide">
+                <span>CIN</span>
+                <input id="field-license" type="text" />
+              </label>
             </div>
-            <label>
-              <span>Nome struttura</span>
-              <input id="field-app-name" type="text" />
-            </label>
-            <label>
-              <span>Sottotitolo della lingua selezionata</span>
-              <input id="field-subtitle" type="text" />
-            </label>
-            <label class="host-grid-wide">
-              <span>Indirizzo</span>
-              <input id="field-address" type="text" />
-            </label>
-            <label class="host-grid-wide">
-              <span>CIN</span>
-              <input id="field-license" type="text" />
-            </label>
           </div>
         </section>
 
-        <section class="host-card">
-          <div class="host-sections-head">
-            <div>
-              <h2>Sezioni app</h2>
-              <p class="host-sections-note">
-                Aggiungi nuovi pulsanti dell'app ospiti. Le nuove sezioni vanno create in italiano e verranno tradotte in publish.
-              </p>
+        <section class="host-card host-panel" data-panel-id="sections">
+          <button class="host-panel-toggle" type="button" data-action="toggle-panel" aria-expanded="true">
+            <span class="host-panel-heading">
+              <span>
+                <p class="host-kicker">Struttura</p>
+                <h2>Sezioni app</h2>
+              </span>
+              <span class="host-section-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </button>
+          <div class="host-panel-body">
+            <div class="host-sections-head">
+              <div>
+                <p class="host-sections-note">
+                  Aggiungi nuovi pulsanti dell'app ospiti. Le nuove sezioni vanno create in italiano e verranno tradotte in publish.
+                </p>
+              </div>
+              <button id="host-add-section" type="button">Aggiungi pulsante</button>
             </div>
-            <button id="host-add-section" type="button">Aggiungi pulsante</button>
           </div>
         </section>
 
@@ -103,6 +123,6 @@
       </section>
     </main>
 
-    <script type="module" src="./host.js?v=20260527j"></script>
+    <script type="module" src="./host.js?v=20260527k"></script>
   </body>
 </html>
