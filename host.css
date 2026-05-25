@@ -234,6 +234,10 @@ button,
   margin-top: 1rem;
 }
 
+.host-panel-body > .host-sections {
+  margin-top: 1rem;
+}
+
 .host-panel.is-collapsed .host-panel-body {
   display: none;
 }
