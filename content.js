@@ -3,12 +3,13 @@ import { fetchRemoteTemplateRow } from "./supabase.js";
 export const STORAGE_KEY = "stampace_essential_template_v1";
 export const IMAGE_ITEM_TYPE = "image";
 export const FIXED_LOCALE = "it";
+export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
 export const MAX_VISIBLE_LOCALES = 3;
-export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - 1;
+export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - REQUIRED_LOCALES.length;
 
 export const AVAILABLE_LANGUAGES = [
-  { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: "./img/flags/it.svg", fixed: true },
-  { code: "en", label: "English", nativeLabel: "English", flag: "🇬🇧", flagSrc: "./img/flags/gb.svg" },
+  { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: "./img/flags/it.svg", mandatory: true },
+  { code: "en", label: "English", nativeLabel: "English", flag: "🇬🇧", flagSrc: "./img/flags/gb.svg", mandatory: true },
   { code: "fr", label: "French", nativeLabel: "Français", flag: "🇫🇷", flagSrc: "./img/flags/fr.svg" },
   { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: "./img/flags/es.svg" },
   { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: "./img/flags/de.svg" },
@@ -641,10 +642,12 @@ export function getHostPrivateItem(localeCode = FIXED_LOCALE) {
 
 function normalizeEnabledLocales(values) {
   const requested = Array.isArray(values)
-    ? values.map(cleanLocaleCode).filter((code) => code && code !== FIXED_LOCALE)
+    ? values
+        .map(cleanLocaleCode)
+        .filter((code) => code && !REQUIRED_LOCALES.includes(code))
     : [];
-  const unique = [...new Set(requested)].filter((code) => LANGUAGE_INDEX[code] && code !== FIXED_LOCALE);
-  return [FIXED_LOCALE, ...unique.slice(0, MAX_OPTIONAL_LOCALES)];
+  const unique = [...new Set(requested)].filter((code) => LANGUAGE_INDEX[code] && !REQUIRED_LOCALES.includes(code));
+  return [...REQUIRED_LOCALES, ...unique.slice(0, MAX_OPTIONAL_LOCALES)];
 }
 
 function normalizeItems(items, fallbackItems) {
@@ -738,19 +741,23 @@ function mirrorItalianContent(localeMap) {
       }
 
       const localized = localeMap[language.code];
+      const localizedDefaults = DEFAULT_LOCALE_CONTENT[language.code];
+      const pickLocalizedValue = (value, italianValue, fallbackValue) =>
+        !value || value === italianValue ? fallbackValue : value;
 
       return [
         language.code,
         {
-          subtitle: localized?.subtitle || italian.subtitle,
+          subtitle: pickLocalizedValue(localized?.subtitle, italian.subtitle, localizedDefaults.subtitle),
           sections: italian.sections.map((section, index) => {
             const localizedSection = localized?.sections?.[index];
+            const localizedDefaultSection = localizedDefaults.sections[index];
             return {
               id: section.id,
               icon: section.icon,
-              menuTitle: localizedSection?.menuTitle || section.menuTitle,
-              sectionTitle: localizedSection?.sectionTitle || section.sectionTitle,
-              lead: localizedSection?.lead || section.lead,
+              menuTitle: pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle),
+              sectionTitle: pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle),
+              lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),
               items:
                 section.id === "host"
                   ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)

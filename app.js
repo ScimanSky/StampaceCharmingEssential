@@ -6,7 +6,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260527b";
+} from "./content.js?v=20260527d";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -282,13 +282,23 @@ function bindMenu() {
 }
 
 function bindLocaleBar() {
-  dom.localeBar.addEventListener("click", (event) => {
+  const handleLocaleChange = (event) => {
     const trigger = event.target.closest("[data-locale-code]");
     if (!trigger) return;
     currentLocale = trigger.dataset.localeCode;
     window.localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
     render();
-  });
+  };
+
+  dom.localeBar.addEventListener("click", handleLocaleChange);
+  dom.localeBar.addEventListener(
+    "touchend",
+    (event) => {
+      event.preventDefault();
+      handleLocaleChange(event);
+    },
+    { passive: false },
+  );
 }
 
 function bindSheet() {

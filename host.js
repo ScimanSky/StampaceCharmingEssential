@@ -5,12 +5,13 @@ import {
   FIXED_LOCALE,
   HOST_PRIVATE_ITEM,
   MAX_OPTIONAL_LOCALES,
+  REQUIRED_LOCALES,
   isImageItem,
   isHostPrivateItem,
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260527b";
+} from "./content.js?v=20260527d";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -87,14 +88,14 @@ function currentLocaleState() {
 
 function renderLanguageOptions() {
   const activeSet = new Set(state.enabledLocales);
-  const optionalCount = state.enabledLocales.filter((code) => code !== FIXED_LOCALE).length;
+  const optionalCount = state.enabledLocales.filter((code) => !REQUIRED_LOCALES.includes(code)).length;
 
   dom.enabledLocales.innerHTML = AVAILABLE_LANGUAGES.map((language) => {
     const checked = activeSet.has(language.code);
-    const disabled = language.fixed || (!checked && optionalCount >= MAX_OPTIONAL_LOCALES);
+    const disabled = language.mandatory || (!checked && optionalCount >= MAX_OPTIONAL_LOCALES);
 
     return `
-      <label class="host-language-option${language.fixed ? " is-fixed" : ""}">
+      <label class="host-language-option${language.mandatory ? " is-fixed" : ""}">
         <input type="checkbox" data-locale-toggle value="${language.code}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""} />
         <span class="host-language-flag" aria-hidden="true">
           <img src="${language.flagSrc}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
@@ -294,13 +295,13 @@ function collectTemplate() {
 
   const optionalEnabled = [...dom.enabledLocales.querySelectorAll('[data-locale-toggle]:checked')]
     .map((input) => input.value)
-    .filter((code) => code !== FIXED_LOCALE)
+    .filter((code) => !REQUIRED_LOCALES.includes(code))
     .slice(0, MAX_OPTIONAL_LOCALES);
 
   next.appName = dom.appName.value;
   next.address = dom.address.value;
   next.license = dom.license.value;
-  next.enabledLocales = [FIXED_LOCALE, ...optionalEnabled];
+  next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {
     ...next.locales[selectedEditorLocale],
     subtitle: dom.subtitle.value,
