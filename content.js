@@ -737,21 +737,26 @@ function mirrorItalianContent(localeMap) {
         return [language.code, italian];
       }
 
+      const localized = localeMap[language.code];
+
       return [
         language.code,
         {
-          subtitle: italian.subtitle,
-          sections: italian.sections.map((section) => ({
-            id: section.id,
-            icon: section.icon,
-            menuTitle: section.menuTitle,
-            sectionTitle: section.sectionTitle,
-            lead: section.lead,
-            items:
-              section.id === "host"
-                ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)
-                : section.items.map(cloneItem),
-          })),
+          subtitle: localized?.subtitle || italian.subtitle,
+          sections: italian.sections.map((section, index) => {
+            const localizedSection = localized?.sections?.[index];
+            return {
+              id: section.id,
+              icon: section.icon,
+              menuTitle: localizedSection?.menuTitle || section.menuTitle,
+              sectionTitle: localizedSection?.sectionTitle || section.sectionTitle,
+              lead: localizedSection?.lead || section.lead,
+              items:
+                section.id === "host"
+                  ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)
+                  : section.items.map(cloneItem),
+            };
+          }),
         },
       ];
     }),
