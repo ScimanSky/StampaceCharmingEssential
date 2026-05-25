@@ -84,6 +84,7 @@ const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
 const TRANSLATE_CHUNK_LIMIT = 2400;
 const translationCache = new Map();
 const expandedSectionIds = new Set();
+let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set(["general", "sections"]);
 
 function renderIcon(name) {
@@ -284,8 +285,9 @@ function syncExpandedSections() {
   [...expandedSectionIds].forEach((id) => {
     if (!sectionIds.includes(id)) expandedSectionIds.delete(id);
   });
-  if (!expandedSectionIds.size && sectionIds.length) {
+  if (shouldSeedExpandedSection && !expandedSectionIds.size && sectionIds.length) {
     expandedSectionIds.add(sectionIds[0]);
+    shouldSeedExpandedSection = false;
   }
 }
 
@@ -565,6 +567,7 @@ function switchEditorLocale(nextLocale) {
 
   state = saveTemplate(collectTemplate());
   selectedEditorLocale = nextLocale;
+  shouldSeedExpandedSection = true;
   syncFields();
   setStatus(`Ora stai modificando la lingua ${nextLocale.toUpperCase()}.`, "success");
 }
@@ -646,6 +649,7 @@ function updateAccessState() {
 }
 
 async function hydrateEditorState() {
+  shouldSeedExpandedSection = true;
   state = await loadTemplate({ preferLocal: true });
 
   try {
@@ -735,6 +739,7 @@ function queueAutoPublish() {
 
 async function restoreDefaultTemplate() {
   clearTemplate();
+  shouldSeedExpandedSection = true;
   state = normalizeTemplate(defaultTemplate);
   syncFields();
   setStatus("Template ripristinato ai valori di default.", "success");
@@ -748,6 +753,7 @@ async function importTemplate(file) {
   reader.onload = async () => {
     try {
       const parsed = JSON.parse(reader.result);
+      shouldSeedExpandedSection = true;
       state = saveTemplate(parsed);
       syncFields();
       setStatus("Template importato correttamente.", "success");
