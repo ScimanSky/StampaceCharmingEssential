@@ -94,6 +94,9 @@ let selectedEditorLocale = FIXED_LOCALE;
 const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
 const TRANSLATE_CHUNK_LIMIT = 2400;
+const TRANSLATE_LOCALE_MAP = {
+  sc: FIXED_LOCALE,
+};
 const translationCache = new Map();
 const expandedSectionIds = new Set();
 let shouldSeedExpandedSection = true;
@@ -109,6 +112,7 @@ function translationKey(targetLocale, text) {
 
 async function translateBatch(texts, targetLocale) {
   if (!texts.length || targetLocale === FIXED_LOCALE) return texts;
+  const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
 
   const translated = [];
   let currentChunk = [];
@@ -120,7 +124,7 @@ async function translateBatch(texts, targetLocale) {
     const params = new URLSearchParams({
       client: "gtx",
       sl: FIXED_LOCALE,
-      tl: targetLocale,
+      tl: serviceLocale,
       dt: "t",
       q: joined,
     });
@@ -620,7 +624,7 @@ function switchEditorLocale(nextLocale) {
 function updateEnabledLocales() {
   state = saveTemplate(collectTemplate());
   syncFields();
-  queueAutoPublish();
+  setStatus("Lingue visibili aggiornate. Pubblica per sincronizzare l'app ospiti.", "success");
 }
 
 function createSectionId() {
