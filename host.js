@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528c";
+} from "./content.js?v=20260528d";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -225,6 +225,18 @@ function preserveWifiValue(text, targetLocale) {
 async function buildTranslatedLocale(italianLocale, targetLocale) {
   if (targetLocale === FIXED_LOCALE) {
     return JSON.parse(JSON.stringify(italianLocale));
+  }
+
+  if (targetLocale === "sc") {
+    const mirrored = JSON.parse(JSON.stringify(italianLocale));
+    mirrored.sections = mirrored.sections.map((section) => ({
+      ...section,
+      items:
+        section.id === "host"
+          ? section.items.map((item) => (isHostPrivateItem(item) ? { ...getHostPrivateItem(targetLocale) } : item))
+          : section.items,
+    }));
+    return mirrored;
   }
 
   const draftLocale = {

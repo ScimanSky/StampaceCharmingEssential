@@ -1476,6 +1476,26 @@ function mirrorItalianContent(localeMap) {
         return [language.code, italian];
       }
 
+      if (language.code === "sc") {
+        return [
+          language.code,
+          {
+            subtitle: italian.subtitle,
+            sections: italian.sections.map((section) => ({
+              id: section.id,
+              icon: section.icon,
+              menuTitle: section.menuTitle,
+              sectionTitle: section.sectionTitle,
+              lead: section.lead,
+              items:
+                section.id === "host"
+                  ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)
+                  : section.items.map(cloneItem),
+            })),
+          },
+        ];
+      }
+
       const localized = localeMap[language.code];
       const localizedDefaults = DEFAULT_LOCALE_CONTENT[language.code];
       const pickLocalizedValue = (value, italianValue, fallbackValue) =>
