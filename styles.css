@@ -135,7 +135,7 @@ svg,
 
 .top-controls {
   display: block;
-  min-height: 2.5rem;
+  min-height: 2.34rem;
   margin-bottom: 0.65rem;
   position: relative;
   z-index: 8;
@@ -144,15 +144,15 @@ svg,
 .host-avatar-button {
   position: absolute;
   left: 0;
-  top: 0.02rem;
+  top: -0.22rem;
   transform: none;
-  min-height: 2.26rem;
+  min-height: 2.34rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
   overflow: hidden;
-  padding: 0.16rem 0.7rem 0.16rem 0.16rem;
+  padding: 0.18rem 0.74rem 0.18rem 0.18rem;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -164,12 +164,12 @@ svg,
 }
 
 .host-avatar-media {
-  width: 1.94rem;
-  height: 1.94rem;
+  width: 1.98rem;
+  height: 1.98rem;
   border-radius: 999px;
   overflow: hidden;
   display: block;
-  flex: 0 0 1.94rem;
+  flex: 0 0 1.98rem;
 }
 
 .host-avatar-button img {
