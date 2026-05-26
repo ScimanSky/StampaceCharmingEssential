@@ -6,7 +6,7 @@ export const FIXED_LOCALE = "it";
 export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
 export const MAX_VISIBLE_LOCALES = 3;
 export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - REQUIRED_LOCALES.length;
-const FLAG_ASSET_VERSION = "20260528b";
+const FLAG_ASSET_VERSION = "20260528c";
 
 export const AVAILABLE_LANGUAGES = [
   { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: `./img/flags/it.svg?v=${FLAG_ASSET_VERSION}`, mandatory: true },
