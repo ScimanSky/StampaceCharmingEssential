@@ -377,7 +377,13 @@ function renderSectionItems(items, sectionId) {
           <div class="sheet-card-copy">
             <strong>${item.title ?? ""}</strong>
             <p>${item.body ?? ""}</p>
-            ${item.href ? `<a class="sheet-link" href="${item.href}">${item.label || item.href}</a>` : ""}
+            ${
+              item.href
+                ? `<a class="sheet-link" href="${item.href}"${
+                    sectionId === "host" ? ' target="_blank" rel="noopener noreferrer"' : ""
+                  }>${item.label || item.href}</a>`
+                : ""
+            }
           </div>
         </article>
       `;
