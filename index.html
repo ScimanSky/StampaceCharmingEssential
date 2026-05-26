@@ -18,11 +18,19 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260527k" />
+    <link rel="stylesheet" href="./styles.css?v=20260528a" />
   </head>
   <body>
     <div class="page-shell">
-      <nav class="locale-bar" id="locale-bar" aria-label="Language switcher"></nav>
+      <div class="top-controls">
+        <button class="host-avatar-button hidden" id="host-avatar-button" type="button" aria-label="Host">
+          <span class="host-avatar-media">
+            <img src="./img/host-avatar.jpg?v=20260528a" alt="" loading="lazy" decoding="async" />
+          </span>
+          <span class="host-avatar-label" id="host-avatar-label">Host</span>
+        </button>
+        <nav class="locale-bar" id="locale-bar" aria-label="Language switcher"></nav>
+      </div>
 
       <header class="topbar">
         <span class="topbar-mark" aria-hidden="true"></span>
@@ -62,6 +70,6 @@
       </section>
     </div>
 
-    <script type="module" src="./app.js?v=20260528a"></script>
+    <script type="module" src="./app.js?v=20260528b"></script>
   </body>
 </html>

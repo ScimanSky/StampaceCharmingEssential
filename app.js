@@ -84,6 +84,8 @@ const iconPaths = {
 
 const dom = {
   appName: document.querySelector("#app-name"),
+  hostAvatarButton: document.querySelector("#host-avatar-button"),
+  hostAvatarLabel: document.querySelector("#host-avatar-label"),
   localeBar: document.querySelector("#locale-bar"),
   subtitle: document.querySelector("#hero-subtitle"),
   address: document.querySelector("#footer-address"),
@@ -162,6 +164,7 @@ function iconForItem(item, sectionId) {
 
 function renderMenu(sections) {
   return sections
+    .filter((section) => section.id !== "host")
     .map(
       (section) => `
         <button class="menu-row" type="button" data-section-id="${section.id}">
@@ -193,6 +196,21 @@ function renderLocaleBar() {
       `,
     )
     .join("");
+}
+
+function renderHostShortcut() {
+  const hostSection = localeState().sections.find((section) => section.id === "host");
+  if (!hostSection) {
+    dom.hostAvatarButton.classList.add("hidden");
+    dom.hostAvatarButton.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  dom.hostAvatarButton.classList.remove("hidden");
+  dom.hostAvatarButton.removeAttribute("aria-hidden");
+  dom.hostAvatarButton.setAttribute("aria-label", hostSection.menuTitle);
+  dom.hostAvatarButton.setAttribute("title", hostSection.menuTitle);
+  dom.hostAvatarLabel.textContent = hostSection.menuTitle;
 }
 
 function renderSectionItems(items, sectionId) {
@@ -342,6 +360,12 @@ function bindMenu() {
   });
 }
 
+function bindHostShortcut() {
+  dom.hostAvatarButton.addEventListener("click", () => {
+    openSection("host");
+  });
+}
+
 function bindLocaleBar() {
   const handleLocaleChange = (event) => {
     const trigger = event.target.closest("[data-locale-code]");
@@ -423,6 +447,7 @@ function preventCopy() {
 function render() {
   const localeTemplate = localeState();
   dom.appName.textContent = template.appName;
+  renderHostShortcut();
   renderLocaleBar();
   dom.subtitle.textContent = localeTemplate.subtitle;
   dom.address.textContent = template.address;
@@ -487,6 +512,7 @@ async function init() {
   }
   render();
   bindMenu();
+  bindHostShortcut();
   bindLocaleBar();
   bindSheet();
   bindCopyButtons();
