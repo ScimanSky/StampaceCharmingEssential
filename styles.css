@@ -416,20 +416,34 @@ svg,
   position: fixed;
   inset: 0;
   z-index: 30;
+  background: var(--bg);
+}
+
+.section-sheet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("./img/patternlegn.webp") center top / 42rem auto repeat;
+  opacity: 0.42;
+  filter: brightness(1.02) contrast(1.18) saturate(0.62);
+  pointer-events: none;
+}
+
+.section-sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background:
-    url("./img/patternlegn.webp") center top / 42rem auto repeat,
-    linear-gradient(180deg, rgba(6, 5, 4, 0.34), rgba(6, 5, 4, 0.48));
+    radial-gradient(circle at top center, rgba(255, 222, 170, 0.05), transparent 28%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.42));
+  pointer-events: none;
 }
 
 .sheet-backdrop {
   position: absolute;
   inset: 0;
   border: 0;
-  background:
-    radial-gradient(circle at top center, rgba(255, 220, 168, 0.05), transparent 30%),
-    rgba(4, 4, 4, 0.18);
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
+  background: transparent;
 }
 
 .sheet-panel {
@@ -437,7 +451,7 @@ svg,
   inset: 0;
   overflow: auto;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, rgba(10, 8, 6, 0.2), rgba(7, 6, 5, 0.34));
+  background: transparent;
 }
 
 .sheet-header {
