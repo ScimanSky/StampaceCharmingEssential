@@ -134,16 +134,18 @@ svg,
 }
 
 .top-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.55rem;
+  display: block;
+  min-height: 2.3rem;
   margin-bottom: 0.65rem;
   position: relative;
   z-index: 8;
 }
 
 .host-avatar-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   min-height: 2.12rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
@@ -190,6 +192,7 @@ svg,
 .locale-bar {
   display: flex;
   justify-content: center;
+  width: 100%;
   gap: 0.45rem;
   margin-bottom: 0;
   flex-wrap: wrap;
