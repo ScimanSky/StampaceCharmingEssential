@@ -183,7 +183,6 @@ function renderGenericLinkItem(item, marker, sectionId) {
   const title = item.title ? `<strong>${escapeHtml(item.title)}</strong>` : "";
   const body = item.body ? `<p>${escapeHtml(item.body)}</p>` : "";
   const label = item.label || item.href;
-  const openInNewTab = sectionId === "host" ? ' target="_blank" rel="noopener noreferrer"' : "";
 
   return `
     <article class="sheet-card sheet-card-link">
@@ -193,7 +192,7 @@ function renderGenericLinkItem(item, marker, sectionId) {
         ${body}
         ${
           item.href
-            ? `<a class="sheet-link" href="${escapeHtml(item.href)}"${openInNewTab}>${escapeHtml(label)}</a>`
+            ? `<a class="sheet-link" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`
             : ""
         }
       </div>
