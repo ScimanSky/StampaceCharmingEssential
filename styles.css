@@ -134,15 +134,18 @@ svg,
 }
 
 .top-controls {
-  display: flex;
-  align-items: center;
-  min-height: 2.34rem;
-  margin-bottom: 0.65rem;
   position: relative;
+  display: block;
+  min-height: 2.7rem;
+  margin-bottom: 0.65rem;
   z-index: 8;
 }
 
 .host-avatar-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   flex-shrink: 0;
   min-height: 2.34rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -192,9 +195,9 @@ svg,
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 1;
+  width: fit-content;
   gap: 0.45rem;
-  margin-bottom: 0;
+  margin: 0 auto;
   flex-wrap: wrap;
   position: relative;
   z-index: 8;
