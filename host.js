@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528d";
+} from "./content.js?v=20260528e";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -95,12 +95,14 @@ const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single"
 const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
 const TRANSLATE_CHUNK_LIMIT = 2400;
 const TRANSLATE_LOCALE_MAP = {
-  sc: FIXED_LOCALE,
+  sc: "ca",
 };
 const translationCache = new Map();
 const expandedSectionIds = new Set();
 let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set(["general", "sections"]);
+const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
+const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -228,15 +230,44 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   }
 
   if (targetLocale === "sc") {
-    const mirrored = JSON.parse(JSON.stringify(italianLocale));
-    mirrored.sections = mirrored.sections.map((section) => ({
-      ...section,
-      items:
-        section.id === "host"
-          ? section.items.map((item) => (isHostPrivateItem(item) ? { ...getHostPrivateItem(targetLocale) } : item))
-          : section.items,
-    }));
-    return mirrored;
+    return {
+      subtitle: italianLocale.subtitle,
+      sections: italianLocale.sections.map((section, sectionIndex) => {
+        const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
+        const scBaseSection = SARDINIAN_TEMPLATE_BASE.sections[sectionIndex] ?? section;
+
+        const pickSectionValue = (currentValue, italianBaseValue, sardinianBaseValue) =>
+          currentValue !== italianBaseValue ? currentValue : sardinianBaseValue;
+
+        const items = section.items.map((item, itemIndex) => {
+          if (isImageItem(item)) return { ...item };
+          if (isHostPrivateItem(item)) return { ...getHostPrivateItem(targetLocale) };
+
+          const itBaseItem = itBaseSection.items?.[itemIndex];
+          const scBaseItem = scBaseSection.items?.[itemIndex];
+
+          if (typeof item === "string") {
+            return item !== itBaseItem ? item : scBaseItem ?? item;
+          }
+
+          return {
+            ...item,
+            title: item.title !== itBaseItem?.title ? item.title : scBaseItem?.title ?? item.title,
+            body: item.body !== itBaseItem?.body ? item.body : scBaseItem?.body ?? item.body,
+            label: item.label !== itBaseItem?.label ? item.label : scBaseItem?.label ?? item.label,
+          };
+        });
+
+        return {
+          id: section.id,
+          icon: section.icon,
+          menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
+          sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
+          lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
+          items,
+        };
+      }),
+    };
   }
 
   const draftLocale = {

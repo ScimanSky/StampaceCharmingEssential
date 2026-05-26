@@ -1318,6 +1318,9 @@ export const defaultTemplate = {
   locales: DEFAULT_LOCALE_CONTENT,
 };
 
+const ITALIAN_TEMPLATE_BASE = DEFAULT_LOCALE_CONTENT[FIXED_LOCALE];
+const SARDINIAN_TEMPLATE_BASE = DEFAULT_LOCALE_CONTENT.sc;
+
 function cleanString(value, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
@@ -1481,17 +1484,40 @@ function mirrorItalianContent(localeMap) {
           language.code,
           {
             subtitle: italian.subtitle,
-            sections: italian.sections.map((section) => ({
-              id: section.id,
-              icon: section.icon,
-              menuTitle: section.menuTitle,
-              sectionTitle: section.sectionTitle,
-              lead: section.lead,
-              items:
-                section.id === "host"
-                  ? ensureHostPrivateItem(section.items.map(cloneItem), language.code)
-                  : section.items.map(cloneItem),
-            })),
+            sections: italian.sections.map((section, sectionIndex) => {
+              const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
+              const scBaseSection = SARDINIAN_TEMPLATE_BASE.sections[sectionIndex] ?? section;
+              const pickSectionValue = (currentValue, italianBaseValue, sardinianBaseValue) =>
+                currentValue !== italianBaseValue ? currentValue : sardinianBaseValue;
+
+              const items = section.items.map((item, itemIndex) => {
+                if (isImageItem(item)) return cloneItem(item);
+                if (isHostPrivateItem(item)) return { ...getHostPrivateItem(language.code) };
+
+                const itBaseItem = itBaseSection.items?.[itemIndex];
+                const scBaseItem = scBaseSection.items?.[itemIndex];
+
+                if (typeof item === "string") {
+                  return item !== itBaseItem ? item : scBaseItem ?? item;
+                }
+
+                return {
+                  ...cloneItem(item),
+                  title: item.title !== itBaseItem?.title ? item.title : scBaseItem?.title ?? item.title,
+                  body: item.body !== itBaseItem?.body ? item.body : scBaseItem?.body ?? item.body,
+                  label: item.label !== itBaseItem?.label ? item.label : scBaseItem?.label ?? item.label,
+                };
+              });
+
+              return {
+                id: section.id,
+                icon: section.icon,
+                menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
+                sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
+                lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
+                items: section.id === "host" ? ensureHostPrivateItem(items, language.code) : items,
+              };
+            }),
           },
         ];
       }
