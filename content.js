@@ -6,20 +6,21 @@ export const FIXED_LOCALE = "it";
 export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
 export const MAX_VISIBLE_LOCALES = 3;
 export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - REQUIRED_LOCALES.length;
+const FLAG_ASSET_VERSION = "20260528a";
 
 export const AVAILABLE_LANGUAGES = [
-  { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: "./img/flags/it.svg", mandatory: true },
-  { code: "en", label: "English", nativeLabel: "English", flag: "🇬🇧", flagSrc: "./img/flags/gb.svg", mandatory: true },
-  { code: "fr", label: "French", nativeLabel: "Français", flag: "🇫🇷", flagSrc: "./img/flags/fr.svg" },
-  { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: "./img/flags/es.svg" },
-  { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: "./img/flags/de.svg" },
-  { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: "./img/flags/pt.svg" },
-  { code: "pl", label: "Polish", nativeLabel: "Polski", flag: "🇵🇱", flagSrc: "./img/flags/pl.svg" },
-  { code: "cs", label: "Czech", nativeLabel: "Čeština", flag: "🇨🇿", flagSrc: "./img/flags/cs.svg" },
-  { code: "ru", label: "Russian", nativeLabel: "Русский", flag: "🇷🇺", flagSrc: "./img/flags/ru.svg" },
-  { code: "zh", label: "Chinese", nativeLabel: "中文", flag: "🇨🇳", flagSrc: "./img/flags/zh.svg" },
-  { code: "hi", label: "Hindi", nativeLabel: "हिन्दी", flag: "🇮🇳", flagSrc: "./img/flags/hi.svg" },
-  { code: "ja", label: "Japanese", nativeLabel: "日本語", flag: "🇯🇵", flagSrc: "./img/flags/ja.svg" },
+  { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: `./img/flags/it.svg?v=${FLAG_ASSET_VERSION}`, mandatory: true },
+  { code: "en", label: "English", nativeLabel: "English", flag: "🇬🇧", flagSrc: `./img/flags/gb.svg?v=${FLAG_ASSET_VERSION}`, mandatory: true },
+  { code: "fr", label: "French", nativeLabel: "Français", flag: "🇫🇷", flagSrc: `./img/flags/fr.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: `./img/flags/es.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: `./img/flags/de.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: `./img/flags/pt.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "pl", label: "Polish", nativeLabel: "Polski", flag: "🇵🇱", flagSrc: `./img/flags/pl.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "cs", label: "Czech", nativeLabel: "Čeština", flag: "🇨🇿", flagSrc: `./img/flags/cs.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "ru", label: "Russian", nativeLabel: "Русский", flag: "🇷🇺", flagSrc: `./img/flags/ru.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "zh", label: "Chinese", nativeLabel: "中文", flag: "🇨🇳", flagSrc: `./img/flags/zh.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "hi", label: "Hindi", nativeLabel: "हिन्दी", flag: "🇮🇳", flagSrc: `./img/flags/hi.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "ja", label: "Japanese", nativeLabel: "日本語", flag: "🇯🇵", flagSrc: `./img/flags/ja.svg?v=${FLAG_ASSET_VERSION}` },
 ];
 
 const LANGUAGE_INDEX = Object.fromEntries(
