@@ -1353,7 +1353,10 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       : baseLocale.sections;
 
   return {
-    subtitle: cleanString(localeData?.subtitle, baseLocale.subtitle),
+    subtitle:
+      localeCode === FIXED_LOCALE
+        ? cleanString(localeData?.subtitle, baseLocale.subtitle)
+        : cleanString(DEFAULT_LOCALE_CONTENT[FIXED_LOCALE]?.subtitle, baseLocale.subtitle),
     sections: normalizeLocaleSections(rawSections, structureSections, localeCode),
   };
 }
@@ -1382,7 +1385,7 @@ function mirrorItalianContent(localeMap) {
       return [
         language.code,
         {
-          subtitle: pickLocalizedValue(localized?.subtitle, italian.subtitle, localizedDefaults.subtitle),
+          subtitle: italian.subtitle,
           sections: italian.sections.map((section, index) => {
             const localizedSection = localized?.sections?.[index];
             const localizedDefaultSection = localizedDefaults.sections[index] ?? section;

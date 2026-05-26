@@ -238,11 +238,6 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   const texts = [];
   const appliers = [];
 
-  texts.push(italianLocale.subtitle);
-  appliers.push((value) => {
-    draftLocale.subtitle = value;
-  });
-
   italianLocale.sections.forEach((section, sectionIndex) => {
     const targetSection = draftLocale.sections[sectionIndex];
 
