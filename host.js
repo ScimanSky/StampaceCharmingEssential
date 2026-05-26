@@ -103,6 +103,7 @@ let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set(["general", "sections"]);
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
 const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
+const LINK_ITEM_PREFIX = "LINK";
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -449,10 +450,34 @@ function serializeItems(items) {
     .filter((item) => !isHostPrivateItem(item) && !isImageItem(item))
     .map((item) => {
       if (typeof item === "string") return item;
+      if (item?.href) {
+        return [
+          LINK_ITEM_PREFIX,
+          item.href ?? "",
+          item.title ?? "",
+          item.body ?? "",
+          item.label ?? "",
+        ].join(" | ");
+      }
       return JSON.stringify(item);
     })
     .map((item) => `+ ${item}`)
     .join("\n\n");
+}
+
+function parseLinkItem(value) {
+  const parts = value.split("|").map((part) => part.trim());
+  if (parts.length < 2 || parts[0].toUpperCase() !== LINK_ITEM_PREFIX) return null;
+
+  const [, href = "", title = "", body = "", label = ""] = parts;
+  if (!href) return null;
+
+  return {
+    title,
+    body,
+    label: label || href,
+    href,
+  };
 }
 
 function parseItems(value) {
@@ -487,6 +512,8 @@ function parseItems(value) {
   flush();
 
   return blocks.map((item) => {
+    const parsedLink = parseLinkItem(item);
+    if (parsedLink) return parsedLink;
     if (item.startsWith("{") && item.endsWith("}")) {
       try {
         return JSON.parse(item);
@@ -571,6 +598,10 @@ function renderSectionEditors() {
                 <span>Contenuti: usa "+" all'inizio di una riga per creare un nuovo paragrafo</span>
                 <textarea data-field="items">${serializeItems(section.items)}</textarea>
               </label>
+              <div class="host-content-tools">
+                <button class="ghost-button" type="button" data-action="add-link">Aggiungi link</button>
+                <p class="host-content-note">Formato link: <code>+ LINK | https://example.com | Titolo | Descrizione | Etichetta</code></p>
+              </div>
             </div>
             <div class="host-section-media">
               <div class="host-section-media-head">
@@ -694,6 +725,19 @@ function addSection() {
   syncFields();
   queueAutoPublish();
   setStatus("Nuovo pulsante aggiunto. Ora compila i campi della nuova sezione.", "success");
+}
+
+function appendLinkTemplate(sectionId) {
+  const sectionCard = dom.sections.querySelector(`[data-section-id="${sectionId}"]`);
+  const textarea = sectionCard?.querySelector('[data-field="items"]');
+  if (!textarea) return;
+
+  const scaffold = "+ LINK | https://example.com | Titolo link | Descrizione del link | Apri link";
+  const currentValue = textarea.value.trimEnd();
+  textarea.value = currentValue ? `${currentValue}\n\n${scaffold}` : scaffold;
+  textarea.focus();
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  setStatus("Scaffold link aggiunto. Compila URL, titolo, descrizione ed etichetta.", "success");
 }
 
 function toggleSection(sectionId) {
@@ -993,6 +1037,13 @@ function bindEditorEvents() {
     if (removeSectionTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
       removeSection(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const addLinkTrigger = event.target.closest('[data-action="add-link"]');
+    if (addLinkTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      appendLinkTemplate(sectionCard?.dataset.sectionId);
       return;
     }
 

@@ -173,6 +173,28 @@ function renderHostStringItem(item, marker) {
   `;
 }
 
+function renderGenericLinkItem(item, marker, sectionId) {
+  const title = item.title ? `<strong>${escapeHtml(item.title)}</strong>` : "";
+  const body = item.body ? `<p>${escapeHtml(item.body)}</p>` : "";
+  const label = item.label || item.href;
+  const openInNewTab = sectionId === "host" ? ' target="_blank" rel="noopener noreferrer"' : "";
+
+  return `
+    <article class="sheet-card sheet-card-link">
+      ${marker}
+      <div class="sheet-card-copy">
+        ${title}
+        ${body}
+        ${
+          item.href
+            ? `<a class="sheet-link" href="${escapeHtml(item.href)}"${openInNewTab}>${escapeHtml(label)}</a>`
+            : ""
+        }
+      </div>
+    </article>
+  `;
+}
+
 function localeState() {
   return getLocaleContent(template, currentLocale);
 }
@@ -371,22 +393,7 @@ function renderSectionItems(items, sectionId) {
         `;
       }
 
-      return `
-        <article class="sheet-card sheet-card-link">
-          ${marker}
-          <div class="sheet-card-copy">
-            <strong>${item.title ?? ""}</strong>
-            <p>${item.body ?? ""}</p>
-            ${
-              item.href
-                ? `<a class="sheet-link" href="${item.href}"${
-                    sectionId === "host" ? ' target="_blank" rel="noopener noreferrer"' : ""
-                  }>${item.label || item.href}</a>`
-                : ""
-            }
-          </div>
-        </article>
-      `;
+      return renderGenericLinkItem(item, marker, sectionId);
     })
     .join("");
 }
