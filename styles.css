@@ -116,9 +116,9 @@ svg,
 .topbar-name {
   display: block;
   font-family: "Roboto", sans-serif;
-  font-size: clamp(1rem, 3.9vw, 1.18rem);
+  font-size: clamp(1.06rem, 4.2vw, 1.28rem);
   line-height: 1.1;
-  letter-spacing: clamp(0.03em, 0.3vw, 0.08em);
+  letter-spacing: clamp(0.05em, 0.42vw, 0.12em);
   color: var(--muted-strong);
   white-space: normal;
   overflow-wrap: anywhere;
