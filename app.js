@@ -58,12 +58,18 @@ const iconPaths = {
     '<rect x="6.3" y="4.8" width="11.4" height="12" rx="2"/><path d="M8.5 8h2.6"/><path d="M13 8h2.5"/><path d="M8 18.2 6.9 20"/><path d="M17.1 18.2 16 20"/><circle cx="9" cy="15.2" r="0.7" fill="currentColor" stroke="none"/><circle cx="15" cy="15.2" r="0.7" fill="currentColor" stroke="none"/>',
   cart:
     '<circle cx="10" cy="17.5" r="1.2"/><circle cx="16" cy="17.5" r="1.2"/><path d="M5 6h1.6l1.2 7h8.2l1.6-5.2H8.3"/>',
+  utensils:
+    '<path d="M7 3.8v7.8"/><path d="M5.2 3.8v4.4"/><path d="M8.8 3.8v4.4"/><path d="M7 11.6V20"/><path d="M15.5 3.8c1.4 1.5 2 3 2 4.8 0 2-.8 3.5-2.4 4.6V20"/><path d="M14.2 3.8v8.2"/>',
   cross:
     '<path d="M12 5.4v13.2"/><path d="M5.4 12h13.2"/>',
   train:
     '<rect x="7" y="5.2" width="10" height="11.6" rx="2"/><path d="M9.5 8.2h5"/><path d="M9.5 11.2h5"/><path d="M9.2 18.2 8 20"/><path d="M14.8 18.2 16 20"/>',
   wave:
     '<path d="M3.8 15.2c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1"/><path d="M4 10.5c1 0 1-.8 2-.8s1 .8 2 .8 1-.8 2-.8 1 .8 2 .8 1-.8 2-.8 1 .8 2 .8"/>',
+  route:
+    '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
+  compass:
+    '<circle cx="12" cy="12" r="8"/><path d="M14.8 9.2 13 13l-3.8 1.8L11 11z"/><circle cx="12" cy="12" r="1"/>',
   id:
     '<rect x="4.8" y="6" width="14.4" height="12" rx="2"/><circle cx="9.3" cy="11" r="1.6"/><path d="M7.2 14.4c.7-1.1 1.5-1.6 2.1-1.6s1.4.5 2.1 1.6"/><path d="M13.6 10h3.1"/><path d="M13.6 13h3.1"/>',
   receipt:
@@ -195,6 +201,22 @@ function renderGenericLinkItem(item, marker, sectionId) {
   `;
 }
 
+function iconForSection(section) {
+  if (!section) return "spark";
+  const genericIcon = !section.icon || section.icon === "spark";
+  if (!genericIcon) return section.icon;
+
+  const text = `${section.menuTitle ?? ""} ${section.sectionTitle ?? ""} ${section.lead ?? ""}`.toLowerCase();
+
+  if (/ristorant|locali|bar|aperitiv|food|drink/.test(text)) return "utensils";
+  if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "route";
+  if (/noleggio|rent|auto|car rental|vehicle/.test(text)) return "car";
+  if (/escursion|tour|gita|trek|experience|esperienz/.test(text)) return "compass";
+  if (/mappa|quartiere|dintorn|local/.test(text)) return "pin";
+
+  return section.icon || "spark";
+}
+
 function localeState() {
   return getLocaleContent(template, currentLocale);
 }
@@ -260,7 +282,7 @@ function renderMenu(sections) {
     .map(
       (section) => `
         <button class="menu-row" type="button" data-section-id="${section.id}">
-          <span class="menu-icon">${renderIcon(section.icon)}</span>
+          <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
           <span class="menu-copy">
             <strong>${section.menuTitle}</strong>
           </span>
@@ -403,7 +425,7 @@ function renderOpenSection(sectionId) {
   if (!section) return;
 
   activeSectionId = section.id;
-  dom.sheetIcon.innerHTML = renderIcon(section.icon);
+  dom.sheetIcon.innerHTML = renderIcon(iconForSection(section));
   dom.sheetBrand.textContent = template.appName;
   dom.sheetTitle.textContent = section.sectionTitle;
   dom.sheetLead.textContent = section.lead;
