@@ -70,6 +70,12 @@ const iconPaths = {
     '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
   compass:
     '<circle cx="12" cy="12" r="8"/><path d="M14.8 9.2 13 13l-3.8 1.8L11 11z"/><circle cx="12" cy="12" r="1"/>',
+  skyline:
+    '<path d="M3.8 18.2h16.4"/><path d="M5.3 18.2V10.8h3.2v7.4"/><path d="M9.7 18.2V7.8h3.6v10.4"/><path d="M14.8 18.2V9.6h3v8.6"/><path d="M11.5 7.8V5.4h1.1v2.4"/><path d="M4.8 20.2a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z"/><path d="M18.2 20.2a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z"/><path d="M6.4 18.4h10.1"/><path d="M15.8 15.9h1.6l1 2.5h-2.6"/><path d="M3.8 18.4h2.2l.9-1.9h2"/>',
+  rental:
+    '<path d="M4.5 12.6 9.6 7.5a2.7 2.7 0 0 1 3.8 0 2.7 2.7 0 0 1 0 3.8l-5.1 5.1"/><circle cx="9.1" cy="7.9" r="1.2"/><path d="M13.8 15.6h2.6l1.7 3.2"/><path d="M10.8 15.6h2.4"/><circle cx="10.4" cy="19" r="1.4"/><circle cx="18.2" cy="19" r="1.4"/><path d="M13 19h3.8"/><path d="M14.6 12.4 12.4 19"/>',
+  trail:
+    '<path d="M4.2 9.3 7.6 5.6 10.1 8.2 13 5l3.1 3.7 2.2-2.4 1.5 1.7"/><path d="M12.5 19.5c.3-1.8.6-3.2 1.4-4.4l1.2-1.8"/><circle cx="10.9" cy="12.1" r="1.2"/><path d="M10.9 13.3 9.2 15.5"/><path d="M10.6 14.4 12.9 16"/><path d="M9.2 15.5 7.8 19.4"/><path d="M13 16l2 3.4"/><path d="M15.2 19.4h3.1"/>',
   id:
     '<rect x="4.8" y="6" width="14.4" height="12" rx="2"/><circle cx="9.3" cy="11" r="1.6"/><path d="M7.2 14.4c.7-1.1 1.5-1.6 2.1-1.6s1.4.5 2.1 1.6"/><path d="M13.6 10h3.1"/><path d="M13.6 13h3.1"/>',
   receipt:
@@ -208,9 +214,9 @@ function iconForSection(section) {
   const text = `${section.menuTitle ?? ""} ${section.sectionTitle ?? ""} ${section.lead ?? ""}`.toLowerCase();
 
   if (/ristorant|locali|bar|aperitiv|food|drink/.test(text)) return "utensils";
-  if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "route";
-  if (/noleggio|rent|auto|car rental|vehicle/.test(text)) return "car";
-  if (/escursion|tour|gita|trek|experience|esperienz/.test(text)) return "compass";
+  if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "skyline";
+  if (/noleggio|rent|auto|car rental|vehicle/.test(text)) return "rental";
+  if (/escursion|tour|gita|trek|experience|esperienz/.test(text)) return "trail";
   if (/mappa|quartiere|dintorn|local/.test(text)) return "pin";
 
   return section.icon || "spark";
