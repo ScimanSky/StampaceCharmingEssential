@@ -186,6 +186,16 @@ function iconForItem(item, sectionId) {
   if (isImageItem(item)) return "image";
   const text = getItemText(item);
 
+  if (sectionId === "rules") {
+    if (/fum|divieto|vietat|proibit/.test(text)) return "ban";
+    if (/rifiut|spazzatura|raccolta/.test(text)) return "trash";
+    if (/rumore|silenzio|notte|orario/.test(text)) return "clock";
+    if (/chiave|chiavi|codic|serratur|porta|accesso/.test(text)) return "lock";
+    if (/animali|pet/.test(text)) return "home";
+    if (/wifi|rete|password|connession/.test(text)) return "spark";
+    return "spark";
+  }
+
   if (/wifi|rete|password|connession/.test(text)) return "wifi";
   if (/tassa|soggiorn|€|euro|contanti|pagamento/.test(text)) return "receipt";
   if (/documento|identit|passaport|patente|questura/.test(text)) return "id";
