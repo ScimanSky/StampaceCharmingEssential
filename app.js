@@ -213,10 +213,10 @@ function iconForSection(section) {
 
   const text = `${section.menuTitle ?? ""} ${section.sectionTitle ?? ""} ${section.lead ?? ""}`.toLowerCase();
 
-  if (/ristorant|locali|bar|aperitiv|food|drink/.test(text)) return "utensils";
+  if (/ristorant|locali|bar|aperitiv|food|drink/.test(text)) return "trail";
   if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "skyline";
   if (/noleggio|rent|auto|car rental|vehicle/.test(text)) return "rental";
-  if (/escursion|tour|gita|trek|experience|esperienz/.test(text)) return "trail";
+  if (/escursion|tour|gita|trek|experience|esperienz/.test(text)) return "utensils";
   if (/mappa|quartiere|dintorn|local/.test(text)) return "pin";
 
   return section.icon || "spark";
