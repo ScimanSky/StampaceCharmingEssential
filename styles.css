@@ -630,8 +630,22 @@ svg,
   display: inline-block;
   max-width: 100%;
   margin-top: 0.45rem;
+  color: var(--icon);
+  text-decoration: underline;
+  text-decoration-color: rgba(223, 195, 156, 0.46);
+  text-underline-offset: 0.16rem;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.sheet-link:visited {
+  color: var(--icon);
+}
+
+.sheet-link:hover,
+.sheet-link:focus-visible {
+  color: var(--copy);
+  text-decoration-color: rgba(231, 216, 193, 0.7);
 }
 
 .sheet-card-media {
