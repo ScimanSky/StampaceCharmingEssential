@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 36" role="img" aria-labelledby="title">
+  <title>Bandiera della Sardegna</title>
+  <rect width="60" height="36" fill="#ffffff"/>
+  <path d="M28 0h4v36h-4z" fill="#c0191f"/>
+  <path d="M0 16h60v4H0z" fill="#c0191f"/>
+  <g fill="#111111">
+    <g transform="translate(8 5)">
+      <circle cx="5" cy="5" r="3.2"/>
+      <path d="M2.2 8.2h5.6v4.6H2.2z"/>
+      <path d="M2.4 3.1h5.2v1.2H2.4z" fill="#ffffff"/>
+    </g>
+    <g transform="translate(42 5)">
+      <circle cx="5" cy="5" r="3.2"/>
+      <path d="M2.2 8.2h5.6v4.6H2.2z"/>
+      <path d="M2.4 3.1h5.2v1.2H2.4z" fill="#ffffff"/>
+    </g>
+    <g transform="translate(8 21)">
+      <circle cx="5" cy="5" r="3.2"/>
+      <path d="M2.2 8.2h5.6v4.6H2.2z"/>
+      <path d="M2.4 3.1h5.2v1.2H2.4z" fill="#ffffff"/>
+    </g>
+    <g transform="translate(42 21)">
+      <circle cx="5" cy="5" r="3.2"/>
+      <path d="M2.2 8.2h5.6v4.6H2.2z"/>
+      <path d="M2.4 3.1h5.2v1.2H2.4z" fill="#ffffff"/>
+    </g>
+  </g>
+</svg>

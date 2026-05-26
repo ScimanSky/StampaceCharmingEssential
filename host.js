@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528a";
+} from "./content.js?v=20260528b";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,

@@ -6,7 +6,7 @@ export const FIXED_LOCALE = "it";
 export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
 export const MAX_VISIBLE_LOCALES = 3;
 export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - REQUIRED_LOCALES.length;
-const FLAG_ASSET_VERSION = "20260528a";
+const FLAG_ASSET_VERSION = "20260528b";
 
 export const AVAILABLE_LANGUAGES = [
   { code: "it", label: "Italiano", nativeLabel: "Italiano", flag: "🇮🇹", flagSrc: `./img/flags/it.svg?v=${FLAG_ASSET_VERSION}`, mandatory: true },
@@ -15,6 +15,7 @@ export const AVAILABLE_LANGUAGES = [
   { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: `./img/flags/es.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: `./img/flags/de.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: `./img/flags/pt.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "sc", label: "Sardinian", nativeLabel: "Sardu", flag: "🏴", flagSrc: `./img/flags/sc.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "pl", label: "Polish", nativeLabel: "Polski", flag: "🇵🇱", flagSrc: `./img/flags/pl.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "cs", label: "Czech", nativeLabel: "Čeština", flag: "🇨🇿", flagSrc: `./img/flags/cs.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "ru", label: "Russian", nativeLabel: "Русский", flag: "🇷🇺", flagSrc: `./img/flags/ru.svg?v=${FLAG_ASSET_VERSION}` },
@@ -62,6 +63,12 @@ export const HOST_PRIVATE_ITEMS = Object.freeze({
     title: "Área do Host",
     body: "Abra a área privada para gerir o modelo ao vivo da aplicação.",
     label: "Abrir Área do Host",
+    href: "./host.html",
+  },
+  sc: {
+    title: "Àrea Host",
+    body: "Aberi s'àrea privada pro gestire su template live de s'app.",
+    label: "Aberi s'Àrea Host",
     href: "./host.html",
   },
   pl: {
@@ -653,6 +660,98 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           "Telefone / WhatsApp: inserir aqui",
           "Email: inserir aqui",
           HOST_PRIVATE_ITEMS.pt,
+        ],
+      },
+    ],
+  },
+  sc: {
+    subtitle: "Luxury apartment",
+    sections: [
+      {
+        id: "checkin",
+        icon: "checkin",
+        menuTitle: "Check-in e Check-out",
+        sectionTitle: "Check-in e Check-out",
+        lead: "Totas is informatziones essentziales pro arribare, intrare in appartamentu e lassare sa domu in manera simpre.",
+        items: [
+          "Check-in: inseri inoghe s'oràriu de arribada cunsentidu e sas istrutziones pro su self check-in o s'atòbiu cun s'host.",
+          "In antis de arribare: pregai a s'òspite de comunicare cun pagu antìtzipu s'oràriu indicativu de arribada, pro organizare menzus s'acollida.",
+          "Atzessu a sa domu: inseri inoghe su percursu curretu, sos riferimentos utiles e in ue recuperare craes o còdighes.",
+          "Check-out: inseri inoghe s'oràriu intro su cale lassare s'appartamentu e inditare si sas craes depent abarrare in domu, in cassetta o essire cunsignadas a s'host.",
+          "In antis de partire: ammenta a sos òspites de istudare sas luces e sa climatizatzione, serrare portas e ventanas e controllare de non aver ismentigadu cosas personales.",
+        ],
+      },
+      {
+        id: "rules",
+        icon: "notepad",
+        menuTitle: "Regulas de sa domu",
+        sectionTitle: "Regulas de sa domu",
+        lead: "Pagas regulas claras pro rendere su soggiornu prus simpre e agradèssiu.",
+        items: [
+          "Agiunghe inoghe sas regulas printzipales de sa struttura.",
+          "Ispetzìfica si est cunsentidu fumar o no.",
+          "Inseri eventuales indicatziones subra rumorosidade, rifiutos e impreu de is ispàtzios.",
+        ],
+      },
+      {
+        id: "wifi",
+        icon: "wifi",
+        menuTitle: "Wi‑Fi",
+        sectionTitle: "Wi‑Fi",
+        lead: "Rete, password e suggerimentos lestru pro si connètere.",
+        items: [
+          "Nòmine rete: de inserire",
+          "Password: de inserire",
+          "Si tenes problemas de connessione, cuntata s'host.",
+        ],
+      },
+      {
+        id: "access",
+        icon: "keypad",
+        menuTitle: "Porta e còdighes",
+        sectionTitle: "Porta e còdighes",
+        lead: "Còdighes, abertura de sa porta e atzessos utiles durante su soggiornu.",
+        items: [
+          "Inseri su còdighe de su portone o de sa cassetta de sas craes.",
+          "Agiunghe eventuales istrutziones pro serraturas smart o tastierinos.",
+          "Ispetzìfica ite faghere in casu de ismarrimentu o blocu.",
+        ],
+      },
+      {
+        id: "safe",
+        icon: "vault",
+        menuTitle: "Cassaforte",
+        sectionTitle: "Cassaforte",
+        lead: "Istrutziones simples pro impreu, abertura e serradura de sa cassaforte.",
+        items: [
+          "Inseri in ue si agat sa cassaforte intro s'appartamentu.",
+          "Agiunghe inoghe sa procedura curreta pro abertura e serradura.",
+          "Ispetzìfica ite faghere in casu de blocu o dificultade.",
+        ],
+      },
+      {
+        id: "around",
+        icon: "binoculars",
+        menuTitle: "In su contornu",
+        sectionTitle: "In su contornu",
+        lead: "Logos utiles e riferimentos acanta a sa struttura.",
+        items: [
+          "Agiunghe supermercadu, farmatzia e parchegiu prus bixinus.",
+          "Inseri 2 o 3 cussìgios affidàbiles subra bar o ristorantes.",
+          "Agiunghe eventuales indicatziones pro ispiàggias o mesus pùblicos.",
+        ],
+      },
+      {
+        id: "host",
+        icon: "avatar",
+        menuTitle: "Host",
+        sectionTitle: "Host",
+        lead: "Cuntatos lestru e riferimentos utiles de s'host.",
+        items: [
+          "Nòmine host: de inserire",
+          "Telefone / WhatsApp: de inserire",
+          "Email: de inserire",
+          HOST_PRIVATE_ITEMS.sc,
         ],
       },
     ],
