@@ -210,7 +210,7 @@ function renderHostShortcut() {
   dom.hostAvatarButton.removeAttribute("aria-hidden");
   dom.hostAvatarButton.setAttribute("aria-label", hostSection.menuTitle);
   dom.hostAvatarButton.setAttribute("title", hostSection.menuTitle);
-  dom.hostAvatarLabel.textContent = hostSection.menuTitle;
+  dom.hostAvatarLabel.textContent = "Host";
 }
 
 function renderSectionItems(items, sectionId) {
