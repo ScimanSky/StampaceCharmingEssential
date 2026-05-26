@@ -113,6 +113,66 @@ function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function normalizePhoneDigits(value) {
+  const cleaned = String(value).replace(/[^\d+]/g, "");
+  if (cleaned.startsWith("+")) return cleaned.slice(1);
+  if (cleaned.startsWith("00")) return cleaned.slice(2);
+  return cleaned;
+}
+
+function renderHostStringItem(item, marker) {
+  const text = String(item).trim();
+  const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  const phoneMatch = text.match(/(?:\+|00)?\d[\d\s().-]{6,}\d/);
+  const lower = text.toLowerCase();
+  const isWhatsapp = /whatsapp|wa\b/.test(lower);
+
+  if (emailMatch) {
+    const email = emailMatch[0];
+    const label = text.slice(0, emailMatch.index).replace(/[:：]\s*$/, "").trim();
+    return `
+      <article class="sheet-card">
+        ${marker}
+        <div class="sheet-card-copy">
+          ${label ? `<strong>${escapeHtml(label)}</strong>` : ""}
+          <a class="sheet-link" href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>
+        </div>
+      </article>
+    `;
+  }
+
+  if (phoneMatch && isWhatsapp) {
+    const rawNumber = phoneMatch[0].trim();
+    const waNumber = normalizePhoneDigits(rawNumber);
+    const label = text.slice(0, phoneMatch.index).replace(/[:：]\s*$/, "").trim();
+    return `
+      <article class="sheet-card">
+        ${marker}
+        <div class="sheet-card-copy">
+          ${label ? `<strong>${escapeHtml(label)}</strong>` : ""}
+          <a class="sheet-link" href="https://wa.me/${escapeHtml(waNumber)}" target="_blank" rel="noopener noreferrer">${escapeHtml(rawNumber)}</a>
+        </div>
+      </article>
+    `;
+  }
+
+  return `
+    <article class="sheet-card">
+      ${marker}
+      <p>${escapeHtml(text)}</p>
+    </article>
+  `;
+}
+
 function localeState() {
   return getLocaleContent(template, currentLocale);
 }
@@ -289,10 +349,14 @@ function renderSectionItems(items, sectionId) {
           `;
         }
 
+        if (sectionId === "host") {
+          return renderHostStringItem(item, marker);
+        }
+
         return `
           <article class="sheet-card">
             ${marker}
-            <p>${item}</p>
+            <p>${escapeHtml(item)}</p>
           </article>
         `;
       }
