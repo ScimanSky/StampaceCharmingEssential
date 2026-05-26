@@ -135,7 +135,9 @@ svg,
 
 .top-controls {
   position: relative;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.7rem;
   margin-bottom: 0.65rem;
   z-index: 8;
