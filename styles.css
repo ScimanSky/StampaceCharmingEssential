@@ -314,6 +314,9 @@ svg,
   width: 100%;
   text-align: left;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
 .menu-row.is-static {
@@ -330,6 +333,20 @@ svg,
   background:
     linear-gradient(180deg, rgba(255, 244, 224, 0.09), rgba(255, 244, 224, 0.03)),
     var(--row-hover);
+}
+
+.menu-row:focus,
+.menu-row:focus-visible,
+.host-avatar-button:focus,
+.host-avatar-button:focus-visible,
+.locale-chip:focus,
+.locale-chip:focus-visible,
+.copy-btn:focus,
+.copy-btn:focus-visible,
+.sheet-close:focus,
+.sheet-close:focus-visible {
+  outline: none;
+  box-shadow: inherit;
 }
 
 .menu-icon {

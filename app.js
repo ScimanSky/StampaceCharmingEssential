@@ -356,12 +356,14 @@ function bindMenu() {
   dom.mainMenu.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-section-id]");
     if (!trigger) return;
+    trigger.blur();
     openSection(trigger.dataset.sectionId);
   });
 }
 
 function bindHostShortcut() {
   dom.hostAvatarButton.addEventListener("click", () => {
+    dom.hostAvatarButton.blur();
     openSection("host");
   });
 }
