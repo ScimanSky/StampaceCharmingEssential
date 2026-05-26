@@ -15,7 +15,6 @@ export const AVAILABLE_LANGUAGES = [
   { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: `./img/flags/es.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: `./img/flags/de.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: `./img/flags/pt.svg?v=${FLAG_ASSET_VERSION}` },
-  { code: "sc", label: "Sardinian", nativeLabel: "Sardu", flag: "🏴", flagSrc: `./img/flags/sc.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "pl", label: "Polish", nativeLabel: "Polski", flag: "🇵🇱", flagSrc: `./img/flags/pl.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "cs", label: "Czech", nativeLabel: "Čeština", flag: "🇨🇿", flagSrc: `./img/flags/cs.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "ru", label: "Russian", nativeLabel: "Русский", flag: "🇷🇺", flagSrc: `./img/flags/ru.svg?v=${FLAG_ASSET_VERSION}` },
