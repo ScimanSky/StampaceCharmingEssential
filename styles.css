@@ -52,7 +52,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: url("./img/patternlegn.png") center top / 42rem auto repeat;
+  background: url("./img/patternlegn.webp") center top / 42rem auto repeat;
   opacity: 0.42;
   filter: brightness(1.02) contrast(1.18) saturate(0.62);
   z-index: -2;
@@ -358,7 +358,7 @@ svg,
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   background:
     linear-gradient(180deg, rgba(10, 8, 6, 0.9), rgba(7, 6, 5, 0.98)),
-    url("./img/patternlegn.png") center top / 42rem auto repeat;
+    url("./img/patternlegn.webp") center top / 42rem auto repeat;
 }
 
 .sheet-header {
@@ -674,4 +674,3 @@ svg,
 .copy-btn:active {
   transform: scale(0.95);
 }
-
