@@ -230,9 +230,10 @@ function ctaIcon(item) {
 }
 
 function renderCtaItem(item) {
+  const kind = ["web", "maps", "whatsapp", "email", "tel"].includes(item.kind) ? item.kind : "web";
   return `
     <article class="sheet-card sheet-card-cta">
-      <a class="sheet-cta" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">
+      <a class="sheet-cta sheet-cta--${escapeHtml(kind)}" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">
         <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(ctaIcon(item))}</span>
         <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
         <span class="sheet-cta-chevron" aria-hidden="true">↗</span>
