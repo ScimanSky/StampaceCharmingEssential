@@ -767,6 +767,11 @@ svg,
 }
 
 @media (min-width: 961px) {
+  .hero-block {
+    min-height: 18.75rem;
+    background-position: center 44%;
+  }
+
   .sheet-image {
     max-height: min(60vh, 26rem);
   }
