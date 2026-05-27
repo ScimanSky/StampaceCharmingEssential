@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./host.css?v=20260528f" />
+    <link rel="stylesheet" href="./host.css?v=20260528g" />
   </head>
   <body>
     <main class="host-shell">
@@ -64,11 +64,23 @@
                 <span>Lingua in modifica</span>
                 <select id="field-editor-locale"></select>
               </label>
-              <div class="host-grid-wide host-language-card">
-                <span>Lingue visibili nell'app ospiti</span>
-                <p class="host-language-note">Italiano e inglese sempre attivi. Puoi selezionare al massimo 1 lingua extra.</p>
-                <div class="host-language-options" id="field-enabled-locales"></div>
-              </div>
+              <section class="host-grid-wide host-inline-panel host-panel" data-panel-id="languages">
+                <button class="host-panel-toggle host-inline-toggle" type="button" data-action="toggle-panel" aria-expanded="false">
+                  <span class="host-panel-heading">
+                    <span>
+                      <p class="host-kicker">Lingue ospiti</p>
+                      <h2>Lingue visibili nell'app</h2>
+                    </span>
+                    <span class="host-section-chevron" aria-hidden="true">⌄</span>
+                  </span>
+                </button>
+                <div class="host-panel-body">
+                  <div class="host-language-card">
+                    <p class="host-language-note">Italiano e inglese sempre attivi. Puoi selezionare al massimo 1 lingua extra.</p>
+                    <div class="host-language-options" id="field-enabled-locales"></div>
+                  </div>
+                </div>
+              </section>
               <label>
                 <span>Nome struttura</span>
                 <input id="field-app-name" type="text" />
