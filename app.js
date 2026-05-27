@@ -6,7 +6,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260528g";
+} from "./content.js?v=20260528h";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -104,8 +104,7 @@ const dom = {
   license: document.querySelector("#footer-license"),
   footerName: document.querySelector("#app-footer-name"),
   footerSubtitle: document.querySelector("#app-footer-subtitle"),
-  footerAddress: document.querySelector("#app-footer-address"),
-  footerLicense: document.querySelector("#app-footer-license"),
+  footerMeta: document.querySelector("#app-footer-meta"),
   mainMenu: document.querySelector("#main-menu"),
   sheet: document.querySelector("#section-sheet"),
   sheetBackdrop: document.querySelector("#sheet-backdrop"),
@@ -572,8 +571,9 @@ function render() {
   dom.license.textContent = template.license;
   dom.footerName.textContent = template.footer.name;
   dom.footerSubtitle.textContent = template.footer.subtitle;
-  dom.footerAddress.textContent = template.footer.address;
-  dom.footerLicense.textContent = template.footer.license;
+  dom.footerMeta.innerHTML = template.footer.lines
+    .map((line) => `<span>${escapeHtml(line)}</span>`)
+    .join("");
   dom.mainMenu.innerHTML = renderMenu(localeTemplate.sections);
 
   if (activeSectionId) {

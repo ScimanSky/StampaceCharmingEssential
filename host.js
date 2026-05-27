@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528g";
+} from "./content.js?v=20260528h";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -79,8 +79,7 @@ const dom = {
   license: document.querySelector("#field-license"),
   footerName: document.querySelector("#field-footer-name"),
   footerSubtitle: document.querySelector("#field-footer-subtitle"),
-  footerAddress: document.querySelector("#field-footer-address"),
-  footerLicense: document.querySelector("#field-footer-license"),
+  footerLines: document.querySelector("#field-footer-lines"),
   sections: document.querySelector("#host-sections"),
 };
 
@@ -108,6 +107,18 @@ const expandedPanelIds = new Set(["general", "sections"]);
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
 const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
 const LINK_ITEM_PREFIX = "LINK";
+
+function serializeFooterLines(lines = []) {
+  return lines.join("\n");
+}
+
+function parseFooterLines(value) {
+  return value
+    .replace(/\r/g, "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
@@ -642,8 +653,7 @@ function syncFields() {
   dom.subtitle.value = localeState.subtitle;
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
-  dom.footerAddress.value = state.footer.address;
-  dom.footerLicense.value = state.footer.license;
+  dom.footerLines.value = serializeFooterLines(state.footer.lines);
   dom.editorLocale.innerHTML = AVAILABLE_LANGUAGES.map(
     (language) => `<option value="${language.code}" ${language.code === selectedEditorLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
   ).join("");
@@ -686,8 +696,7 @@ function collectTemplate() {
   next.footer = {
     name: dom.footerName.value,
     subtitle: dom.footerSubtitle.value,
-    address: dom.footerAddress.value,
-    license: dom.footerLicense.value,
+    lines: parseFooterLines(dom.footerLines.value),
   };
   next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {

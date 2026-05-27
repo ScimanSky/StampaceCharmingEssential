@@ -1316,8 +1316,7 @@ export const defaultTemplate = {
   footer: {
     name: "Stampace Charming",
     subtitle: "Luxury apartment",
-    address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
-    license: "CIN: IT092009C2000R8066",
+    lines: ["Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia", "CIN: IT092009C2000R8066"],
   },
   enabledLocales: ["it", "en", "de"],
   locales: DEFAULT_LOCALE_CONTENT,
@@ -1592,6 +1591,9 @@ export function normalizeTemplate(rawTemplate = {}) {
   const resolvedAppName = cleanString(rawTemplate.appName, defaultTemplate.appName);
   const resolvedAddress = cleanString(rawTemplate.address, defaultTemplate.address);
   const resolvedLicense = cleanString(rawTemplate.license, defaultTemplate.license);
+  const footerLines = Array.isArray(footerSource.lines)
+    ? footerSource.lines.map((line) => cleanString(line)).filter(Boolean)
+    : [cleanString(footerSource.address, resolvedAddress), cleanString(footerSource.license, resolvedLicense)].filter(Boolean);
   return {
     appName: resolvedAppName,
     address: resolvedAddress,
@@ -1599,8 +1601,7 @@ export function normalizeTemplate(rawTemplate = {}) {
     footer: {
       name: cleanString(footerSource.name, resolvedAppName || fallbackFooter.name),
       subtitle: cleanString(footerSource.subtitle, fallbackFooter.subtitle),
-      address: cleanString(footerSource.address, resolvedAddress || fallbackFooter.address),
-      license: cleanString(footerSource.license, resolvedLicense || fallbackFooter.license),
+      lines: footerLines.length ? footerLines : fallbackFooter.lines,
     },
     enabledLocales: normalizeEnabledLocales(rawTemplate.enabledLocales ?? rawTemplate.visibleLocales ?? defaultTemplate.enabledLocales),
     locales: buildLocaleMap(rawTemplate),
