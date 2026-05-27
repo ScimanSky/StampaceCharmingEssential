@@ -102,6 +102,10 @@ const dom = {
   subtitle: document.querySelector("#hero-subtitle"),
   address: document.querySelector("#footer-address"),
   license: document.querySelector("#footer-license"),
+  footerName: document.querySelector("#app-footer-name"),
+  footerSubtitle: document.querySelector("#app-footer-subtitle"),
+  footerAddress: document.querySelector("#app-footer-address"),
+  footerLicense: document.querySelector("#app-footer-license"),
   mainMenu: document.querySelector("#main-menu"),
   sheet: document.querySelector("#section-sheet"),
   sheetBackdrop: document.querySelector("#sheet-backdrop"),
@@ -566,6 +570,10 @@ function render() {
   dom.subtitle.textContent = localeTemplate.subtitle;
   dom.address.textContent = template.address;
   dom.license.textContent = template.license;
+  dom.footerName.textContent = template.appName;
+  dom.footerSubtitle.textContent = localeTemplate.subtitle;
+  dom.footerAddress.textContent = template.address;
+  dom.footerLicense.textContent = template.license;
   dom.mainMenu.innerHTML = renderMenu(localeTemplate.sections);
 
   if (activeSectionId) {

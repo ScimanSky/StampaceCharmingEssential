@@ -302,6 +302,49 @@ svg,
   margin-top: 1.05rem;
 }
 
+.app-footer {
+  display: grid;
+  justify-items: center;
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+  padding: 0 0.25rem 0.35rem;
+  text-align: center;
+}
+
+.app-footer-rule {
+  width: min(100%, 9rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(231, 216, 193, 0.3), transparent);
+  margin-bottom: 0.2rem;
+}
+
+.app-footer-name,
+.app-footer-subtitle,
+.app-footer-meta {
+  margin: 0;
+}
+
+.app-footer-name {
+  color: var(--muted-strong);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.app-footer-subtitle {
+  color: var(--muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.app-footer-meta {
+  display: grid;
+  gap: 0.12rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
 .menu-row {
   display: grid;
   grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
