@@ -1041,15 +1041,8 @@ function bindEditorEvents() {
   if (editorBound) return;
   editorBound = true;
 
-  dom.save.addEventListener("click", saveCurrentTemplate);
-  dom.export.addEventListener("click", downloadTemplate);
-  dom.reset.addEventListener("click", restoreDefaultTemplate);
   dom.addSection.addEventListener("click", addSection);
   dom.logout.addEventListener("click", logout);
-  dom.import.addEventListener("change", (event) => {
-    importTemplate(event.target.files?.[0]);
-    event.target.value = "";
-  });
 
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
