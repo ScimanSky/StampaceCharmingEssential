@@ -6,7 +6,6 @@ import {
   FIXED_LOCALE,
   getHostPrivateItem,
   HOST_PRIVATE_ITEM,
-  MAX_OPTIONAL_LOCALES,
   REQUIRED_LOCALES,
   isCtaItem,
   isImageItem,
@@ -91,7 +90,7 @@ const dom = {
   import: document.querySelector("#host-import"),
   addSection: document.querySelector("#host-add-section"),
   editorLocale: document.querySelector("#field-editor-locale"),
-  enabledLocales: document.querySelector("#field-enabled-locales"),
+  optionalLocale: document.querySelector("#field-optional-locale"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
   address: document.querySelector("#field-address"),
@@ -585,27 +584,17 @@ function sectionBadge(section) {
   return parts.join(" · ");
 }
 
-function renderLanguageOptions() {
-  const activeSet = new Set(state.enabledLocales);
-  const optionalCount = state.enabledLocales.filter((code) => !REQUIRED_LOCALES.includes(code)).length;
+function renderOptionalLocaleSelect() {
+  const selectedOptionalLocale = state.enabledLocales.find((code) => !REQUIRED_LOCALES.includes(code)) ?? "";
+  const optionalLanguages = AVAILABLE_LANGUAGES.filter((language) => !language.mandatory);
 
-  dom.enabledLocales.innerHTML = AVAILABLE_LANGUAGES.map((language) => {
-    const checked = activeSet.has(language.code);
-    const disabled = language.mandatory || (!checked && optionalCount >= MAX_OPTIONAL_LOCALES);
-
-    return `
-      <label class="host-language-option${language.mandatory ? " is-fixed" : ""}">
-        <input type="checkbox" data-locale-toggle value="${language.code}" ${checked ? "checked" : ""} ${disabled ? "disabled" : ""} />
-        <span class="host-language-flag" aria-hidden="true">
-          <img src="${language.flagSrc}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
-        </span>
-        <span class="host-language-copy">
-          <strong>${language.label}</strong>
-          <span>${language.nativeLabel}</span>
-        </span>
-      </label>
-    `;
-  }).join("");
+  dom.optionalLocale.innerHTML = [
+    '<option value="">Nessuna lingua extra</option>',
+    ...optionalLanguages.map(
+      (language) =>
+        `<option value="${language.code}" ${language.code === selectedOptionalLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
+    ),
+  ].join("");
 }
 
 function setStatus(message, variant = "") {
@@ -896,7 +885,7 @@ function syncFields() {
     (language) => `<option value="${language.code}" ${language.code === selectedEditorLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
   ).join("");
   syncPanelState();
-  renderLanguageOptions();
+  renderOptionalLocaleSelect();
   renderSectionEditors();
 }
 
@@ -937,10 +926,9 @@ function collectTemplate() {
     };
   });
 
-  const optionalEnabled = [...dom.enabledLocales.querySelectorAll('[data-locale-toggle]:checked')]
-    .map((input) => input.value)
-    .filter((code) => !REQUIRED_LOCALES.includes(code))
-    .slice(0, MAX_OPTIONAL_LOCALES);
+  const optionalEnabled = dom.optionalLocale.value && !REQUIRED_LOCALES.includes(dom.optionalLocale.value)
+    ? [dom.optionalLocale.value]
+    : [];
 
   next.appName = dom.appName.value;
   next.address = dom.address.value;
@@ -1454,8 +1442,7 @@ function bindEditorEvents() {
     switchEditorLocale(event.target.value);
   });
 
-  dom.enabledLocales.addEventListener("change", (event) => {
-    if (!event.target.matches('[data-locale-toggle]')) return;
+  dom.optionalLocale.addEventListener("change", () => {
     updateEnabledLocales();
   });
 

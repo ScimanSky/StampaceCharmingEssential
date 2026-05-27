@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./host.css?v=20260528g" />
+    <link rel="stylesheet" href="./host.css?v=20260528h" />
   </head>
   <body>
     <main class="host-shell">
@@ -64,23 +64,11 @@
                 <span>Lingua in modifica</span>
                 <select id="field-editor-locale"></select>
               </label>
-              <section class="host-grid-wide host-inline-panel host-panel" data-panel-id="languages">
-                <button class="host-panel-toggle host-inline-toggle" type="button" data-action="toggle-panel" aria-expanded="false">
-                  <span class="host-panel-heading">
-                    <span>
-                      <p class="host-kicker">Lingue ospiti</p>
-                      <h2>Lingue visibili nell'app</h2>
-                    </span>
-                    <span class="host-section-chevron" aria-hidden="true">⌄</span>
-                  </span>
-                </button>
-                <div class="host-panel-body">
-                  <div class="host-language-card">
-                    <p class="host-language-note">Italiano e inglese sempre attivi. Puoi selezionare al massimo 1 lingua extra.</p>
-                    <div class="host-language-options" id="field-enabled-locales"></div>
-                  </div>
-                </div>
-              </section>
+              <label class="host-grid-wide host-language-field">
+                <span>Lingua extra visibile nell'app</span>
+                <select id="field-optional-locale"></select>
+                <small class="host-language-note">Italiano e inglese restano sempre attivi. Qui scegli solo l’eventuale terza lingua.</small>
+              </label>
               <label>
                 <span>Nome struttura</span>
                 <input id="field-app-name" type="text" />
@@ -138,6 +126,6 @@
       </section>
     </main>
 
-    <script type="module" src="./host.js?v=20260528q"></script>
+    <script type="module" src="./host.js?v=20260528r"></script>
   </body>
 </html>
