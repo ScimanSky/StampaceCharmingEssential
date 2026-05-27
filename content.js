@@ -1313,6 +1313,12 @@ export const defaultTemplate = {
   appName: "Stampace Charming",
   address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
   license: "CIN: IT092009C2000R8066",
+  footer: {
+    name: "Stampace Charming",
+    subtitle: "Luxury apartment",
+    address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
+    license: "CIN: IT092009C2000R8066",
+  },
   enabledLocales: ["it", "en", "de"],
   locales: DEFAULT_LOCALE_CONTENT,
 };
@@ -1581,10 +1587,21 @@ function buildLocaleMap(rawTemplate = {}) {
 }
 
 export function normalizeTemplate(rawTemplate = {}) {
+  const footerSource = rawTemplate.footer && typeof rawTemplate.footer === "object" ? rawTemplate.footer : {};
+  const fallbackFooter = defaultTemplate.footer;
+  const resolvedAppName = cleanString(rawTemplate.appName, defaultTemplate.appName);
+  const resolvedAddress = cleanString(rawTemplate.address, defaultTemplate.address);
+  const resolvedLicense = cleanString(rawTemplate.license, defaultTemplate.license);
   return {
-    appName: cleanString(rawTemplate.appName, defaultTemplate.appName),
-    address: cleanString(rawTemplate.address, defaultTemplate.address),
-    license: cleanString(rawTemplate.license, defaultTemplate.license),
+    appName: resolvedAppName,
+    address: resolvedAddress,
+    license: resolvedLicense,
+    footer: {
+      name: cleanString(footerSource.name, resolvedAppName || fallbackFooter.name),
+      subtitle: cleanString(footerSource.subtitle, fallbackFooter.subtitle),
+      address: cleanString(footerSource.address, resolvedAddress || fallbackFooter.address),
+      license: cleanString(footerSource.license, resolvedLicense || fallbackFooter.license),
+    },
     enabledLocales: normalizeEnabledLocales(rawTemplate.enabledLocales ?? rawTemplate.visibleLocales ?? defaultTemplate.enabledLocales),
     locales: buildLocaleMap(rawTemplate),
   };

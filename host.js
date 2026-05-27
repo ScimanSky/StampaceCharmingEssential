@@ -12,7 +12,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528f";
+} from "./content.js?v=20260528g";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -77,6 +77,10 @@ const dom = {
   subtitle: document.querySelector("#field-subtitle"),
   address: document.querySelector("#field-address"),
   license: document.querySelector("#field-license"),
+  footerName: document.querySelector("#field-footer-name"),
+  footerSubtitle: document.querySelector("#field-footer-subtitle"),
+  footerAddress: document.querySelector("#field-footer-address"),
+  footerLicense: document.querySelector("#field-footer-license"),
   sections: document.querySelector("#host-sections"),
 };
 
@@ -636,6 +640,10 @@ function syncFields() {
   dom.address.value = state.address;
   dom.license.value = state.license;
   dom.subtitle.value = localeState.subtitle;
+  dom.footerName.value = state.footer.name;
+  dom.footerSubtitle.value = state.footer.subtitle;
+  dom.footerAddress.value = state.footer.address;
+  dom.footerLicense.value = state.footer.license;
   dom.editorLocale.innerHTML = AVAILABLE_LANGUAGES.map(
     (language) => `<option value="${language.code}" ${language.code === selectedEditorLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
   ).join("");
@@ -675,6 +683,12 @@ function collectTemplate() {
   next.appName = dom.appName.value;
   next.address = dom.address.value;
   next.license = dom.license.value;
+  next.footer = {
+    name: dom.footerName.value,
+    subtitle: dom.footerSubtitle.value,
+    address: dom.footerAddress.value,
+    license: dom.footerLicense.value,
+  };
   next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {
     ...next.locales[selectedEditorLocale],

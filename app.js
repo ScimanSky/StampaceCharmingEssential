@@ -6,7 +6,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260528f";
+} from "./content.js?v=20260528g";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -570,10 +570,10 @@ function render() {
   dom.subtitle.textContent = localeTemplate.subtitle;
   dom.address.textContent = template.address;
   dom.license.textContent = template.license;
-  dom.footerName.textContent = template.appName;
-  dom.footerSubtitle.textContent = localeTemplate.subtitle;
-  dom.footerAddress.textContent = template.address;
-  dom.footerLicense.textContent = template.license;
+  dom.footerName.textContent = template.footer.name;
+  dom.footerSubtitle.textContent = template.footer.subtitle;
+  dom.footerAddress.textContent = template.footer.address;
+  dom.footerLicense.textContent = template.footer.license;
   dom.mainMenu.innerHTML = renderMenu(localeTemplate.sections);
 
   if (activeSectionId) {
