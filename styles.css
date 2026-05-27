@@ -697,6 +697,73 @@ svg,
   align-items: center;
 }
 
+.sheet-card-cta {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.sheet-cta {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 2.8rem minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: 0.95rem;
+  padding: 0.95rem 1rem;
+  color: var(--text);
+  text-decoration: none;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 224, 0.08), rgba(255, 244, 224, 0.03)),
+    rgba(17, 14, 11, 0.38);
+}
+
+.sheet-cta-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted-strong);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.sheet-cta-icon svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sheet-cta-label {
+  min-width: 0;
+  font-size: 0.98rem;
+  line-height: 1.3;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
+}
+
+.sheet-cta-chevron {
+  justify-self: end;
+  color: var(--muted-soft);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.sheet-cta:hover,
+.sheet-cta:focus-visible {
+  background:
+    linear-gradient(180deg, rgba(255, 244, 224, 0.11), rgba(255, 244, 224, 0.04)),
+    rgba(27, 22, 17, 0.5);
+}
+
 .sheet-card-media-body {
   display: grid;
   gap: 0.65rem;

@@ -565,6 +565,99 @@ button,
   color: var(--copy);
 }
 
+.host-cta-editor {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.host-cta-list {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 0.9rem;
+}
+
+.host-cta-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.host-cta-item {
+  display: grid;
+  gap: 0.85rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.host-cta-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.host-cta-icon-preview {
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.72rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--copy);
+  flex: 0 0 auto;
+}
+
+.host-cta-icon-preview svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.host-cta-heading {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: grid;
+  gap: 0.12rem;
+}
+
+.host-cta-heading strong,
+.host-cta-heading span {
+  overflow-wrap: anywhere;
+}
+
+.host-cta-heading strong {
+  font-weight: 400;
+}
+
+.host-cta-heading span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.host-cta-actions {
+  display: inline-flex;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+}
+
+.host-remove-cta {
+  white-space: nowrap;
+}
+
+.host-cta-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .host-section-icon {
   width: 2.8rem;
   height: 2.8rem;
@@ -647,6 +740,20 @@ button,
   }
 
   .host-upload-button {
+    width: 100%;
+  }
+
+  .host-cta-meta,
+  .host-cta-grid,
+  .host-cta-actions {
+    display: grid;
+  }
+
+  .host-cta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .host-remove-cta {
     width: 100%;
   }
 }

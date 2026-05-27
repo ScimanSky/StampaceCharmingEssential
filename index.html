@@ -1,82 +1,82 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Stampace Charming Essential</title>
-    <meta name="description" content="&#8203;" />
-    <meta property="og:title" content="Stampace Charming Essential" />
-    <meta property="og:description" content="&#8203;" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://scimansky.github.io/StampaceCharmingEssential/" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Stampace Charming Essential" />
-    <meta name="twitter:description" content="&#8203;" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./styles.css?v=20260528k" />
-  </head>
-  <body>
-    <div class="page-shell">
-      <div class="top-controls">
-        <button class="host-avatar-button hidden" id="host-avatar-button" type="button" aria-label="Host">
-          <span class="host-avatar-media">
-            <img src="./img/host-avatar.jpg?v=20260528a" alt="" loading="lazy" decoding="async" />
-          </span>
-          <span class="host-avatar-label" id="host-avatar-label">Host</span>
-        </button>
-        <nav class="locale-bar" id="locale-bar" aria-label="Language switcher"></nav>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Stampace Charming Essential</title>
+  <meta name="description" content="&#8203;" />
+  <meta property="og:title" content="Stampace Charming Essential" />
+  <meta property="og:description" content="&#8203;" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://scimansky.github.io/StampaceCharmingEssential/" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Stampace Charming Essential" />
+  <meta name="twitter:description" content="&#8203;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css?v=20260528l" />
+</head>
+
+<body>
+  <div class="page-shell">
+    <div class="top-controls">
+      <button class="host-avatar-button hidden" id="host-avatar-button" type="button" aria-label="Host">
+        <span class="host-avatar-media">
+          <img src="./img/host-avatar.jpg?v=20260528a" alt="" loading="lazy" decoding="async" />
+        </span>
+        <span class="host-avatar-label" id="host-avatar-label">Host</span>
+      </button>
+      <nav class="locale-bar" id="locale-bar" aria-label="Language switcher"></nav>
+    </div>
+
+    <header class="topbar">
+      <span class="topbar-mark" aria-hidden="true"></span>
+      <div class="topbar-copy">
+        <strong class="topbar-name" id="app-name"></strong>
       </div>
+    </header>
 
-      <header class="topbar">
-        <span class="topbar-mark" aria-hidden="true"></span>
-        <div class="topbar-copy">
-          <strong class="topbar-name" id="app-name"></strong>
+    <section class="hero-block" aria-hidden="true"></section>
+
+    <section class="hero-caption">
+      <p class="hero-subtitle" id="hero-subtitle"></p>
+      <div class="hero-meta">
+        <span id="footer-address"></span>
+        <span id="footer-license"></span>
+      </div>
+    </section>
+
+    <main class="main-menu" id="main-menu"></main>
+
+    <footer class="app-footer" id="app-footer" aria-label="Footer">
+      <div class="app-footer-rule" aria-hidden="true"></div>
+      <p class="app-footer-name" id="app-footer-name"></p>
+      <p class="app-footer-subtitle" id="app-footer-subtitle"></p>
+      <div class="app-footer-meta" id="app-footer-meta"></div>
+    </footer>
+  </div>
+
+  <div class="section-sheet hidden" id="section-sheet" aria-hidden="true">
+    <button class="sheet-backdrop" id="sheet-backdrop" type="button" aria-label="Close"></button>
+    <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <header class="sheet-header">
+        <div class="sheet-icon" id="sheet-icon" aria-hidden="true"></div>
+        <div class="sheet-title-block">
+          <p class="sheet-brand" id="sheet-brand"></p>
+          <h2 id="sheet-title"></h2>
+          <p class="sheet-lead" id="sheet-lead"></p>
         </div>
+        <button class="sheet-close" id="sheet-close" type="button" aria-label="Close section">
+          <span aria-hidden="true">×</span>
+        </button>
       </header>
+      <div class="sheet-content" id="sheet-content"></div>
+    </section>
+  </div>
 
-      <section class="hero-block" aria-hidden="true"></section>
+  <script type="module" src="./app.js?v=20260528w"></script>
+</body>
 
-      <section class="hero-caption">
-        <p class="hero-subtitle" id="hero-subtitle"></p>
-        <div class="hero-meta">
-          <span id="footer-address"></span>
-          <span id="footer-license"></span>
-        </div>
-      </section>
-
-      <main class="main-menu" id="main-menu"></main>
-
-      <footer class="app-footer" id="app-footer" aria-label="Footer">
-        <div class="app-footer-rule" aria-hidden="true"></div>
-        <p class="app-footer-name" id="app-footer-name"></p>
-        <p class="app-footer-subtitle" id="app-footer-subtitle"></p>
-        <div class="app-footer-meta" id="app-footer-meta"></div>
-      </footer>
-    </div>
-
-    <div class="section-sheet hidden" id="section-sheet" aria-hidden="true">
-      <button class="sheet-backdrop" id="sheet-backdrop" type="button" aria-label="Close"></button>
-      <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-        <header class="sheet-header">
-          <div class="sheet-icon" id="sheet-icon" aria-hidden="true"></div>
-          <div class="sheet-title-block">
-            <p class="sheet-brand" id="sheet-brand"></p>
-            <h2 id="sheet-title"></h2>
-            <p class="sheet-lead" id="sheet-lead"></p>
-          </div>
-          <button class="sheet-close" id="sheet-close" type="button" aria-label="Close section">
-            <span aria-hidden="true">×</span>
-          </button>
-        </header>
-        <div class="sheet-content" id="sheet-content"></div>
-      </section>
-    </div>
-
-    <script type="module" src="./app.js?v=20260528v"></script>
-  </body>
 </html>

@@ -3,10 +3,11 @@ import {
   fetchRemoteTemplateEnvelope,
   getLocaleContent,
   getVisibleLocales,
+  isCtaItem,
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260528h";
+} from "./content.js?v=20260528i";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -70,6 +71,14 @@ const iconPaths = {
     '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
   compass:
     '<circle cx="12" cy="12" r="8"/><path d="M14.8 9.2 13 13l-3.8 1.8L11 11z"/><circle cx="12" cy="12" r="1"/>',
+  chat:
+    '<path d="M5.2 18.5 6 15.8a6.9 6.9 0 1 1 2.7 1.6z"/><path d="M8.4 11.4h7.2"/><path d="M8.4 8.8h4.6"/>',
+  link:
+    '<path d="M10.7 13.3 13.3 10.7"/><path d="M8.1 15.9 6.6 17.4a3 3 0 0 1-4.2-4.2l3-3a3 3 0 0 1 4.2 0"/><path d="M15.9 8.1l1.5-1.5a3 3 0 1 1 4.2 4.2l-3 3a3 3 0 0 1-4.2 0"/>',
+  map:
+    '<path d="M3.2 6.1 8.6 4l6.8 2.1 5.4-2.1v13.9l-5.4 2.1-6.8-2.1-5.4 2.1z"/><path d="M8.6 4v13.9"/><path d="M15.4 6.1V20"/>',
+  ticket:
+    '<path d="M4.2 8.2A2.2 2.2 0 0 0 6.4 6h11.2a2.2 2.2 0 0 0 2.2 2.2v2.2a2.2 2.2 0 0 0-2.2 2.2H6.4a2.2 2.2 0 0 0-2.2-2.2z"/><path d="M12 6v8.8"/><path d="M12 8.2v1.2"/><path d="M12 11.4v1.2"/>',
   skyline:
     '<path d="M3.8 18.2h16.4"/><path d="M5.3 18.2V10.8h3.2v7.4"/><path d="M9.7 18.2V7.8h3.6v10.4"/><path d="M14.8 18.2V9.6h3v8.6"/><path d="M11.5 7.8V5.4h1.1v2.4"/><path d="M4.8 20.2a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z"/><path d="M18.2 20.2a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6z"/><path d="M6.4 18.4h10.1"/><path d="M15.8 15.9h1.6l1 2.5h-2.6"/><path d="M3.8 18.4h2.2l.9-1.9h2"/>',
   rental:
@@ -205,6 +214,29 @@ function renderGenericLinkItem(item, marker, sectionId) {
             : ""
         }
       </div>
+    </article>
+  `;
+}
+
+function ctaIcon(item) {
+  const kindFallback = {
+    web: "link",
+    maps: "map",
+    whatsapp: "chat",
+    email: "mail",
+    tel: "phone",
+  };
+  return item.icon || kindFallback[item.kind] || "link";
+}
+
+function renderCtaItem(item) {
+  return `
+    <article class="sheet-card sheet-card-cta">
+      <a class="sheet-cta" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">
+        <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(ctaIcon(item))}</span>
+        <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
+        <span class="sheet-cta-chevron" aria-hidden="true">↗</span>
+      </a>
     </article>
   `;
 }
@@ -419,6 +451,10 @@ function renderSectionItems(items, sectionId) {
             <p>${escapeHtml(item)}</p>
           </article>
         `;
+      }
+
+      if (isCtaItem(item)) {
+        return renderCtaItem(item);
       }
 
       return renderGenericLinkItem(item, marker, sectionId);

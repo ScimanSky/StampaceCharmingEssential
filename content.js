@@ -2,6 +2,7 @@ import { fetchRemoteTemplateRow } from "./supabase.js";
 
 export const STORAGE_KEY = "stampace_essential_template_v1";
 export const IMAGE_ITEM_TYPE = "image";
+export const CTA_ITEM_TYPE = "cta";
 export const FIXED_LOCALE = "it";
 export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
 export const MAX_VISIBLE_LOCALES = 3;
@@ -1370,6 +1371,15 @@ function normalizeItems(items, fallbackItems) {
             caption: cleanString(item.caption),
           };
         }
+        if (item.type === CTA_ITEM_TYPE) {
+          return {
+            type: CTA_ITEM_TYPE,
+            kind: cleanString(item.kind, "web"),
+            label: cleanString(item.label),
+            href: cleanString(item.href),
+            icon: cleanString(item.icon),
+          };
+        }
         return {
           title: cleanString(item.title),
           body: cleanString(item.body),
@@ -1382,6 +1392,7 @@ function normalizeItems(items, fallbackItems) {
     .filter((item) => {
       if (typeof item === "string") return Boolean(item);
       if (item.type === IMAGE_ITEM_TYPE) return Boolean(item.src);
+      if (item.type === CTA_ITEM_TYPE) return Boolean(item.label && item.href);
       return Boolean(item.title || item.body || item.href || item.label);
     });
 
@@ -1399,6 +1410,10 @@ export function isHostPrivateItem(item) {
 
 export function isImageItem(item) {
   return Boolean(item && typeof item === "object" && item.type === IMAGE_ITEM_TYPE && item.src);
+}
+
+export function isCtaItem(item) {
+  return Boolean(item && typeof item === "object" && item.type === CTA_ITEM_TYPE && item.label && item.href);
 }
 
 function ensureHostPrivateItem(items, localeCode) {

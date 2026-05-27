@@ -1,18 +1,20 @@
 import {
   AVAILABLE_LANGUAGES,
   clearTemplate,
+  CTA_ITEM_TYPE,
   defaultTemplate,
   FIXED_LOCALE,
   getHostPrivateItem,
   HOST_PRIVATE_ITEM,
   MAX_OPTIONAL_LOCALES,
   REQUIRED_LOCALES,
+  isCtaItem,
   isImageItem,
   isHostPrivateItem,
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528h";
+} from "./content.js?v=20260528i";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -52,6 +54,24 @@ const iconPaths = {
     '<path d="M2 5.5l6.7-3.5 6.7 3.5 6.7-3.5v15l-6.7 3.5-6.7-3.5-6.7 3.5Z M8.7 2v15 M15.4 5.5v15"/>',
   avatar:
     '<path d="M6.5 11c1.8-2 4-2 5.5-1c1.8-1 4-1 5.5.5c.5-4-1-6-5.5-6s-6 2-5.5 6.5z" style="fill: currentColor;"/><path d="M6.5 11a1.8 1.8 0 0 0 0 3.6M17.5 11a1.8 1.8 0 0 1 0 3.6"/><path d="M6.5 12.5v2.5a5.5 5.5 0 0 0 11 0v-2.5"/><circle cx="9.8" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><circle cx="14.2" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><path d="M11.5 14.2a0.5 0.5 0 0 0 1 0"/><path d="M9.5 16a2.5 2.5 0 0 0 5 0"/>',
+  phone:
+    '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
+  mail:
+    '<rect x="4" y="6.2" width="16" height="11.6" rx="2"/><path d="m5.3 7.7 6.7 5 6.7-5"/>',
+  home:
+    '<path d="M4.5 10.2 12 4l7.5 6.2"/><path d="M6.5 9.4V19h11V9.4"/>',
+  car:
+    '<path d="M5.2 14.8h13.6"/><path d="m7 14.8 1-4.2c.2-.7.8-1.2 1.5-1.2h5c.7 0 1.3.5 1.5 1.2l1 4.2"/><circle cx="8.3" cy="16.8" r="1.3"/><circle cx="15.7" cy="16.8" r="1.3"/>',
+  route:
+    '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
+  link:
+    '<path d="M10.7 13.3 13.3 10.7"/><path d="M8.1 15.9 6.6 17.4a3 3 0 0 1-4.2-4.2l3-3a3 3 0 0 1 4.2 0"/><path d="M15.9 8.1l1.5-1.5a3 3 0 1 1 4.2 4.2l-3 3a3 3 0 0 1-4.2 0"/>',
+  chat:
+    '<path d="M5.2 18.5 6 15.8a6.9 6.9 0 1 1 2.7 1.6z"/><path d="M8.4 11.4h7.2"/><path d="M8.4 8.8h4.6"/>',
+  map:
+    '<path d="M3.2 6.1 8.6 4l6.8 2.1 5.4-2.1v13.9l-5.4 2.1-6.8-2.1-5.4 2.1z"/><path d="M8.6 4v13.9"/><path d="M15.4 6.1V20"/>',
+  ticket:
+    '<path d="M4.2 8.2A2.2 2.2 0 0 0 6.4 6h11.2a2.2 2.2 0 0 0 2.2 2.2v2.2a2.2 2.2 0 0 0-2.2 2.2H6.4a2.2 2.2 0 0 0-2.2-2.2z"/><path d="M12 6v8.8"/><path d="M12 8.2v1.2"/><path d="M12 11.4v1.2"/>',
 };
 
 const AUTO_PUBLISH_DELAY = 900;
@@ -106,6 +126,25 @@ const expandedPanelIds = new Set(["general", "sections"]);
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
 const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
 const LINK_ITEM_PREFIX = "LINK";
+const CTA_KIND_OPTIONS = [
+  { value: "web", label: "Web" },
+  { value: "maps", label: "Google Maps" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "email", label: "Email" },
+  { value: "tel", label: "Telefono" },
+];
+const CTA_ICON_OPTIONS = [
+  { value: "map", label: "Mappa" },
+  { value: "phone", label: "Telefono" },
+  { value: "mail", label: "Email" },
+  { value: "chat", label: "Chat" },
+  { value: "link", label: "Link" },
+  { value: "route", label: "Percorso" },
+  { value: "car", label: "Auto" },
+  { value: "ticket", label: "Ticket" },
+  { value: "home", label: "Casa" },
+  { value: "key", label: "Chiave" },
+];
 
 function serializeFooterLines(lines = []) {
   return lines.join("\n");
@@ -119,8 +158,54 @@ function parseFooterLines(value) {
     .filter(Boolean);
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function ctaDefaultIcon(kind = "web") {
+  const fallbackMap = {
+    web: "link",
+    maps: "map",
+    whatsapp: "chat",
+    email: "mail",
+    tel: "phone",
+  };
+  return fallbackMap[kind] ?? "link";
+}
+
+function normalizeCtaHref(kind, href) {
+  const value = String(href).trim();
+  if (!value) return "";
+
+  if (kind === "whatsapp") {
+    if (/^https?:\/\//i.test(value)) return value;
+    const digits = value.replace(/[^\d+]/g, "");
+    if (!digits) return "";
+    if (digits.startsWith("+")) return `https://wa.me/${digits.slice(1)}`;
+    if (digits.startsWith("00")) return `https://wa.me/${digits.slice(2)}`;
+    return `https://wa.me/${digits}`;
+  }
+
+  if (kind === "email") {
+    return /^mailto:/i.test(value) ? value : `mailto:${value}`;
+  }
+
+  if (kind === "tel") {
+    if (/^tel:/i.test(value)) return value;
+    const digits = value.replace(/[^\d+]/g, "");
+    return digits ? `tel:${digits}` : "";
+  }
+
+  return value;
 }
 
 function translationKey(targetLocale, text) {
@@ -254,12 +339,20 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
         const pickSectionValue = (currentValue, italianBaseValue, sardinianBaseValue) =>
           currentValue !== italianBaseValue ? currentValue : sardinianBaseValue;
 
-        const items = section.items.map((item, itemIndex) => {
-          if (isImageItem(item)) return { ...item };
-          if (isHostPrivateItem(item)) return { ...getHostPrivateItem(targetLocale) };
+              const items = section.items.map((item, itemIndex) => {
+                if (isImageItem(item)) return { ...item };
+                if (isHostPrivateItem(item)) return { ...getHostPrivateItem(targetLocale) };
+                if (isCtaItem(item)) {
+                  const itBaseItem = itBaseSection.items?.[itemIndex];
+                  const scBaseItem = scBaseSection.items?.[itemIndex];
+                  return {
+                    ...item,
+                    label: item.label !== itBaseItem?.label ? item.label : scBaseItem?.label ?? item.label,
+                  };
+                }
 
-          const itBaseItem = itBaseSection.items?.[itemIndex];
-          const scBaseItem = scBaseSection.items?.[itemIndex];
+                const itBaseItem = itBaseSection.items?.[itemIndex];
+                const scBaseItem = scBaseSection.items?.[itemIndex];
 
           if (typeof item === "string") {
             return item !== itBaseItem ? item : scBaseItem ?? item;
@@ -326,6 +419,16 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
       if (isHostPrivateItem(item)) {
         targetSection.items.push({ ...getHostPrivateItem(targetLocale) });
+        return;
+      }
+
+      if (isCtaItem(item)) {
+        const translatedItem = { ...item, label: "" };
+        const nextIndex = targetSection.items.push(translatedItem) - 1;
+        texts.push(item.label ?? "");
+        appliers.push((value) => {
+          targetSection.items[nextIndex].label = value;
+        });
         return;
       }
 
@@ -461,7 +564,7 @@ function setStatus(message, variant = "") {
 
 function serializeItems(items) {
   return items
-    .filter((item) => !isHostPrivateItem(item) && !isImageItem(item))
+    .filter((item) => !isHostPrivateItem(item) && !isImageItem(item) && !isCtaItem(item))
     .map((item) => {
       if (typeof item === "string") return item;
       if (item?.href) {
@@ -537,6 +640,58 @@ function parseItems(value) {
     }
     return item;
   });
+}
+
+function renderSectionCtas(section) {
+  const ctas = section.items.filter(isCtaItem);
+  const editable = selectedEditorLocale === FIXED_LOCALE;
+
+  if (!ctas.length) {
+    return `<p class="host-cta-empty">Nessun pulsante grafico configurato.</p>`;
+  }
+
+  return ctas
+    .map(
+      (item, index) => `
+        <article class="host-cta-item" data-cta-item data-cta-index="${index}">
+          <div class="host-cta-meta">
+            <span class="host-cta-icon-preview" aria-hidden="true">${renderIcon(item.icon || ctaDefaultIcon(item.kind))}</span>
+            <span class="host-cta-heading">
+              <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}</strong>
+              <span>${CTA_KIND_OPTIONS.find((option) => option.value === item.kind)?.label ?? "Web"}</span>
+            </span>
+            <div class="host-cta-actions">
+              <button class="ghost-button host-order-button" type="button" data-action="move-cta-up" ${!editable || index === 0 ? "disabled" : ""} aria-label="Sposta CTA in alto">↑</button>
+              <button class="ghost-button host-order-button" type="button" data-action="move-cta-down" ${!editable || index === ctas.length - 1 ? "disabled" : ""} aria-label="Sposta CTA in basso">↓</button>
+              <button class="ghost-button host-remove-cta" type="button" data-action="remove-cta" ${!editable ? "disabled" : ""}>Rimuovi</button>
+            </div>
+          </div>
+          <div class="host-cta-grid">
+            <label>
+              <span>Tipo</span>
+              <select data-cta-field="kind" ${!editable ? "disabled" : ""}>
+                ${CTA_KIND_OPTIONS.map((option) => `<option value="${option.value}" ${option.value === item.kind ? "selected" : ""}>${option.label}</option>`).join("")}
+              </select>
+            </label>
+            <label>
+              <span>Icona</span>
+              <select data-cta-field="icon" ${!editable ? "disabled" : ""}>
+                ${CTA_ICON_OPTIONS.map((option) => `<option value="${option.value}" ${option.value === item.icon ? "selected" : ""}>${option.label}</option>`).join("")}
+              </select>
+            </label>
+            <label>
+              <span>Etichetta bottone</span>
+              <input data-cta-field="label" type="text" value="${escapeHtml(item.label ?? "")}" ${!editable ? "disabled" : ""} />
+            </label>
+            <label>
+              <span>Destinazione</span>
+              <input data-cta-field="href" type="text" value="${escapeHtml(item.href ?? "")}" ${!editable ? "disabled" : ""} />
+            </label>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
 }
 
 function renderSectionImages(section) {
@@ -620,8 +775,25 @@ function renderSectionEditors() {
               </label>
               <div class="host-content-tools">
                 <button class="ghost-button" type="button" data-action="add-link">Aggiungi link</button>
+                <button class="ghost-button" type="button" data-action="add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
                 <p class="host-content-note">Formato link: <code>+ LINK | https://example.com | Titolo | Descrizione | Etichetta</code></p>
               </div>
+            </div>
+            <div class="host-cta-editor">
+              <div class="host-section-media-head">
+                <div>
+                  <p class="host-kicker">Pulsanti grafici</p>
+                  <p class="host-media-note">CTA larghe con icona, etichetta e destinazione. Si aprono sempre in una nuova scheda.</p>
+                </div>
+              </div>
+              <div class="host-cta-list">
+                ${renderSectionCtas(section)}
+              </div>
+              ${
+                selectedEditorLocale !== FIXED_LOCALE
+                  ? `<p class="host-lock-note">I pulsanti grafici si gestiscono solo mentre modifichi la lingua italiana.</p>`
+                  : ""
+              }
             </div>
             <div class="host-section-media">
               <div class="host-section-media-head">
@@ -673,6 +845,19 @@ function collectTemplate() {
   const sections = sectionCards.map((card) => {
     const id = card.dataset.sectionId;
     const base = currentLocaleState().sections.find((section) => section.id === id);
+    const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
+      const kind = item.querySelector('[data-cta-field="kind"]').value;
+      const label = item.querySelector('[data-cta-field="label"]').value.trim();
+      const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
+      const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
+      return {
+        type: CTA_ITEM_TYPE,
+        kind,
+        label,
+        href,
+        icon,
+      };
+    }).filter((item) => item.label && item.href);
     const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
       type: "image",
       path: item.dataset.imagePath || "",
@@ -686,7 +871,7 @@ function collectTemplate() {
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
-      items: [...parseItems(card.querySelector('[data-field="items"]').value), ...imageItems],
+      items: [...parseItems(card.querySelector('[data-field="items"]').value), ...ctaItems, ...imageItems],
     };
   });
 
@@ -726,7 +911,7 @@ function switchEditorLocale(nextLocale) {
 function updateEnabledLocales() {
   state = saveTemplate(collectTemplate());
   syncFields();
-  setStatus("Lingue visibili aggiornate. Pubblica per sincronizzare l'app ospiti.", "success");
+  setStatus("Lingue visibili aggiornate. L'app ospiti si sincronizza automaticamente.", "success");
 }
 
 function createSectionId() {
@@ -766,6 +951,41 @@ function appendLinkTemplate(sectionId) {
   textarea.focus();
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
   setStatus("Scaffold link aggiunto. Compila URL, titolo, descrizione ed etichetta.", "success");
+}
+
+function updateSectionCtas(sectionId, updater) {
+  state = collectTemplate();
+  const section = currentLocaleState().sections.find((item) => item.id === sectionId);
+  if (!section) return;
+
+  const textItems = section.items.filter((item) => !isImageItem(item) && !isCtaItem(item));
+  const imageItems = section.items.filter(isImageItem);
+  const ctaItems = section.items.filter(isCtaItem);
+  const nextCtas = updater([...ctaItems]) ?? ctaItems;
+
+  section.items = [...textItems, ...nextCtas, ...imageItems];
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+}
+
+function addCta(sectionId) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Aggiungi pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  updateSectionCtas(sectionId, (ctaItems) => {
+    ctaItems.push({
+      type: CTA_ITEM_TYPE,
+      kind: "web",
+      label: "Nuovo pulsante grafico",
+      href: "https://example.com",
+      icon: ctaDefaultIcon("web"),
+    });
+    return ctaItems;
+  });
+  setStatus("Nuovo pulsante grafico aggiunto. Compila etichetta, destinazione e icona.", "success");
 }
 
 function toggleSection(sectionId) {
@@ -819,6 +1039,31 @@ function moveSection(sectionId, direction) {
   syncFields();
   queueAutoPublish();
   setStatus(`Ordine aggiornato: "${sections[nextIndex].menuTitle}" spostato.`, "success");
+}
+
+function removeCta(sectionId, ctaIndex) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Rimuovi pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  updateSectionCtas(sectionId, (ctaItems) => ctaItems.filter((_, index) => index !== ctaIndex));
+  setStatus("Pulsante grafico rimosso.", "success");
+}
+
+function moveCta(sectionId, ctaIndex, direction) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Riordina i pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  updateSectionCtas(sectionId, (ctaItems) => {
+    const nextIndex = ctaIndex + direction;
+    if (nextIndex < 0 || nextIndex >= ctaItems.length) return ctaItems;
+    [ctaItems[ctaIndex], ctaItems[nextIndex]] = [ctaItems[nextIndex], ctaItems[ctaIndex]];
+    return ctaItems;
+  });
+  setStatus("Ordine dei pulsanti grafici aggiornato.", "success");
 }
 
 function isAuthorizedSession(nextSession) {
@@ -1066,6 +1311,11 @@ function bindEditorEvents() {
     event.target.value = "";
   });
 
+  dom.sections.addEventListener("change", (event) => {
+    if (!event.target.matches('[data-cta-field]')) return;
+    queueAutoPublish();
+  });
+
   dom.sections.addEventListener("click", (event) => {
     const toggleTrigger = event.target.closest('[data-action="toggle-section"]');
     if (toggleTrigger) {
@@ -1099,6 +1349,37 @@ function bindEditorEvents() {
     if (addLinkTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
       appendLinkTemplate(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const addCtaTrigger = event.target.closest('[data-action="add-cta"]');
+    if (addCtaTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      addCta(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const removeCtaTrigger = event.target.closest('[data-action="remove-cta"]');
+    if (removeCtaTrigger) {
+      const ctaCard = event.target.closest("[data-cta-item]");
+      const sectionCard = event.target.closest("[data-section-id]");
+      removeCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
+      return;
+    }
+
+    const moveCtaUpTrigger = event.target.closest('[data-action="move-cta-up"]');
+    if (moveCtaUpTrigger) {
+      const ctaCard = event.target.closest("[data-cta-item]");
+      const sectionCard = event.target.closest("[data-section-id]");
+      moveCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10), -1);
+      return;
+    }
+
+    const moveCtaDownTrigger = event.target.closest('[data-action="move-cta-down"]');
+    if (moveCtaDownTrigger) {
+      const ctaCard = event.target.closest("[data-cta-item]");
+      const sectionCard = event.target.closest("[data-section-id]");
+      moveCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10), 1);
       return;
     }
 
