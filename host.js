@@ -14,7 +14,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528i";
+} from "./content.js?v=20260528j";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -145,6 +145,13 @@ const CTA_ICON_OPTIONS = [
   { value: "home", label: "Casa" },
   { value: "key", label: "Chiave" },
 ];
+const CTA_PRESET_OPTIONS = [
+  { kind: "web", label: "CTA Web" },
+  { kind: "maps", label: "CTA Mappa" },
+  { kind: "whatsapp", label: "CTA WhatsApp" },
+  { kind: "email", label: "CTA Email" },
+  { kind: "tel", label: "CTA Telefono" },
+];
 
 function serializeFooterLines(lines = []) {
   return lines.join("\n");
@@ -180,6 +187,38 @@ function ctaDefaultIcon(kind = "web") {
     tel: "phone",
   };
   return fallbackMap[kind] ?? "link";
+}
+
+function ctaDefaultLabel(kind = "web") {
+  const fallbackMap = {
+    web: "Apri link",
+    maps: "Apri mappa",
+    whatsapp: "Scrivi su WhatsApp",
+    email: "Invia email",
+    tel: "Chiama",
+  };
+  return fallbackMap[kind] ?? "Apri link";
+}
+
+function ctaDefaultHref(kind = "web") {
+  const fallbackMap = {
+    web: "https://example.com",
+    maps: "https://maps.google.com/",
+    whatsapp: "+39",
+    email: "email@example.com",
+    tel: "+39",
+  };
+  return fallbackMap[kind] ?? "https://example.com";
+}
+
+function buildCtaPreset(kind = "web") {
+  return {
+    type: CTA_ITEM_TYPE,
+    kind,
+    label: ctaDefaultLabel(kind),
+    href: ctaDefaultHref(kind),
+    icon: ctaDefaultIcon(kind),
+  };
 }
 
 function normalizeCtaHref(kind, href) {
@@ -531,7 +570,18 @@ function syncPanelState() {
 }
 
 function sectionBadge(section) {
-  return section.id.startsWith("custom-") ? "Sezione personalizzata" : section.id;
+  const parts = [];
+  if (section.id.startsWith("custom-")) {
+    parts.push("Sezione personalizzata");
+  } else if (section.id === "host") {
+    parts.push("Sezione fissa");
+  } else {
+    parts.push(section.id);
+  }
+  if (section.hidden) {
+    parts.push("Nascosta nell'app ospiti");
+  }
+  return parts.join(" · ");
 }
 
 function renderLanguageOptions() {
@@ -732,7 +782,7 @@ function renderSectionEditors() {
   dom.sections.innerHTML = localeState.sections
     .map(
       (section, index) => `
-        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}" data-section-id="${section.id}">
+        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}" data-section-id="${section.id}" data-section-hidden="${section.hidden ? "true" : "false"}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
               <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
@@ -752,6 +802,8 @@ function renderSectionEditors() {
                 <button class="ghost-button host-order-button" type="button" data-action="move-section-up" ${index === 0 ? "disabled" : ""} aria-label="Sposta in alto">↑</button>
                 <button class="ghost-button host-order-button" type="button" data-action="move-section-down" ${index === localeState.sections.length - 1 ? "disabled" : ""} aria-label="Sposta in basso">↓</button>
               </div>
+              <button class="ghost-button host-section-secondary" type="button" data-action="duplicate-section" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>Duplica</button>
+              <button class="ghost-button host-section-secondary" type="button" data-action="toggle-section-visibility" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>${section.hidden ? "Mostra" : "Nascondi"}</button>
               <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
             </div>
           </div>
@@ -776,6 +828,9 @@ function renderSectionEditors() {
               <div class="host-content-tools">
                 <button class="ghost-button" type="button" data-action="add-link">Aggiungi link</button>
                 <button class="ghost-button" type="button" data-action="add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
+                <div class="host-cta-presets">
+                  ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="add-cta-preset" data-cta-kind="${preset.kind}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${preset.label}</button>`).join("")}
+                </div>
                 <p class="host-content-note">Formato link: <code>+ LINK | https://example.com | Titolo | Descrizione | Etichetta</code></p>
               </div>
             </div>
@@ -868,6 +923,7 @@ function collectTemplate() {
     return {
       id,
       icon: base.icon,
+      hidden: card.dataset.sectionHidden === "true",
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
@@ -915,7 +971,7 @@ function updateEnabledLocales() {
 }
 
 function createSectionId() {
-  return `custom-${Date.now().toString(36)}`;
+  return `custom-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
 function addSection() {
@@ -928,6 +984,7 @@ function addSection() {
   currentLocaleState().sections.push({
     id: createSectionId(),
     icon: "spark",
+    hidden: false,
     menuTitle: "Nuovo pulsante",
     sectionTitle: "Nuova sezione",
     lead: "",
@@ -938,6 +995,60 @@ function addSection() {
   syncFields();
   queueAutoPublish();
   setStatus("Nuovo pulsante aggiunto. Ora compila i campi della nuova sezione.", "success");
+}
+
+function cloneSection(section) {
+  return JSON.parse(JSON.stringify(section));
+}
+
+function duplicateSection(sectionId) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Duplica sezioni solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  const sections = currentLocaleState().sections;
+  const sectionIndex = sections.findIndex((section) => section.id === sectionId);
+  if (sectionIndex < 0) return;
+
+  const sourceSection = sections[sectionIndex];
+  if (sourceSection.id === "host") return;
+
+  const duplicated = cloneSection(sourceSection);
+  duplicated.id = createSectionId();
+  duplicated.hidden = false;
+  duplicated.menuTitle = `${sourceSection.menuTitle} copia`;
+  duplicated.sectionTitle = `${sourceSection.sectionTitle} copia`;
+
+  sections.splice(sectionIndex + 1, 0, duplicated);
+  expandedSectionIds.add(duplicated.id);
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+  setStatus(`Sezione "${sourceSection.menuTitle}" duplicata.`, "success");
+}
+
+function toggleSectionVisibility(sectionId) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Gestisci la visibilità solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  const section = currentLocaleState().sections.find((item) => item.id === sectionId);
+  if (!section || section.id === "host") return;
+
+  section.hidden = !section.hidden;
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+  setStatus(
+    section.hidden
+      ? `La sezione "${section.menuTitle}" è stata nascosta nell'app ospiti.`
+      : `La sezione "${section.menuTitle}" è di nuovo visibile nell'app ospiti.`,
+    "success",
+  );
 }
 
 function appendLinkTemplate(sectionId) {
@@ -969,20 +1080,14 @@ function updateSectionCtas(sectionId, updater) {
   queueAutoPublish();
 }
 
-function addCta(sectionId) {
+function addCta(sectionId, kind = "web") {
   if (selectedEditorLocale !== FIXED_LOCALE) {
     setStatus("Aggiungi pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
     return;
   }
 
   updateSectionCtas(sectionId, (ctaItems) => {
-    ctaItems.push({
-      type: CTA_ITEM_TYPE,
-      kind: "web",
-      label: "Nuovo pulsante grafico",
-      href: "https://example.com",
-      icon: ctaDefaultIcon("web"),
-    });
+    ctaItems.push(buildCtaPreset(kind));
     return ctaItems;
   });
   setStatus("Nuovo pulsante grafico aggiunto. Compila etichetta, destinazione e icona.", "success");
@@ -1227,6 +1332,14 @@ async function handleImageUpload(sectionId, file) {
   }
 }
 
+function countImagePathUsage(templateState, imagePath) {
+  if (!imagePath || !templateState?.locales?.[FIXED_LOCALE]) return 0;
+  return templateState.locales[FIXED_LOCALE].sections.reduce((count, section) => {
+    const items = Array.isArray(section?.items) ? section.items : [];
+    return count + items.filter((item) => isImageItem(item) && item.path === imagePath).length;
+  }, 0);
+}
+
 async function removeImage(sectionId, imageIndex) {
   state = collectTemplate();
   const section = currentLocaleState().sections.find((item) => item.id === sectionId);
@@ -1236,7 +1349,8 @@ async function removeImage(sectionId, imageIndex) {
   if (!target) return;
 
   try {
-    if (target.path && isAuthorizedSession(session)) {
+    const pathUsageCount = countImagePathUsage(state, target.path);
+    if (target.path && pathUsageCount <= 1 && isAuthorizedSession(session)) {
       await deleteSectionImage(target.path, supabase);
     }
 
@@ -1345,6 +1459,20 @@ function bindEditorEvents() {
       return;
     }
 
+    const duplicateSectionTrigger = event.target.closest('[data-action="duplicate-section"]');
+    if (duplicateSectionTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      duplicateSection(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const toggleVisibilityTrigger = event.target.closest('[data-action="toggle-section-visibility"]');
+    if (toggleVisibilityTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      toggleSectionVisibility(sectionCard?.dataset.sectionId);
+      return;
+    }
+
     const addLinkTrigger = event.target.closest('[data-action="add-link"]');
     if (addLinkTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
@@ -1356,6 +1484,13 @@ function bindEditorEvents() {
     if (addCtaTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
       addCta(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const addCtaPresetTrigger = event.target.closest('[data-action="add-cta-preset"]');
+    if (addCtaPresetTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      addCta(sectionCard?.dataset.sectionId, addCtaPresetTrigger.dataset.ctaKind || "web");
       return;
     }
 

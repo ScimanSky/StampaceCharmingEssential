@@ -404,9 +404,14 @@ button,
   flex: 0 0 auto;
 }
 
+.host-section-secondary {
+  flex: 0 0 auto;
+}
+
 .host-section-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.55rem;
   flex: 0 0 auto;
 }
@@ -551,6 +556,16 @@ button,
   justify-self: start;
 }
 
+.host-cta-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.host-cta-preset {
+  padding: 0.68rem 0.8rem;
+}
+
 .host-content-note {
   margin: 0;
   color: var(--muted);
@@ -678,6 +693,14 @@ button,
   stroke-linejoin: round;
 }
 
+.host-section-card.is-hidden-section {
+  border-color: rgba(224, 205, 177, 0.08);
+}
+
+.host-section-card.is-hidden-section .host-section-badge {
+  color: rgba(239, 176, 168, 0.85);
+}
+
 @media (max-width: 720px) {
   .host-header {
     grid-template-columns: 1fr;
@@ -739,6 +762,10 @@ button,
     width: 100%;
   }
 
+  .host-section-secondary {
+    width: 100%;
+  }
+
   .host-upload-button {
     width: 100%;
   }
@@ -755,6 +782,10 @@ button,
 
   .host-remove-cta {
     width: 100%;
+  }
+
+  .host-cta-presets {
+    display: grid;
   }
 }
 

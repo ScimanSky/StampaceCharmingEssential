@@ -7,7 +7,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260528i";
+} from "./content.js?v=20260528j";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -317,7 +317,7 @@ function iconForItem(item, sectionId) {
 
 function renderMenu(sections) {
   return sections
-    .filter((section) => section.id !== "host")
+    .filter((section) => section.id !== "host" && !section.hidden)
     .map(
       (section) => `
         <button class="menu-row" type="button" data-section-id="${section.id}">
@@ -352,7 +352,7 @@ function renderLocaleBar() {
 }
 
 function renderHostShortcut() {
-  const hostSection = localeState().sections.find((section) => section.id === "host");
+  const hostSection = localeState().sections.find((section) => section.id === "host" && !section.hidden);
   if (!hostSection) {
     dom.hostAvatarButton.classList.add("hidden");
     dom.hostAvatarButton.setAttribute("aria-hidden", "true");
@@ -465,7 +465,7 @@ function renderSectionItems(items, sectionId) {
 
 function renderOpenSection(sectionId) {
   const section = localeState().sections.find((item) => item.id === sectionId);
-  if (!section) return;
+  if (!section || section.hidden) return;
 
   activeSectionId = section.id;
   dom.sheetIcon.innerHTML = renderIcon(iconForSection(section));
@@ -614,7 +614,15 @@ function render() {
   dom.mainMenu.innerHTML = renderMenu(localeTemplate.sections);
 
   if (activeSectionId) {
-    renderOpenSection(activeSectionId);
+    const activeSection = localeTemplate.sections.find((section) => section.id === activeSectionId);
+    if (!activeSection || activeSection.hidden) {
+      activeSectionId = null;
+      dom.sheet.classList.add("hidden");
+      dom.sheet.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("sheet-open");
+    } else {
+      renderOpenSection(activeSectionId);
+    }
   }
 }
 

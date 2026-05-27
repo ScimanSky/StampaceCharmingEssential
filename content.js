@@ -1426,6 +1426,7 @@ function buildFallbackSection(section = {}, index = 0) {
   return {
     id: cleanString(section?.id, `custom-${index + 1}`),
     icon: cleanString(section?.icon, "spark"),
+    hidden: Boolean(section?.hidden),
     menuTitle: fallbackTitle,
     sectionTitle: cleanString(section?.sectionTitle, fallbackTitle),
     lead: cleanString(section?.lead, ""),
@@ -1438,6 +1439,7 @@ function normalizeSection(section, baseSection, localeCode) {
   return {
     id: baseSection.id,
     icon: baseSection.id.startsWith("custom-") ? cleanString(section?.icon, baseSection.icon) : baseSection.icon,
+    hidden: Boolean(section?.hidden ?? baseSection.hidden),
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
@@ -1531,6 +1533,7 @@ function mirrorItalianContent(localeMap) {
               return {
                 id: section.id,
                 icon: section.icon,
+                hidden: Boolean(section.hidden),
                 menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
                 sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
                 lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
@@ -1565,6 +1568,7 @@ function mirrorItalianContent(localeMap) {
             return {
               id: section.id,
               icon: section.icon,
+              hidden: Boolean(section.hidden),
               menuTitle: pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle),
               sectionTitle: pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle),
               lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),
