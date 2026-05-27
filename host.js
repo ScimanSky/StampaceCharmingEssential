@@ -69,7 +69,6 @@ const dom = {
   reset: document.querySelector("#host-reset"),
   export: document.querySelector("#host-export"),
   import: document.querySelector("#host-import"),
-  publish: document.querySelector("#host-publish"),
   addSection: document.querySelector("#host-add-section"),
   editorLocale: document.querySelector("#field-editor-locale"),
   enabledLocales: document.querySelector("#field-enabled-locales"),
@@ -890,13 +889,13 @@ function downloadTemplate() {
 
 async function publishNow({ silent = false } = {}) {
   if (!isAuthorizedSession(session)) {
-    setStatus("Accedi come host per pubblicare live.", "error");
+    setStatus("Accedi come host per sincronizzare le modifiche live.", "error");
     return;
   }
 
   state = saveTemplate(collectTemplate());
   if (!silent) {
-    setStatus("Traduzione e pubblicazione live in corso...", "");
+    setStatus("Traduzione e sincronizzazione live in corso...", "");
   }
 
   try {
@@ -905,12 +904,12 @@ async function publishNow({ silent = false } = {}) {
     const published = await publishRemoteTemplate(state, supabase);
     latestRemoteUpdatedAt = published.updated_at ?? null;
     if (!silent) {
-      setStatus("Template pubblicato live. L'app ospiti si aggiorna in remoto.", "success");
+      setStatus("Template sincronizzato live. L'app ospiti si aggiorna in remoto.", "success");
     } else {
       setStatus("Modifiche sincronizzate live.", "success");
     }
   } catch {
-    setStatus("Pubblicazione live fallita. Verifica accesso host, setup Supabase o traduzione online.", "error");
+    setStatus("Sincronizzazione live fallita. Verifica accesso host, setup Supabase o traduzione online.", "error");
   }
 }
 
@@ -1045,7 +1044,6 @@ function bindEditorEvents() {
   dom.save.addEventListener("click", saveCurrentTemplate);
   dom.export.addEventListener("click", downloadTemplate);
   dom.reset.addEventListener("click", restoreDefaultTemplate);
-  dom.publish.addEventListener("click", () => publishNow({ silent: false }));
   dom.addSection.addEventListener("click", addSection);
   dom.logout.addEventListener("click", logout);
   dom.import.addEventListener("change", (event) => {
