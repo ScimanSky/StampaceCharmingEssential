@@ -126,6 +126,7 @@ const expandedPanelIds = new Set(["general", "sections"]);
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
 const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
 const LINK_ITEM_PREFIX = "LINK";
+let draggingSectionId = null;
 const CTA_KIND_OPTIONS = [
   { value: "web", label: "Web" },
   { value: "maps", label: "Google Maps" },
@@ -782,7 +783,7 @@ function renderSectionEditors() {
   dom.sections.innerHTML = localeState.sections
     .map(
       (section, index) => `
-        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}" data-section-id="${section.id}" data-section-hidden="${section.hidden ? "true" : "false"}">
+        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${selectedEditorLocale === FIXED_LOCALE ? " is-draggable" : ""}" data-section-id="${section.id}" data-section-hidden="${section.hidden ? "true" : "false"}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
               <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
@@ -798,10 +799,15 @@ function renderSectionEditors() {
               </button>
             </div>
             <div class="host-section-actions">
-              <div class="host-section-order">
-                <button class="ghost-button host-order-button" type="button" data-action="move-section-up" ${index === 0 ? "disabled" : ""} aria-label="Sposta in alto">↑</button>
-                <button class="ghost-button host-order-button" type="button" data-action="move-section-down" ${index === localeState.sections.length - 1 ? "disabled" : ""} aria-label="Sposta in basso">↓</button>
-              </div>
+              <button
+                class="ghost-button host-drag-handle"
+                type="button"
+                data-action="drag-section"
+                draggable="${selectedEditorLocale === FIXED_LOCALE ? "true" : "false"}"
+                ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}
+                aria-label="Trascina per riordinare"
+                title="Trascina per riordinare"
+              >↕</button>
               <button class="ghost-button host-section-secondary" type="button" data-action="duplicate-section" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>Duplica</button>
               <button class="ghost-button host-section-secondary" type="button" data-action="toggle-section-visibility" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>${section.hidden ? "Mostra" : "Nascondi"}</button>
               <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
@@ -1146,6 +1152,42 @@ function moveSection(sectionId, direction) {
   setStatus(`Ordine aggiornato: "${sections[nextIndex].menuTitle}" spostato.`, "success");
 }
 
+function clearSectionDropState() {
+  dom.sections.querySelectorAll("[data-section-id]").forEach((card) => {
+    card.classList.remove("is-dragging");
+    delete card.dataset.dropPosition;
+  });
+}
+
+function reorderSection(sectionId, targetSectionId, position = "before") {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Riordina i pulsanti solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  if (!sectionId || !targetSectionId || sectionId === targetSectionId) return;
+
+  state = collectTemplate();
+  const sections = currentLocaleState().sections;
+  const sourceIndex = sections.findIndex((section) => section.id === sectionId);
+  const targetIndex = sections.findIndex((section) => section.id === targetSectionId);
+  if (sourceIndex < 0 || targetIndex < 0) return;
+
+  const [movedSection] = sections.splice(sourceIndex, 1);
+  let insertIndex = sections.findIndex((section) => section.id === targetSectionId);
+  if (insertIndex < 0) {
+    sections.push(movedSection);
+  } else {
+    if (position === "after") insertIndex += 1;
+    sections.splice(insertIndex, 0, movedSection);
+  }
+
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+  setStatus(`Ordine aggiornato: "${movedSection.menuTitle}" riposizionato.`, "success");
+}
+
 function removeCta(sectionId, ctaIndex) {
   if (selectedEditorLocale !== FIXED_LOCALE) {
     setStatus("Rimuovi pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
@@ -1445,20 +1487,6 @@ function bindEditorEvents() {
       return;
     }
 
-    const moveUpTrigger = event.target.closest('[data-action="move-section-up"]');
-    if (moveUpTrigger) {
-      const sectionCard = event.target.closest("[data-section-id]");
-      moveSection(sectionCard?.dataset.sectionId, -1);
-      return;
-    }
-
-    const moveDownTrigger = event.target.closest('[data-action="move-section-down"]');
-    if (moveDownTrigger) {
-      const sectionCard = event.target.closest("[data-section-id]");
-      moveSection(sectionCard?.dataset.sectionId, 1);
-      return;
-    }
-
     const duplicateSectionTrigger = event.target.closest('[data-action="duplicate-section"]');
     if (duplicateSectionTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
@@ -1523,6 +1551,57 @@ function bindEditorEvents() {
     const imageItem = event.target.closest("[data-image-item]");
     const sectionCard = event.target.closest("[data-section-id]");
     removeImage(sectionCard?.dataset.sectionId, Number.parseInt(imageItem?.dataset.imageIndex ?? "-1", 10));
+  });
+
+  dom.sections.addEventListener("dragstart", (event) => {
+    const handle = event.target.closest('[data-action="drag-section"]');
+    if (!handle || selectedEditorLocale !== FIXED_LOCALE) {
+      event.preventDefault();
+      return;
+    }
+
+    const sectionCard = event.target.closest("[data-section-id]");
+    draggingSectionId = sectionCard?.dataset.sectionId ?? null;
+    if (!draggingSectionId) {
+      event.preventDefault();
+      return;
+    }
+
+    clearSectionDropState();
+    sectionCard.classList.add("is-dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", draggingSectionId);
+  });
+
+  dom.sections.addEventListener("dragover", (event) => {
+    if (!draggingSectionId) return;
+    const sectionCard = event.target.closest("[data-section-id]");
+    if (!sectionCard || sectionCard.dataset.sectionId === draggingSectionId) return;
+
+    event.preventDefault();
+    const rect = sectionCard.getBoundingClientRect();
+    const position = event.clientY > rect.top + rect.height / 2 ? "after" : "before";
+    dom.sections.querySelectorAll("[data-section-id]").forEach((card) => {
+      if (card !== sectionCard) delete card.dataset.dropPosition;
+    });
+    sectionCard.dataset.dropPosition = position;
+  });
+
+  dom.sections.addEventListener("drop", (event) => {
+    const sectionCard = event.target.closest("[data-section-id]");
+    if (!draggingSectionId || !sectionCard) return;
+
+    event.preventDefault();
+    const targetSectionId = sectionCard.dataset.sectionId;
+    const position = sectionCard.dataset.dropPosition || "before";
+    clearSectionDropState();
+    reorderSection(draggingSectionId, targetSectionId, position);
+    draggingSectionId = null;
+  });
+
+  dom.sections.addEventListener("dragend", () => {
+    draggingSectionId = null;
+    clearSectionDropState();
   });
 
   dom.app.addEventListener("click", (event) => {

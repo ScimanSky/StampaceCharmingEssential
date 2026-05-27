@@ -408,6 +408,16 @@ button,
   flex: 0 0 auto;
 }
 
+.host-drag-handle {
+  flex: 0 0 auto;
+  min-width: 2.6rem;
+  cursor: grab;
+}
+
+.host-drag-handle:active {
+  cursor: grabbing;
+}
+
 .host-section-actions {
   display: flex;
   align-items: center;
@@ -701,6 +711,26 @@ button,
   color: rgba(239, 176, 168, 0.85);
 }
 
+.host-section-card.is-draggable .host-section-meta {
+  user-select: none;
+}
+
+.host-section-card.is-dragging {
+  opacity: 0.45;
+}
+
+.host-section-card[data-drop-position="before"] {
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.2),
+    inset 0 3px 0 rgba(231, 216, 193, 0.85);
+}
+
+.host-section-card[data-drop-position="after"] {
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.2),
+    inset 0 -3px 0 rgba(231, 216, 193, 0.85);
+}
+
 @media (max-width: 720px) {
   .host-header {
     grid-template-columns: 1fr;
@@ -763,6 +793,10 @@ button,
   }
 
   .host-section-secondary {
+    width: 100%;
+  }
+
+  .host-drag-handle {
     width: 100%;
   }
 
