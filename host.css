@@ -404,6 +404,29 @@ button,
   flex: 0 0 auto;
 }
 
+.host-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 0 0 auto;
+}
+
+.host-section-order {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.host-order-button {
+  min-width: 2.35rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.host-order-button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .host-section-toggle {
   width: 100%;
   display: flex;
@@ -604,6 +627,19 @@ button,
   .host-section-heading {
     display: grid;
     align-items: start;
+  }
+
+  .host-section-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .host-section-order {
+    flex: 1 1 auto;
+  }
+
+  .host-order-button {
+    flex: 1 1 0;
   }
 
   .host-remove-section {

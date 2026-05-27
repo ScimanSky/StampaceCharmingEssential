@@ -577,7 +577,7 @@ function renderSectionEditors() {
 
   dom.sections.innerHTML = localeState.sections
     .map(
-      (section) => `
+      (section, index) => `
         <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}" data-section-id="${section.id}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
@@ -593,7 +593,13 @@ function renderSectionEditors() {
                 </span>
               </button>
             </div>
-            <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
+            <div class="host-section-actions">
+              <div class="host-section-order">
+                <button class="ghost-button host-order-button" type="button" data-action="move-section-up" ${index === 0 ? "disabled" : ""} aria-label="Sposta in alto">↑</button>
+                <button class="ghost-button host-order-button" type="button" data-action="move-section-down" ${index === localeState.sections.length - 1 ? "disabled" : ""} aria-label="Sposta in basso">↓</button>
+              </div>
+              <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
+            </div>
           </div>
           <div class="host-section-body">
             <div class="host-section-grid">
@@ -793,6 +799,27 @@ function removeSection(sectionId) {
   syncFields();
   queueAutoPublish();
   setStatus(`Pulsante "${target.menuTitle}" rimosso.`, "success");
+}
+
+function moveSection(sectionId, direction) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Riordina i pulsanti solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  const sections = currentLocaleState().sections;
+  const currentIndex = sections.findIndex((section) => section.id === sectionId);
+  if (currentIndex < 0) return;
+
+  const nextIndex = currentIndex + direction;
+  if (nextIndex < 0 || nextIndex >= sections.length) return;
+
+  [sections[currentIndex], sections[nextIndex]] = [sections[nextIndex], sections[currentIndex]];
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+  setStatus(`Ordine aggiornato: "${sections[nextIndex].menuTitle}" spostato.`, "success");
 }
 
 function isAuthorizedSession(nextSession) {
@@ -1060,6 +1087,20 @@ function bindEditorEvents() {
     if (removeSectionTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
       removeSection(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const moveUpTrigger = event.target.closest('[data-action="move-section-up"]');
+    if (moveUpTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      moveSection(sectionCard?.dataset.sectionId, -1);
+      return;
+    }
+
+    const moveDownTrigger = event.target.closest('[data-action="move-section-down"]');
+    if (moveDownTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      moveSection(sectionCard?.dataset.sectionId, 1);
       return;
     }
 
