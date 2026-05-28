@@ -139,6 +139,7 @@ let activeSectionId = null;
 let remoteTemplateUpdatedAt = null;
 let unsubscribeRealtime = null;
 let lastFocusedElement = null;
+let sheetCloseTimer = null;
 const SHEET_HISTORY_KEY = "stampaceSectionId";
 const LOCALE_STORAGE_KEY = "stampace_essential_guest_locale";
 const FOCUSABLE_SELECTOR = [
@@ -482,6 +483,11 @@ function renderOpenSection(sectionId) {
   const section = localeState().sections.find((item) => item.id === sectionId);
   if (!section || section.hidden) return;
 
+  if (sheetCloseTimer) {
+    window.clearTimeout(sheetCloseTimer);
+    sheetCloseTimer = null;
+  }
+
   activeSectionId = section.id;
   dom.sheetIcon.innerHTML = renderIcon(iconForSection(section));
   dom.sheetBrand.textContent = template.appName;
@@ -490,6 +496,10 @@ function renderOpenSection(sectionId) {
   dom.sheetContent.innerHTML = renderSectionItems(section.items, section.id);
 
   dom.sheet.classList.remove("hidden");
+  dom.sheet.classList.remove("is-closing");
+  window.requestAnimationFrame(() => {
+    dom.sheet.classList.add("is-visible");
+  });
   dom.sheet.setAttribute("aria-hidden", "false");
   document.body.classList.add("sheet-open");
 }
@@ -526,10 +536,21 @@ function openSection(sectionId, { pushHistory = true } = {}) {
 function closeSection({ fromHistory = false } = {}) {
   const focusTarget = lastFocusedElement;
   activeSectionId = null;
-  dom.sheet.classList.add("hidden");
+  dom.sheet.classList.remove("is-visible");
+  dom.sheet.classList.add("is-closing");
   dom.sheet.setAttribute("aria-hidden", "true");
   document.body.classList.remove("sheet-open");
   lastFocusedElement = null;
+
+  if (sheetCloseTimer) {
+    window.clearTimeout(sheetCloseTimer);
+  }
+
+  sheetCloseTimer = window.setTimeout(() => {
+    dom.sheet.classList.add("hidden");
+    dom.sheet.classList.remove("is-closing");
+    sheetCloseTimer = null;
+  }, 320);
 
   if (focusTarget && document.contains(focusTarget)) {
     window.requestAnimationFrame(() => focusTarget.focus({ preventScroll: true }));
@@ -670,6 +691,7 @@ function render() {
     if (!activeSection || activeSection.hidden) {
       activeSectionId = null;
       dom.sheet.classList.add("hidden");
+      dom.sheet.classList.remove("is-visible", "is-closing");
       dom.sheet.setAttribute("aria-hidden", "true");
       document.body.classList.remove("sheet-open");
     } else {

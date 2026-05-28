@@ -341,8 +341,9 @@ svg,
 
 .main-menu {
   display: grid;
-  gap: 0.62rem;
+  gap: 0.72rem;
   margin-top: 1.05rem;
+  perspective: 900px;
 }
 
 .app-footer {
@@ -389,22 +390,35 @@ svg,
 }
 
 .menu-row {
+  --menu-accent: #d6aa68;
+  --menu-accent-strong: #f0d7ac;
+  --menu-surface: rgba(24, 19, 14, 0.76);
+  --menu-shade: rgba(7, 5, 4, 0.58);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
   align-items: center;
   gap: 0.95rem;
   min-height: 3.7rem;
   padding: 0 0.9rem 0 0.78rem;
-  border: 1px solid var(--line);
-  border-radius: 0.72rem;
+  border: 1px solid color-mix(in srgb, var(--menu-accent) 24%, rgba(255, 255, 255, 0.08));
+  border-radius: 0.82rem;
   background:
-    linear-gradient(180deg, rgba(255, 244, 224, 0.06), rgba(255, 244, 224, 0.02)),
-    var(--row);
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--menu-accent) 18%, transparent), transparent 34%),
+    linear-gradient(180deg, rgba(255, 246, 231, 0.13), rgba(255, 246, 231, 0.04) 46%, rgba(0, 0, 0, 0.16)),
+    var(--menu-surface);
   color: inherit;
   text-decoration: none;
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -8px 16px var(--menu-shade),
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 14px 0 rgba(7, 5, 4, 0.24),
+    0 22px 34px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(8px) saturate(1.08);
+  -webkit-backdrop-filter: blur(8px) saturate(1.08);
   appearance: none;
   width: 100%;
   text-align: left;
@@ -412,6 +426,61 @@ svg,
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   outline: none;
+  transform: translateY(0) rotateX(0deg);
+  transform-origin: center top;
+  transition:
+    border-color 190ms ease,
+    background 190ms ease,
+    box-shadow 190ms ease,
+    color 190ms ease,
+    transform 190ms cubic-bezier(0.2, 0.8, 0.22, 1);
+}
+
+.menu-row::before,
+.menu-row::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.menu-row::before {
+  inset: 1px;
+  border-radius: inherit;
+  background:
+    linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.16) 38%, transparent 55%);
+  opacity: 0;
+  transform: translateX(-44%);
+  transition:
+    opacity 180ms ease,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.menu-row::after {
+  inset: auto 0 0;
+  height: 0.34rem;
+  border-bottom-right-radius: inherit;
+  border-bottom-left-radius: inherit;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--menu-accent) 38%, transparent), transparent);
+  opacity: 0.56;
+}
+
+.menu-row:nth-child(4n + 2) {
+  --menu-accent: #69aeb5;
+  --menu-accent-strong: #c8eef1;
+  --menu-surface: rgba(16, 27, 28, 0.72);
+}
+
+.menu-row:nth-child(4n + 3) {
+  --menu-accent: #c88b58;
+  --menu-accent-strong: #f0cfad;
+  --menu-surface: rgba(28, 18, 12, 0.74);
+}
+
+.menu-row:nth-child(4n + 4) {
+  --menu-accent: #89aa70;
+  --menu-accent-strong: #dce8c4;
+  --menu-surface: rgba(18, 26, 16, 0.72);
 }
 
 .menu-row.is-static {
@@ -421,13 +490,35 @@ svg,
 }
 
 .menu-row:active {
-  background: var(--row-hover);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -5px 10px rgba(0, 0, 0, 0.38),
+    0 5px 0 rgba(7, 5, 4, 0.28),
+    0 12px 22px rgba(0, 0, 0, 0.22);
+  transform: translateY(4px) scale(0.992);
 }
 
-.menu-row:hover {
+.menu-row:hover,
+.menu-row:focus-visible {
   background:
-    linear-gradient(180deg, rgba(255, 244, 224, 0.09), rgba(255, 244, 224, 0.03)),
-    var(--row-hover);
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--menu-accent) 28%, transparent), transparent 36%),
+    linear-gradient(180deg, rgba(255, 248, 235, 0.18), rgba(255, 248, 235, 0.05) 46%, rgba(0, 0, 0, 0.13)),
+    color-mix(in srgb, var(--menu-surface) 86%, var(--menu-accent) 14%);
+  border-color: color-mix(in srgb, var(--menu-accent) 54%, rgba(255, 255, 255, 0.16));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.34),
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 16px 0 rgba(7, 5, 4, 0.22),
+    0 28px 42px rgba(0, 0, 0, 0.3),
+    0 0 28px color-mix(in srgb, var(--menu-accent) 18%, transparent);
+  transform: translateY(-3px) rotateX(2deg);
+}
+
+.menu-row:hover::before,
+.menu-row:focus-visible::before {
+  opacity: 1;
+  transform: translateX(44%);
 }
 
 .menu-row:focus,
@@ -453,10 +544,28 @@ svg,
   height: 2.75rem;
   display: grid;
   place-items: center;
-  color: var(--muted-strong);
-  border-radius: 0.58rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #17100a;
+  border-radius: 0.68rem;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.42), transparent 28%),
+    linear-gradient(145deg, color-mix(in srgb, var(--menu-accent) 46%, #fff0d5), color-mix(in srgb, var(--menu-accent) 52%, #21150c));
+  border: 1px solid color-mix(in srgb, var(--menu-accent) 42%, rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.16),
+    0 8px 16px color-mix(in srgb, var(--menu-accent) 22%, transparent);
+  transition:
+    box-shadow 190ms ease,
+    transform 190ms ease;
+}
+
+.menu-row:hover .menu-icon,
+.menu-row:focus-visible .menu-icon {
+  transform: translateY(-1px) scale(1.045);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.14),
+    0 10px 22px color-mix(in srgb, var(--menu-accent) 32%, transparent);
 }
 
 .menu-icon svg {
@@ -483,7 +592,7 @@ svg,
 
 .menu-copy strong {
   font-size: clamp(0.98rem, 3.7vw, 1.08rem);
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text);
   line-height: 1.1;
   text-align: center;
@@ -498,9 +607,19 @@ svg,
 
 .menu-chevron {
   justify-self: end;
-  color: var(--muted-soft);
+  color: var(--menu-accent-strong);
   font-size: 1.02rem;
   line-height: 1;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--menu-accent) 32%, transparent);
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.menu-row:hover .menu-chevron,
+.menu-row:focus-visible .menu-chevron {
+  color: #fff7e8;
+  transform: translateX(2px);
 }
 
 .hidden {
@@ -512,6 +631,19 @@ svg,
   inset: 0;
   z-index: 30;
   background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.section-sheet.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.section-sheet.is-closing {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .section-sheet::before {
@@ -522,6 +654,10 @@ svg,
   opacity: 0.42;
   filter: brightness(1.02) contrast(1.18) saturate(0.62);
   pointer-events: none;
+  transform: scale(1.02);
+  transition:
+    opacity 260ms ease,
+    transform 420ms ease;
 }
 
 .section-sheet::after {
@@ -532,6 +668,20 @@ svg,
     radial-gradient(circle at top center, rgba(255, 222, 170, 0.05), transparent 28%),
     linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.42));
   pointer-events: none;
+  transition: opacity 260ms ease;
+}
+
+.section-sheet.is-visible::before {
+  transform: scale(1);
+}
+
+.section-sheet.is-closing::before {
+  opacity: 0.18;
+  transform: scale(1.04);
+}
+
+.section-sheet.is-closing::after {
+  opacity: 0;
 }
 
 .sheet-backdrop {
@@ -547,6 +697,21 @@ svg,
   overflow: auto;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   background: transparent;
+  opacity: 0;
+  transform: translateY(1.5rem) scale(0.985);
+  transition:
+    opacity 300ms ease,
+    transform 360ms cubic-bezier(0.2, 0.8, 0.22, 1);
+}
+
+.section-sheet.is-visible .sheet-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.section-sheet.is-closing .sheet-panel {
+  opacity: 0;
+  transform: translateY(1.15rem) scale(0.985);
 }
 
 .sheet-header {
@@ -991,6 +1156,12 @@ svg,
     gap: 0.75rem;
     padding-left: 0.72rem;
     padding-right: 0.78rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -8px 16px var(--menu-shade),
+      0 1px 0 rgba(255, 255, 255, 0.05),
+      0 10px 0 rgba(7, 5, 4, 0.24),
+      0 18px 28px rgba(0, 0, 0, 0.24);
   }
 
   .sheet-panel {
@@ -1144,5 +1315,10 @@ svg,
 
   .sheet-cta::before {
     display: none;
+  }
+
+  .menu-row::before,
+  .locale-chip:active img {
+    animation: none;
   }
 }
