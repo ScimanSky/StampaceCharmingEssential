@@ -671,7 +671,47 @@ function preventCopy() {
   });
 }
 
+function applyTheme(theme) {
+  const primaryFont = theme?.fontPrimary || "Roboto";
+  const secondaryFont = theme?.fontSecondary || "Roboto";
+
+  const serifFonts = ["Playfair Display", "Lora", "Cormorant Garamond"];
+  const primaryFallback = serifFonts.includes(primaryFont) ? "serif" : "sans-serif";
+  const secondaryFallback = serifFonts.includes(secondaryFont) ? "serif" : "sans-serif";
+
+  document.documentElement.style.setProperty("--font-primary", `"${primaryFont}", ${primaryFallback}`);
+  document.documentElement.style.setProperty("--font-secondary", `"${secondaryFont}", ${secondaryFallback}`);
+
+  const fontsToLoad = new Set([primaryFont, secondaryFont]);
+  const linkId = "google-fonts-dynamic";
+  let linkEl = document.getElementById(linkId);
+  if (!linkEl) {
+    linkEl = document.createElement("link");
+    linkEl.id = linkId;
+    linkEl.rel = "stylesheet";
+    document.head.appendChild(linkEl);
+  }
+
+  const fontQueries = [];
+  fontsToLoad.forEach((font) => {
+    if (font === "System") return;
+    const formattedName = font.replace(/ /g, "+");
+    if (["Playfair Display", "Lora", "Cormorant Garamond"].includes(font)) {
+      fontQueries.push(`family=${formattedName}:ital,wght@0,300..700;1,300..700`);
+    } else {
+      fontQueries.push(`family=${formattedName}:wght@300;400;500;600`);
+    }
+  });
+
+  if (fontQueries.length > 0) {
+    linkEl.href = `https://fonts.googleapis.com/css2?${fontQueries.join("&")}&display=swap`;
+  } else {
+    linkEl.removeAttribute("href");
+  }
+}
+
 function render() {
+  applyTheme(template.theme);
   const localeTemplate = localeState();
   dom.appName.textContent = template.appName;
   renderHostShortcut();

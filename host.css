@@ -9,6 +9,8 @@
   --accent: var(--copy);
   --success: #9fd7a4;
   --danger: #efb0a8;
+  --font-primary: "Roboto", sans-serif;
+  --font-secondary: "Roboto", sans-serif;
 }
 
 * {
@@ -25,7 +27,7 @@ body {
     linear-gradient(180deg, rgba(9, 7, 5, 0.88), rgba(9, 7, 5, 0.96)),
     url("./img/patternlegn.webp") center top / 42rem auto repeat;
   color: var(--text);
-  font-family: "Roboto", sans-serif;
+  font-family: var(--font-secondary);
 }
 
 button,
@@ -88,6 +90,7 @@ select {
 .host-section-card h2 {
   margin: 0.35rem 0 0;
   font-weight: 400;
+  font-family: var(--font-primary);
 }
 
 .host-copy {

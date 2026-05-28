@@ -10,6 +10,10 @@
       "CIN: IT092009C2000R8066"
     ]
   },
+  "theme": {
+    "fontPrimary": "Roboto",
+    "fontSecondary": "Roboto"
+  },
   "enabledLocales": [
     "it",
     "en",

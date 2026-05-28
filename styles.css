@@ -16,6 +16,8 @@
   --radius-xl: 1.8rem;
   --radius-lg: 1.15rem;
   --radius-md: 0.95rem;
+  --font-primary: "Roboto", sans-serif;
+  --font-secondary: "Roboto", sans-serif;
 }
 
 * {
@@ -36,7 +38,7 @@ body {
   position: relative;
   background: var(--bg);
   color: var(--text);
-  font-family: "Roboto", sans-serif;
+  font-family: var(--font-secondary), sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   -webkit-user-select: none;
@@ -115,7 +117,7 @@ svg,
 
 .topbar-name {
   display: block;
-  font-family: "Roboto", sans-serif;
+  font-family: var(--font-primary), sans-serif;
   font-size: clamp(1.06rem, 4.2vw, 1.28rem);
   line-height: 1.1;
   letter-spacing: clamp(0.05em, 0.42vw, 0.12em);
@@ -312,7 +314,7 @@ svg,
   letter-spacing: clamp(0.08em, 0.45vw, 0.14em);
   text-transform: uppercase;
   text-align: center;
-  font-family: "Roboto", sans-serif;
+  font-family: var(--font-primary), sans-serif;
   font-weight: 400;
   text-wrap: balance;
   overflow-wrap: anywhere;
@@ -373,6 +375,7 @@ svg,
   font-size: 0.8rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  font-family: var(--font-primary), sans-serif;
 }
 
 .app-footer-subtitle {
@@ -380,6 +383,7 @@ svg,
   font-size: 0.76rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  font-family: var(--font-primary), sans-serif;
 }
 
 .app-footer-meta {
@@ -599,6 +603,7 @@ svg,
   overflow-wrap: anywhere;
   word-break: break-word;
   text-wrap: balance;
+  font-family: var(--font-primary), sans-serif;
 }
 
 .menu-copy span {
@@ -765,6 +770,7 @@ svg,
   overflow-wrap: anywhere;
   word-break: break-word;
   text-wrap: balance;
+  font-family: var(--font-primary), sans-serif;
 }
 
 .sheet-lead {

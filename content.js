@@ -1319,6 +1319,10 @@ export const defaultTemplate = {
     subtitle: "Luxury apartment",
     lines: ["Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia", "CIN: IT092009C2000R8066"],
   },
+  theme: {
+    fontPrimary: "Roboto",
+    fontSecondary: "Roboto",
+  },
   enabledLocales: ["it", "en", "de"],
   locales: DEFAULT_LOCALE_CONTENT,
 };
@@ -1796,6 +1800,8 @@ export function normalizeTemplate(rawTemplate = {}) {
   const footerLines = Array.isArray(footerSource.lines)
     ? footerSource.lines.map((line) => cleanString(line)).filter(Boolean)
     : [cleanString(footerSource.address, resolvedAddress), cleanString(footerSource.license, resolvedLicense)].filter(Boolean);
+  const themeSource = rawTemplate.theme && typeof rawTemplate.theme === "object" ? rawTemplate.theme : {};
+  const fallbackTheme = defaultTemplate.theme || { fontPrimary: "Roboto", fontSecondary: "Roboto" };
   return {
     appName: resolvedAppName,
     address: resolvedAddress,
@@ -1804,6 +1810,10 @@ export function normalizeTemplate(rawTemplate = {}) {
       name: cleanString(footerSource.name, resolvedAppName || fallbackFooter.name),
       subtitle: cleanString(footerSource.subtitle, fallbackFooter.subtitle),
       lines: footerLines.length ? footerLines : fallbackFooter.lines,
+    },
+    theme: {
+      fontPrimary: cleanString(themeSource.fontPrimary, fallbackTheme.fontPrimary),
+      fontSecondary: cleanString(themeSource.fontSecondary, fallbackTheme.fontSecondary),
     },
     enabledLocales: normalizeEnabledLocales(rawTemplate.enabledLocales ?? rawTemplate.visibleLocales ?? defaultTemplate.enabledLocales),
     locales: buildLocaleMap(rawTemplate),

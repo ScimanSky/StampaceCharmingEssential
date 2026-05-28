@@ -103,6 +103,8 @@ const dom = {
   subtitle: document.querySelector("#field-subtitle"),
   address: document.querySelector("#field-address"),
   license: document.querySelector("#field-license"),
+  fontPrimary: document.querySelector("#field-font-primary"),
+  fontSecondary: document.querySelector("#field-font-secondary"),
   footerName: document.querySelector("#field-footer-name"),
   footerSubtitle: document.querySelector("#field-footer-subtitle"),
   footerLines: document.querySelector("#field-footer-lines"),
@@ -135,6 +137,15 @@ const expandedPanelIds = new Set(["general", "sections"]);
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
 const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
 const LINK_ITEM_PREFIX = "LINK";
+const AVAILABLE_FONTS = [
+  { value: "Roboto", label: "Roboto (Sans-serif pulito)" },
+  { value: "Inter", label: "Inter (Sans-serif moderno)" },
+  { value: "Outfit", label: "Outfit (Sans-serif geometrico elegante)" },
+  { value: "Playfair Display", label: "Playfair Display (Serif elegante)" },
+  { value: "Lora", label: "Lora (Serif editoriale leggibile)" },
+  { value: "Montserrat", label: "Montserrat (Sans-serif bold moderno)" },
+  { value: "Cormorant Garamond", label: "Cormorant Garamond (Serif lusso tradizionale)" }
+];
 let draggingSectionId = null;
 const CTA_KIND_OPTIONS = [
   { value: "web", label: "Web" },
@@ -177,6 +188,45 @@ function parseFooterLines(value) {
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function applyTheme(theme) {
+  const primaryFont = theme?.fontPrimary || "Roboto";
+  const secondaryFont = theme?.fontSecondary || "Roboto";
+
+  const serifFonts = ["Playfair Display", "Lora", "Cormorant Garamond"];
+  const primaryFallback = serifFonts.includes(primaryFont) ? "serif" : "sans-serif";
+  const secondaryFallback = serifFonts.includes(secondaryFont) ? "serif" : "sans-serif";
+
+  document.documentElement.style.setProperty("--font-primary", `"${primaryFont}", ${primaryFallback}`);
+  document.documentElement.style.setProperty("--font-secondary", `"${secondaryFont}", ${secondaryFallback}`);
+
+  const fontsToLoad = new Set([primaryFont, secondaryFont]);
+  const linkId = "google-fonts-dynamic";
+  let linkEl = document.getElementById(linkId);
+  if (!linkEl) {
+    linkEl = document.createElement("link");
+    linkEl.id = linkId;
+    linkEl.rel = "stylesheet";
+    document.head.appendChild(linkEl);
+  }
+
+  const fontQueries = [];
+  fontsToLoad.forEach((font) => {
+    if (font === "System") return;
+    const formattedName = font.replace(/ /g, "+");
+    if (["Playfair Display", "Lora", "Cormorant Garamond"].includes(font)) {
+      fontQueries.push(`family=${formattedName}:ital,wght@0,300..700;1,300..700`);
+    } else {
+      fontQueries.push(`family=${formattedName}:wght@300;400;500;600`);
+    }
+  });
+
+  if (fontQueries.length > 0) {
+    linkEl.href = `https://fonts.googleapis.com/css2?${fontQueries.join("&")}&display=swap`;
+  } else {
+    linkEl.removeAttribute("href");
+  }
 }
 
 function ctaDefaultIcon(kind = "web") {
@@ -884,10 +934,20 @@ function renderSectionEditors() {
 }
 
 function syncFields() {
+  if (dom.fontPrimary && dom.fontPrimary.options.length === 0) {
+    const optionsHtml = AVAILABLE_FONTS.map(
+      (font) => `<option value="${escapeAttribute(font.value)}">${escapeHtml(font.label)}</option>`
+    ).join("");
+    dom.fontPrimary.innerHTML = optionsHtml;
+    dom.fontSecondary.innerHTML = optionsHtml;
+  }
+  applyTheme(state.theme);
   const localeState = currentLocaleState();
   dom.appName.value = state.appName;
   dom.address.value = state.address;
   dom.license.value = state.license;
+  dom.fontPrimary.value = state.theme?.fontPrimary || "Roboto";
+  dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
   dom.subtitle.value = localeState.subtitle;
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
@@ -949,6 +1009,10 @@ function collectTemplate() {
     name: dom.footerName.value,
     subtitle: dom.footerSubtitle.value,
     lines: parseFooterLines(dom.footerLines.value),
+  };
+  next.theme = {
+    fontPrimary: dom.fontPrimary.value,
+    fontSecondary: dom.fontSecondary.value,
   };
   next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {
@@ -1464,6 +1528,18 @@ function bindEditorEvents() {
 
   dom.optionalLocale.addEventListener("change", () => {
     updateEnabledLocales();
+  });
+
+  dom.fontPrimary.addEventListener("change", () => {
+    state = saveTemplate(collectTemplate());
+    syncFields();
+    queueAutoPublish();
+  });
+
+  dom.fontSecondary.addEventListener("change", () => {
+    state = saveTemplate(collectTemplate());
+    syncFields();
+    queueAutoPublish();
   });
 
   dom.sections.addEventListener("change", (event) => {
