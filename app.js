@@ -8,6 +8,14 @@ import {
   loadTemplate,
   normalizeTemplate,
 } from "./content.js?v=20260528j";
+import {
+  escapeAttribute,
+  escapeHtml,
+  normalizeCtaHref,
+  normalizeCtaKind,
+  sanitizeHref,
+  sanitizeImageSrc,
+} from "./security.js?v=20260528b";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -114,6 +122,7 @@ const dom = {
   footerName: document.querySelector("#app-footer-name"),
   footerSubtitle: document.querySelector("#app-footer-subtitle"),
   footerMeta: document.querySelector("#app-footer-meta"),
+  syncStatus: document.querySelector("#sync-status"),
   mainMenu: document.querySelector("#main-menu"),
   sheet: document.querySelector("#section-sheet"),
   sheetBackdrop: document.querySelector("#sheet-backdrop"),
@@ -129,21 +138,21 @@ let template = null;
 let activeSectionId = null;
 let remoteTemplateUpdatedAt = null;
 let unsubscribeRealtime = null;
+let lastFocusedElement = null;
 const SHEET_HISTORY_KEY = "stampaceSectionId";
 const LOCALE_STORAGE_KEY = "stampace_essential_guest_locale";
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
 let currentLocale = FIXED_LOCALE;
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }
 
 function normalizePhoneDigits(value) {
@@ -201,6 +210,7 @@ function renderGenericLinkItem(item, marker, sectionId) {
   const title = item.title ? `<strong>${escapeHtml(item.title)}</strong>` : "";
   const body = item.body ? `<p>${escapeHtml(item.body)}</p>` : "";
   const label = item.label || item.href;
+  const href = sanitizeHref(item.href);
 
   return `
     <article class="sheet-card sheet-card-link">
@@ -209,8 +219,8 @@ function renderGenericLinkItem(item, marker, sectionId) {
         ${title}
         ${body}
         ${
-          item.href
-            ? `<a class="sheet-link" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`
+          href
+            ? `<a class="sheet-link" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`
             : ""
         }
       </div>
@@ -230,10 +240,13 @@ function ctaIcon(item) {
 }
 
 function renderCtaItem(item) {
-  const kind = ["web", "maps", "whatsapp", "email", "tel"].includes(item.kind) ? item.kind : "web";
+  const kind = normalizeCtaKind(item.kind);
+  const href = normalizeCtaHref(kind, item.href);
+  if (!href) return "";
+
   return `
     <article class="sheet-card sheet-card-cta">
-      <a class="sheet-cta sheet-cta--${escapeHtml(kind)}" href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">
+      <a class="sheet-cta sheet-cta--${escapeAttribute(kind)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
         <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(ctaIcon(item))}</span>
         <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
         <span class="sheet-cta-chevron" aria-hidden="true">↗</span>
@@ -320,10 +333,10 @@ function renderMenu(sections) {
     .filter((section) => section.id !== "host" && !section.hidden)
     .map(
       (section) => `
-        <button class="menu-row" type="button" data-section-id="${section.id}">
+        <button class="menu-row" type="button" data-section-id="${escapeAttribute(section.id)}">
           <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
           <span class="menu-copy">
-            <strong>${section.menuTitle}</strong>
+            <strong>${escapeHtml(section.menuTitle)}</strong>
           </span>
           <span class="menu-chevron" aria-hidden="true">›</span>
         </button>
@@ -340,11 +353,11 @@ function renderLocaleBar() {
         <button
           class="locale-chip${language.code === currentLocale ? " is-active" : ""}"
           type="button"
-          data-locale-code="${language.code}"
-          aria-label="${language.label}"
-          title="${language.label}"
+          data-locale-code="${escapeAttribute(language.code)}"
+          aria-label="${escapeAttribute(language.label)}"
+          title="${escapeAttribute(language.label)}"
         >
-          <img src="${language.flagSrc}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+          <img src="${escapeAttribute(sanitizeImageSrc(language.flagSrc))}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
         </button>
       `,
     )
@@ -397,13 +410,15 @@ function renderSectionItems(items, sectionId) {
         : `<span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>`;
 
       if (isImageItem(item)) {
+        const src = sanitizeImageSrc(item.src);
+        if (!src) return "";
         return `
           <article class="sheet-card sheet-card-media">
             <div class="sheet-card-media-body">
-              <img class="sheet-image" src="${item.src}" alt="${item.alt ?? ""}" loading="lazy" />
+              <img class="sheet-image" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
               ${
                 item.caption
-                  ? `<p class="sheet-image-caption">${item.caption}</p>`
+                  ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
                   : ""
               }
             </div>
@@ -429,7 +444,7 @@ function renderSectionItems(items, sectionId) {
               <div class="sheet-wifi-field">
                 <div class="sheet-wifi-label-value">
                   <span class="sheet-wifi-label">${label}</span>
-                  <span class="sheet-wifi-value" id="wifi-value-${type}">${value}</span>
+                  <span class="sheet-wifi-value" id="wifi-value-${type}">${escapeHtml(value)}</span>
                 </div>
                 <button class="copy-btn" data-copy-id="wifi-value-${type}" title="Copia" type="button">
                   <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -479,7 +494,21 @@ function renderOpenSection(sectionId) {
   document.body.classList.add("sheet-open");
 }
 
+function setSyncStatus(message = "") {
+  if (!dom.syncStatus) return;
+  dom.syncStatus.textContent = message;
+  dom.syncStatus.classList.toggle("is-visible", Boolean(message));
+}
+
+function focusSheet() {
+  window.requestAnimationFrame(() => {
+    dom.sheetClose.focus({ preventScroll: true });
+  });
+}
+
 function openSection(sectionId, { pushHistory = true } = {}) {
+  lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
   if (pushHistory) {
     window.history.pushState(
       {
@@ -491,13 +520,20 @@ function openSection(sectionId, { pushHistory = true } = {}) {
   }
 
   renderOpenSection(sectionId);
+  focusSheet();
 }
 
 function closeSection({ fromHistory = false } = {}) {
+  const focusTarget = lastFocusedElement;
   activeSectionId = null;
   dom.sheet.classList.add("hidden");
   dom.sheet.setAttribute("aria-hidden", "true");
   document.body.classList.remove("sheet-open");
+  lastFocusedElement = null;
+
+  if (focusTarget && document.contains(focusTarget)) {
+    window.requestAnimationFrame(() => focusTarget.focus({ preventScroll: true }));
+  }
 
   if (!fromHistory && window.history.state?.[SHEET_HISTORY_KEY]) {
     window.history.back();
@@ -508,14 +544,12 @@ function bindMenu() {
   dom.mainMenu.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-section-id]");
     if (!trigger) return;
-    trigger.blur();
     openSection(trigger.dataset.sectionId);
   });
 }
 
 function bindHostShortcut() {
   dom.hostAvatarButton.addEventListener("click", () => {
-    dom.hostAvatarButton.blur();
     openSection("host");
   });
 }
@@ -545,6 +579,23 @@ function bindSheet() {
   dom.sheetClose.addEventListener("click", () => closeSection());
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Tab" && activeSectionId) {
+      const focusable = [...dom.sheet.querySelectorAll(FOCUSABLE_SELECTOR)].filter(
+        (element) => element.offsetParent !== null,
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+      return;
+    }
+
     if (event.key === "Escape" && activeSectionId) {
       closeSection();
     }
@@ -554,6 +605,7 @@ function bindSheet() {
     const nextSectionId = event.state?.[SHEET_HISTORY_KEY];
     if (nextSectionId) {
       renderOpenSection(nextSectionId);
+      focusSheet();
       return;
     }
 
@@ -636,9 +688,10 @@ async function syncRemoteTemplate() {
       currentLocale = FIXED_LOCALE;
       window.localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
     }
+    setSyncStatus("");
     render();
   } catch {
-    // Keep the current rendered template if remote sync fails.
+    setSyncStatus("Offline: mostro l'ultima versione disponibile.");
   }
 }
 
@@ -659,6 +712,7 @@ function startLiveSync() {
         currentLocale = FIXED_LOCALE;
         window.localStorage.setItem(LOCALE_STORAGE_KEY, currentLocale);
       }
+      setSyncStatus("");
       render();
     }
   });
@@ -673,6 +727,7 @@ async function init() {
     template = remote.template;
   } catch {
     remoteTemplateUpdatedAt = null;
+    setSyncStatus("Offline: mostro l'ultima versione disponibile.");
   }
   if (!template.enabledLocales.includes(currentLocale)) {
     currentLocale = FIXED_LOCALE;
@@ -685,6 +740,16 @@ async function init() {
   bindCopyButtons();
   preventCopy();
   startLiveSync();
+  registerServiceWorker();
 }
 
 init();
+
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      // The app keeps working as a normal GitHub Pages site if registration fails.
+    });
+  });
+}

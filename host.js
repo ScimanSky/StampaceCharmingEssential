@@ -23,6 +23,14 @@ import {
   publishRemoteTemplate,
   uploadSectionImage,
 } from "./supabase.js";
+import {
+  escapeAttribute,
+  escapeHtml,
+  normalizeCtaHref,
+  normalizeCtaKind,
+  sanitizeHref,
+  sanitizeImageSrc,
+} from "./security.js?v=20260528b";
 
 const iconPaths = {
   shield:
@@ -73,7 +81,7 @@ const iconPaths = {
     '<path d="M4.2 8.2A2.2 2.2 0 0 0 6.4 6h11.2a2.2 2.2 0 0 0 2.2 2.2v2.2a2.2 2.2 0 0 0-2.2 2.2H6.4a2.2 2.2 0 0 0-2.2-2.2z"/><path d="M12 6v8.8"/><path d="M12 8.2v1.2"/><path d="M12 11.4v1.2"/>',
 };
 
-const AUTO_PUBLISH_DELAY = 900;
+const AUTO_PUBLISH_DELAY = 2500;
 const EDITOR_HASH = "#editor";
 
 const dom = {
@@ -115,10 +123,12 @@ let selectedEditorLocale = FIXED_LOCALE;
 const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
 const TRANSLATE_CHUNK_LIMIT = 2400;
+const TRANSLATE_TIMEOUT_MS = 8000;
 const TRANSLATE_LOCALE_MAP = {
   sc: "ca",
 };
 const translationCache = new Map();
+let lastTranslationFallbackLocales = [];
 const expandedSectionIds = new Set();
 let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set(["general", "sections"]);
@@ -163,15 +173,6 @@ function parseFooterLines(value) {
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }
 
 function renderIcon(name) {
@@ -221,32 +222,6 @@ function buildCtaPreset(kind = "web") {
   };
 }
 
-function normalizeCtaHref(kind, href) {
-  const value = String(href).trim();
-  if (!value) return "";
-
-  if (kind === "whatsapp") {
-    if (/^https?:\/\//i.test(value)) return value;
-    const digits = value.replace(/[^\d+]/g, "");
-    if (!digits) return "";
-    if (digits.startsWith("+")) return `https://wa.me/${digits.slice(1)}`;
-    if (digits.startsWith("00")) return `https://wa.me/${digits.slice(2)}`;
-    return `https://wa.me/${digits}`;
-  }
-
-  if (kind === "email") {
-    return /^mailto:/i.test(value) ? value : `mailto:${value}`;
-  }
-
-  if (kind === "tel") {
-    if (/^tel:/i.test(value)) return value;
-    const digits = value.replace(/[^\d+]/g, "");
-    return digits ? `tel:${digits}` : "";
-  }
-
-  return value;
-}
-
 function translationKey(targetLocale, text) {
   return `${targetLocale}::${text}`;
 }
@@ -269,17 +244,25 @@ async function translateBatch(texts, targetLocale) {
       dt: "t",
       q: joined,
     });
-    const response = await fetch(`${TRANSLATE_ENDPOINT}?${params.toString()}`);
-    if (!response.ok) {
-      throw new Error("Servizio di traduzione non disponibile.");
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), TRANSLATE_TIMEOUT_MS);
+    try {
+      const response = await fetch(`${TRANSLATE_ENDPOINT}?${params.toString()}`, {
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error("Servizio di traduzione non disponibile.");
+      }
+      const payload = await response.json();
+      const translatedText = (payload[0] ?? []).map((part) => part[0] ?? "").join("");
+      const parts = translatedText.split(TRANSLATE_SEPARATOR);
+      if (parts.length !== currentChunk.length) {
+        throw new Error("Formato risposta traduzione non valido.");
+      }
+      translated.push(...parts);
+    } finally {
+      window.clearTimeout(timeoutId);
     }
-    const payload = await response.json();
-    const translatedText = (payload[0] ?? []).map((part) => part[0] ?? "").join("");
-    const parts = translatedText.split(TRANSLATE_SEPARATOR);
-    if (parts.length !== currentChunk.length) {
-      throw new Error("Formato risposta traduzione non valido.");
-    }
-    translated.push(...parts);
     currentChunk = [];
     currentSize = 0;
   }
@@ -317,7 +300,13 @@ async function translateTexts(texts, targetLocale) {
   });
 
   if (missingTexts.length) {
-    const translated = await translateBatch(missingTexts, targetLocale);
+    let translated;
+    try {
+      translated = await translateBatch(missingTexts, targetLocale);
+    } catch {
+      lastTranslationFallbackLocales.push(targetLocale);
+      translated = missingTexts;
+    }
     translated.forEach((value, idx) => {
       const source = missingTexts[idx];
       const index = missingIndexes[idx];
@@ -516,9 +505,12 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 async function buildPublishedTemplate(template) {
   const next = JSON.parse(JSON.stringify(template));
   const italianLocale = next.locales[FIXED_LOCALE];
+  const enabledLocaleCodes = new Set(next.enabledLocales ?? REQUIRED_LOCALES);
+  lastTranslationFallbackLocales = [];
 
   for (const language of AVAILABLE_LANGUAGES) {
     if (language.code === FIXED_LOCALE) continue;
+    if (!enabledLocaleCodes.has(language.code)) continue;
     next.locales[language.code] = await buildTranslatedLocale(italianLocale, language.code);
   }
 
@@ -592,7 +584,7 @@ function renderOptionalLocaleSelect() {
     '<option value="">Nessuna lingua extra</option>',
     ...optionalLanguages.map(
       (language) =>
-        `<option value="${language.code}" ${language.code === selectedOptionalLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
+        `<option value="${escapeAttribute(language.code)}" ${language.code === selectedOptionalLocale ? "selected" : ""}>${escapeHtml(language.label)} (${escapeHtml(language.nativeLabel)})</option>`,
     ),
   ].join("");
 }
@@ -627,13 +619,14 @@ function parseLinkItem(value) {
   if (parts.length < 2 || parts[0].toUpperCase() !== LINK_ITEM_PREFIX) return null;
 
   const [, href = "", title = "", body = "", label = ""] = parts;
-  if (!href) return null;
+  const safeHref = sanitizeHref(href);
+  if (!safeHref) return null;
 
   return {
     title,
     body,
     label: label || href,
-    href,
+    href: safeHref,
   };
 }
 
@@ -692,13 +685,17 @@ function renderSectionCtas(section) {
 
   return ctas
     .map(
-      (item, index) => `
-        <article class="host-cta-item" data-cta-item data-cta-index="${index}">
+      (item, index) => {
+        const kind = normalizeCtaKind(item.kind);
+        const href = normalizeCtaHref(kind, item.href);
+        const icon = item.icon || ctaDefaultIcon(kind);
+        return `
+        <article class="host-cta-item" data-cta-item data-cta-index="${escapeAttribute(index)}">
           <div class="host-cta-meta">
-            <span class="host-cta-icon-preview" aria-hidden="true">${renderIcon(item.icon || ctaDefaultIcon(item.kind))}</span>
+            <span class="host-cta-icon-preview" aria-hidden="true">${renderIcon(icon)}</span>
             <span class="host-cta-heading">
               <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}</strong>
-              <span>${CTA_KIND_OPTIONS.find((option) => option.value === item.kind)?.label ?? "Web"}</span>
+              <span>${escapeHtml(CTA_KIND_OPTIONS.find((option) => option.value === kind)?.label ?? "Web")}</span>
             </span>
             <div class="host-cta-actions">
               <button class="ghost-button host-order-button" type="button" data-action="move-cta-up" ${!editable || index === 0 ? "disabled" : ""} aria-label="Sposta CTA in alto">↑</button>
@@ -710,26 +707,27 @@ function renderSectionCtas(section) {
             <label>
               <span>Tipo</span>
               <select data-cta-field="kind" ${!editable ? "disabled" : ""}>
-                ${CTA_KIND_OPTIONS.map((option) => `<option value="${option.value}" ${option.value === item.kind ? "selected" : ""}>${option.label}</option>`).join("")}
+                ${CTA_KIND_OPTIONS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === kind ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
               </select>
             </label>
             <label>
               <span>Icona</span>
               <select data-cta-field="icon" ${!editable ? "disabled" : ""}>
-                ${CTA_ICON_OPTIONS.map((option) => `<option value="${option.value}" ${option.value === item.icon ? "selected" : ""}>${option.label}</option>`).join("")}
+                ${CTA_ICON_OPTIONS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
               </select>
             </label>
             <label>
               <span>Etichetta bottone</span>
-              <input data-cta-field="label" type="text" value="${escapeHtml(item.label ?? "")}" ${!editable ? "disabled" : ""} />
+              <input data-cta-field="label" type="text" value="${escapeAttribute(item.label ?? "")}" ${!editable ? "disabled" : ""} />
             </label>
             <label>
               <span>Destinazione</span>
-              <input data-cta-field="href" type="text" value="${escapeHtml(item.href ?? "")}" ${!editable ? "disabled" : ""} />
+              <input data-cta-field="href" type="text" value="${escapeAttribute(href || item.href || "")}" ${!editable ? "disabled" : ""} />
             </label>
           </div>
         </article>
-      `,
+      `;
+      },
     )
     .join("");
 }
@@ -742,22 +740,26 @@ function renderSectionImages(section) {
 
   return images
     .map(
-      (item, index) => `
-        <article class="host-image-item" data-image-item data-image-index="${index}" data-image-path="${item.path ?? ""}" data-image-src="${item.src}">
-          <img src="${item.src}" alt="${item.alt || ""}" loading="lazy" />
+      (item, index) => {
+        const src = sanitizeImageSrc(item.src);
+        if (!src) return "";
+        return `
+        <article class="host-image-item" data-image-item data-image-index="${escapeAttribute(index)}" data-image-path="${escapeAttribute(item.path ?? "")}" data-image-src="${escapeAttribute(src)}">
+          <img src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt || "")}" loading="lazy" />
           <div class="host-image-fields">
             <label>
               <span>Alt text</span>
-              <input data-image-field="alt" type="text" value="${item.alt ?? ""}" />
+              <input data-image-field="alt" type="text" value="${escapeAttribute(item.alt ?? "")}" />
             </label>
             <label>
               <span>Didascalia</span>
-              <input data-image-field="caption" type="text" value="${item.caption ?? ""}" />
+              <input data-image-field="caption" type="text" value="${escapeAttribute(item.caption ?? "")}" />
             </label>
           </div>
           <button class="ghost-button host-image-remove" type="button" data-action="remove-image">Rimuovi</button>
         </article>
-      `,
+      `;
+      },
     )
     .join("");
 }
@@ -772,16 +774,16 @@ function renderSectionEditors() {
   dom.sections.innerHTML = localeState.sections
     .map(
       (section, index) => `
-        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${selectedEditorLocale === FIXED_LOCALE ? " is-draggable" : ""}" data-section-id="${section.id}" data-section-hidden="${section.hidden ? "true" : "false"}">
+        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${selectedEditorLocale === FIXED_LOCALE ? " is-draggable" : ""}" data-section-id="${escapeAttribute(section.id)}" data-section-hidden="${section.hidden ? "true" : "false"}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
               <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
                 <span class="host-section-icon">${renderIcon(section.icon)}</span>
                 <span class="host-section-heading">
                   <span>
-                    <p class="host-kicker">${section.id}</p>
-                    <h2>${section.menuTitle}</h2>
-                    <p class="host-section-badge">${sectionBadge(section)}</p>
+                    <p class="host-kicker">${escapeHtml(section.id)}</p>
+                    <h2>${escapeHtml(section.menuTitle)}</h2>
+                    <p class="host-section-badge">${escapeHtml(sectionBadge(section))}</p>
                   </span>
                   <span class="host-section-chevron" aria-hidden="true">⌄</span>
                 </span>
@@ -806,25 +808,25 @@ function renderSectionEditors() {
             <div class="host-section-grid">
               <label>
                 <span>Titolo nel menu</span>
-                <input data-field="menuTitle" type="text" value="${section.menuTitle}" />
+                <input data-field="menuTitle" type="text" value="${escapeAttribute(section.menuTitle)}" />
               </label>
               <label>
                 <span>Titolo sezione</span>
-                <input data-field="sectionTitle" type="text" value="${section.sectionTitle}" />
+                <input data-field="sectionTitle" type="text" value="${escapeAttribute(section.sectionTitle)}" />
               </label>
               <label>
                 <span>Testo introduttivo</span>
-                <textarea data-field="lead">${section.lead}</textarea>
+                <textarea data-field="lead">${escapeHtml(section.lead)}</textarea>
               </label>
               <label>
                 <span>Contenuti: usa "+" all'inizio di una riga per creare un nuovo paragrafo</span>
-                <textarea data-field="items">${serializeItems(section.items)}</textarea>
+                <textarea data-field="items">${escapeHtml(serializeItems(section.items))}</textarea>
               </label>
               <div class="host-content-tools">
                 <button class="ghost-button" type="button" data-action="add-link">Aggiungi link</button>
                 <button class="ghost-button" type="button" data-action="add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
                 <div class="host-cta-presets">
-                  ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="add-cta-preset" data-cta-kind="${preset.kind}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${preset.label}</button>`).join("")}
+                  ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="add-cta-preset" data-cta-kind="${escapeAttribute(preset.kind)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${escapeHtml(preset.label)}</button>`).join("")}
                 </div>
                 <p class="host-content-note">Formato link: <code>+ LINK | https://example.com | Titolo | Descrizione | Etichetta</code></p>
               </div>
@@ -862,7 +864,7 @@ function renderSectionEditors() {
             </div>
             ${
               section.id === "host"
-                ? `<p class="host-lock-note">La voce "${localeHostPrivateItem.title}" viene reinserita automaticamente e non può essere eliminata.</p>`
+                ? `<p class="host-lock-note">La voce "${escapeHtml(localeHostPrivateItem.title)}" viene reinserita automaticamente e non può essere eliminata.</p>`
                 : ""
             }
           </div>
@@ -882,7 +884,7 @@ function syncFields() {
   dom.footerSubtitle.value = state.footer.subtitle;
   dom.footerLines.value = serializeFooterLines(state.footer.lines);
   dom.editorLocale.innerHTML = AVAILABLE_LANGUAGES.map(
-    (language) => `<option value="${language.code}" ${language.code === selectedEditorLocale ? "selected" : ""}>${language.label} (${language.nativeLabel})</option>`,
+    (language) => `<option value="${escapeAttribute(language.code)}" ${language.code === selectedEditorLocale ? "selected" : ""}>${escapeHtml(language.label)} (${escapeHtml(language.nativeLabel)})</option>`,
   ).join("");
   syncPanelState();
   renderOptionalLocaleSelect();
@@ -896,7 +898,7 @@ function collectTemplate() {
     const id = card.dataset.sectionId;
     const base = currentLocaleState().sections.find((section) => section.id === id);
     const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
-      const kind = item.querySelector('[data-cta-field="kind"]').value;
+      const kind = normalizeCtaKind(item.querySelector('[data-cta-field="kind"]').value);
       const label = item.querySelector('[data-cta-field="label"]').value.trim();
       const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
       const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
@@ -911,10 +913,10 @@ function collectTemplate() {
     const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
       type: "image",
       path: item.dataset.imagePath || "",
-      src: item.dataset.imageSrc || "",
+      src: sanitizeImageSrc(item.dataset.imageSrc || ""),
       alt: item.querySelector('[data-image-field="alt"]').value,
       caption: item.querySelector('[data-image-field="caption"]').value,
-    }));
+    })).filter((item) => item.src);
     return {
       id,
       icon: base.icon,
@@ -966,6 +968,10 @@ function updateEnabledLocales() {
 
 function createSectionId() {
   return `custom-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function sectionDataSelector(sectionId) {
+  return `[data-section-id="${CSS.escape(String(sectionId ?? ""))}"]`;
 }
 
 function addSection() {
@@ -1046,7 +1052,7 @@ function toggleSectionVisibility(sectionId) {
 }
 
 function appendLinkTemplate(sectionId) {
-  const sectionCard = dom.sections.querySelector(`[data-section-id="${sectionId}"]`);
+  const sectionCard = dom.sections.querySelector(sectionDataSelector(sectionId));
   const textarea = sectionCard?.querySelector('[data-field="items"]');
   if (!textarea) return;
 
@@ -1283,10 +1289,14 @@ async function publishNow({ silent = false } = {}) {
     saveTemplate(state);
     const published = await publishRemoteTemplate(state, supabase);
     latestRemoteUpdatedAt = published.updated_at ?? null;
+    const fallbackLocales = [...new Set(lastTranslationFallbackLocales)];
+    const fallbackNote = fallbackLocales.length
+      ? ` Traduzione non disponibile per: ${fallbackLocales.map((code) => code.toUpperCase()).join(", ")}; pubblicato il testo italiano.`
+      : "";
     if (!silent) {
-      setStatus("Template sincronizzato live. L'app ospiti si aggiorna in remoto.", "success");
+      setStatus(`Template sincronizzato live. L'app ospiti si aggiorna in remoto.${fallbackNote}`, "success");
     } else {
-      setStatus("Modifiche sincronizzate live.", "success");
+      setStatus(`Modifiche sincronizzate live.${fallbackNote}`, "success");
     }
   } catch {
     setStatus("Sincronizzazione live fallita. Verifica accesso host, setup Supabase o traduzione online.", "error");
@@ -1296,7 +1306,7 @@ async function publishNow({ silent = false } = {}) {
 function queueAutoPublish() {
   if (!isAuthorizedSession(session)) return;
   window.clearTimeout(autoPublishTimer);
-  setStatus("Modifica rilevata. Sincronizzazione live in corso...", "");
+  setStatus("Modifica rilevata. Sincronizzazione live tra pochi secondi...", "");
   autoPublishTimer = window.setTimeout(() => {
     publishNow({ silent: true });
   }, AUTO_PUBLISH_DELAY);

@@ -11,6 +11,17 @@ Stack:
 - HTML
 - CSS
 - JavaScript vanilla
+- Supabase
+- GitHub Pages
+
+Verifiche:
+
+```bash
+npm run check
+```
+
+Il file `template.json` usa il formato canonico con `footer`, `enabledLocales` e `locales`.
+Supabase resta la sorgente live; `template.json` e il default in `content.js` sono fallback.
 
 Avvio locale:
 

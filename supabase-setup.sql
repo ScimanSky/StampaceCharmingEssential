@@ -114,10 +114,23 @@ select
   'live',
   '{
     "appName": "Stampace Charming",
-    "subtitle": "Luxury apartment",
     "address": "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
     "license": "CIN: IT092009C2000R8066",
-    "sections": []
+    "footer": {
+      "name": "Stampace Charming",
+      "subtitle": "Luxury apartment",
+      "lines": [
+        "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
+        "CIN: IT092009C2000R8066"
+      ]
+    },
+    "enabledLocales": ["it", "en", "de"],
+    "locales": {
+      "it": {
+        "subtitle": "Luxury apartment",
+        "sections": []
+      }
+    }
   }'::jsonb
 where not exists (
   select 1 from public.app_templates where id = 'live'

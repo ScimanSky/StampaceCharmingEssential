@@ -1,0 +1,19 @@
+{
+  "name": "Stampace Charming Essential",
+  "short_name": "Stampace",
+  "description": "Guida mobile per gli ospiti di Stampace Charming.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#070605",
+  "theme_color": "#070605",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./img/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

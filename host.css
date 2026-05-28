@@ -45,6 +45,7 @@ select {
   color: var(--text);
   padding: 0.85rem 0.9rem;
   outline: none;
+  min-height: 2.75rem;
 }
 
 .hidden {
@@ -130,6 +131,10 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+input {
+  min-height: 2.75rem;
+}
+
 textarea {
   min-height: 9rem;
   resize: vertical;
@@ -147,6 +152,20 @@ button,
   white-space: normal;
   overflow-wrap: anywhere;
   text-wrap: balance;
+  min-height: 2.75rem;
+}
+
+button:focus,
+button:focus-visible,
+.file-button:focus-within,
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: 3px solid rgba(231, 216, 193, 0.68);
+  outline-offset: 3px;
 }
 
 .ghost-button {
@@ -368,7 +387,7 @@ button,
 }
 
 .host-order-button {
-  min-width: 2.35rem;
+  min-width: 2.75rem;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
@@ -773,5 +792,16 @@ button,
 
   .host-image-item img {
     max-height: min(34vh, 11rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
