@@ -416,7 +416,7 @@ function renderSectionItems(items, sectionId) {
         return `
           <article class="sheet-card sheet-card-media">
             <div class="sheet-card-media-body">
-              <img class="sheet-image" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
+              <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
               ${
                 item.caption
                   ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`

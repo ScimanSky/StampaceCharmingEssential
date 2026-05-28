@@ -1133,6 +1133,25 @@ svg,
   background: rgba(255, 255, 255, 0.03);
 }
 
+.sheet-image--grande {
+  max-width: 100%;
+}
+
+.sheet-image--media {
+  max-width: 65%;
+  justify-self: center;
+}
+
+.sheet-image--piccola {
+  max-width: 40%;
+  justify-self: center;
+}
+
+.sheet-image--media + .sheet-image-caption,
+.sheet-image--piccola + .sheet-image-caption {
+  text-align: center;
+}
+
 .sheet-image-caption {
   font-size: 0.9rem;
   color: var(--muted);

@@ -1365,6 +1365,7 @@ function normalizeItems(items, fallbackItems) {
             path: cleanString(item.path),
             alt: cleanString(item.alt),
             caption: cleanString(item.caption),
+            size: cleanString(item.size, "grande"),
           };
         }
         if (item.type === CTA_ITEM_TYPE) {

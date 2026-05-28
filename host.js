@@ -743,6 +743,7 @@ function renderSectionImages(section) {
       (item, index) => {
         const src = sanitizeImageSrc(item.src);
         if (!src) return "";
+        const size = item.size || "grande";
         return `
         <article class="host-image-item" data-image-item data-image-index="${escapeAttribute(index)}" data-image-path="${escapeAttribute(item.path ?? "")}" data-image-src="${escapeAttribute(src)}">
           <img src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt || "")}" loading="lazy" />
@@ -754,6 +755,14 @@ function renderSectionImages(section) {
             <label>
               <span>Didascalia</span>
               <input data-image-field="caption" type="text" value="${escapeAttribute(item.caption ?? "")}" />
+            </label>
+            <label>
+              <span>Dimensione</span>
+              <select data-image-field="size">
+                <option value="grande" ${size === "grande" ? "selected" : ""}>Grande (100%)</option>
+                <option value="media" ${size === "media" ? "selected" : ""}>Media (65%)</option>
+                <option value="piccola" ${size === "piccola" ? "selected" : ""}>Piccola (40%)</option>
+              </select>
             </label>
           </div>
           <button class="ghost-button host-image-remove" type="button" data-action="remove-image">Rimuovi</button>
@@ -916,6 +925,7 @@ function collectTemplate() {
       src: sanitizeImageSrc(item.dataset.imageSrc || ""),
       alt: item.querySelector('[data-image-field="alt"]').value,
       caption: item.querySelector('[data-image-field="caption"]').value,
+      size: item.querySelector('[data-image-field="size"]')?.value || "grande",
     })).filter((item) => item.src);
     return {
       id,
@@ -1465,7 +1475,7 @@ function bindEditorEvents() {
   });
 
   dom.sections.addEventListener("change", (event) => {
-    if (!event.target.matches('[data-cta-field]')) return;
+    if (!event.target.matches('[data-cta-field], [data-image-field="size"]')) return;
     queueAutoPublish();
   });
 
