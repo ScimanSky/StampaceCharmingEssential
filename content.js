@@ -1342,10 +1342,6 @@ export function getHostPrivateItem(localeCode = FIXED_LOCALE) {
   return HOST_PRIVATE_ITEMS[cleanLocaleCode(localeCode)] ?? HOST_PRIVATE_ITEMS[FIXED_LOCALE];
 }
 
-function itemsAreEquivalent(left = [], right = []) {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
-
 function normalizeEnabledLocales(values) {
   const requested = Array.isArray(values)
     ? values
@@ -1490,6 +1486,102 @@ function cloneItem(item) {
   return item;
 }
 
+function localizedSectionByIdOrIndex(locale, sectionId, index) {
+  const sections = Array.isArray(locale?.sections) ? locale.sections : [];
+  return sections.find((section) => section?.id === sectionId) ?? sections[index];
+}
+
+function sameCtaTarget(left, right) {
+  if (!isCtaItem(left) || !isCtaItem(right)) return false;
+  const leftHref = cleanString(left.href);
+  const rightHref = cleanString(right.href);
+  if (leftHref && rightHref && leftHref === rightHref) return true;
+  return cleanString(left.kind, "web") === cleanString(right.kind, "web") && cleanString(left.icon) === cleanString(right.icon);
+}
+
+function localizedCtaFor(italianItem, ctaIndex, localizedCtas, fallbackCtas) {
+  return (
+    localizedCtas.find((item) => sameCtaTarget(italianItem, item)) ??
+    localizedCtas[ctaIndex] ??
+    fallbackCtas.find((item) => sameCtaTarget(italianItem, item)) ??
+    fallbackCtas[ctaIndex]
+  );
+}
+
+function localizedGenericItemFor(items, itemIndex, fallbackItems) {
+  const localizedItem = items[itemIndex];
+  if (localizedItem && typeof localizedItem === "object" && !isImageItem(localizedItem) && !isCtaItem(localizedItem)) {
+    return localizedItem;
+  }
+
+  const fallbackItem = fallbackItems[itemIndex];
+  if (fallbackItem && typeof fallbackItem === "object" && !isImageItem(fallbackItem) && !isCtaItem(fallbackItem)) {
+    return fallbackItem;
+  }
+
+  return {};
+}
+
+function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fallbackItems = [], localeCode = FIXED_LOCALE) {
+  const localizedCtas = localizedItems.filter(isCtaItem);
+  const fallbackCtas = fallbackItems.filter(isCtaItem);
+  const localizedImages = localizedItems.filter(isImageItem);
+  const fallbackImages = fallbackItems.filter(isImageItem);
+  const localizedTexts = localizedItems.filter((item) => typeof item === "string");
+  const fallbackTexts = fallbackItems.filter((item) => typeof item === "string");
+  const localizedGenericItems = localizedItems.filter((item) => item && typeof item === "object" && !isImageItem(item) && !isCtaItem(item));
+  const fallbackGenericItems = fallbackItems.filter((item) => item && typeof item === "object" && !isImageItem(item) && !isCtaItem(item));
+  let ctaIndex = 0;
+  let imageIndex = 0;
+  let textIndex = 0;
+  let genericIndex = 0;
+
+  return italianItems.map((italianItem, itemIndex) => {
+    if (isHostPrivateItem(italianItem)) {
+      return { ...getHostPrivateItem(localeCode) };
+    }
+
+    if (isCtaItem(italianItem)) {
+      const localizedItem = localizedCtaFor(italianItem, ctaIndex, localizedCtas, fallbackCtas);
+      ctaIndex += 1;
+      return {
+        ...cloneItem(italianItem),
+        label: cleanString(localizedItem?.label, italianItem.label),
+      };
+    }
+
+    if (isImageItem(italianItem)) {
+      const localizedItem = localizedImages[imageIndex] ?? fallbackImages[imageIndex] ?? {};
+      imageIndex += 1;
+      return {
+        ...cloneItem(italianItem),
+        alt: cleanString(localizedItem.alt, italianItem.alt),
+        caption: cleanString(localizedItem.caption, italianItem.caption),
+      };
+    }
+
+    if (typeof italianItem === "string") {
+      const localizedItem = localizedTexts[textIndex];
+      const fallbackItem = fallbackTexts[textIndex];
+      textIndex += 1;
+      return typeof localizedItem === "string"
+        ? localizedItem
+        : typeof fallbackItem === "string"
+          ? fallbackItem
+          : italianItem;
+    }
+
+    const localizedItem = localizedGenericItemFor(localizedGenericItems, genericIndex, fallbackGenericItems);
+    genericIndex += 1;
+    return {
+      ...cloneItem(italianItem),
+      title: cleanString(localizedItem.title, italianItem.title),
+      body: cleanString(localizedItem.body, italianItem.body),
+      label: cleanString(localizedItem.label, italianItem.label),
+    };
+  });
+}
+
 function mirrorItalianContent(localeMap) {
   const italian = localeMap[FIXED_LOCALE];
   if (!italian) return localeMap;
@@ -1554,17 +1646,18 @@ function mirrorItalianContent(localeMap) {
         {
           subtitle: italian.subtitle,
           sections: italian.sections.map((section, index) => {
-            const localizedSection = localized?.sections?.[index];
-            const localizedDefaultSection = localizedDefaults.sections[index] ?? section;
+            const localizedSection = localizedSectionByIdOrIndex(localized, section.id, index);
+            const localizedDefaultSection = localizedSectionByIdOrIndex(localizedDefaults, section.id, index) ?? section;
             const localizedItems = Array.isArray(localizedSection?.items) ? localizedSection.items : [];
             const fallbackItems = Array.isArray(localizedDefaultSection?.items)
               ? localizedDefaultSection.items
               : section.items;
-            const resolvedItems = localizedItems.length
-              ? itemsAreEquivalent(localizedItems, section.items)
-                ? fallbackItems.map(cloneItem)
-                : localizedItems.map(cloneItem)
-              : fallbackItems.map(cloneItem);
+            const resolvedItems = alignLocalizedItemsToItalian(
+              section.items,
+              localizedItems,
+              fallbackItems,
+              language.code,
+            );
             return {
               id: section.id,
               icon: section.icon,
