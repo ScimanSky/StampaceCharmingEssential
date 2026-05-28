@@ -15,6 +15,7 @@ export const AVAILABLE_LANGUAGES = [
   { code: "fr", label: "French", nativeLabel: "Français", flag: "🇫🇷", flagSrc: `./img/flags/fr.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "es", label: "Spanish", nativeLabel: "Español", flag: "🇪🇸", flagSrc: `./img/flags/es.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "de", label: "German", nativeLabel: "Deutsch", flag: "🇩🇪", flagSrc: `./img/flags/de.svg?v=${FLAG_ASSET_VERSION}` },
+  { code: "nl", label: "Dutch", nativeLabel: "Nederlands", flag: "🇳🇱", flagSrc: `./img/flags/nl.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "pt", label: "Portuguese", nativeLabel: "Português", flag: "🇵🇹", flagSrc: `./img/flags/pt.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "pl", label: "Polish", nativeLabel: "Polski", flag: "🇵🇱", flagSrc: `./img/flags/pl.svg?v=${FLAG_ASSET_VERSION}` },
   { code: "cs", label: "Czech", nativeLabel: "Čeština", flag: "🇨🇿", flagSrc: `./img/flags/cs.svg?v=${FLAG_ASSET_VERSION}` },
@@ -57,6 +58,12 @@ export const HOST_PRIVATE_ITEMS = Object.freeze({
     title: "Host-Bereich",
     body: "Öffnen Sie den privaten Bereich, um die Live-Vorlage der App zu verwalten.",
     label: "Host-Bereich öffnen",
+    href: "./host.html",
+  },
+  nl: {
+    title: "Hostgedeelte",
+    body: "Open het privégedeelte om de live-template van de app te beheren.",
+    label: "Hostgedeelte openen",
     href: "./host.html",
   },
   pt: {
@@ -1346,6 +1353,10 @@ export function getHostPrivateItem(localeCode = FIXED_LOCALE) {
   return HOST_PRIVATE_ITEMS[cleanLocaleCode(localeCode)] ?? HOST_PRIVATE_ITEMS[FIXED_LOCALE];
 }
 
+function localeBaseContent(localeCode) {
+  return DEFAULT_LOCALE_CONTENT[localeCode] ?? DEFAULT_LOCALE_CONTENT.en ?? DEFAULT_LOCALE_CONTENT[FIXED_LOCALE];
+}
+
 function normalizeEnabledLocales(values) {
   const requested = Array.isArray(values)
     ? values
@@ -1720,7 +1731,7 @@ function mirrorItalianContent(localeMap) {
       }
 
       const localized = localeMap[language.code];
-      const localizedDefaults = DEFAULT_LOCALE_CONTENT[language.code];
+      const localizedDefaults = localeBaseContent(language.code);
       const usedLocalizedSectionIndexes = new Set();
       const pickLocalizedValue = (value, italianValue, fallbackValue) =>
         !value || value === italianValue ? fallbackValue : value;
@@ -1780,7 +1791,7 @@ function buildLocaleMap(rawTemplate = {}) {
 
   const localeMap = Object.fromEntries(
     AVAILABLE_LANGUAGES.map((language) => {
-      const baseLocale = DEFAULT_LOCALE_CONTENT[language.code];
+      const baseLocale = localeBaseContent(language.code);
       const rawLocale =
         rawLocales[language.code] ??
         (language.code === FIXED_LOCALE ? legacyItLocale : {});

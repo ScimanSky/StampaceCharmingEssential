@@ -7,7 +7,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260528l";
+} from "./content.js?v=20260528m";
 import {
   escapeAttribute,
   escapeHtml,

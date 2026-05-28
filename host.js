@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528l";
+} from "./content.js?v=20260528m";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -381,7 +381,7 @@ function preserveWifiValue(text, targetLocale) {
   const value = text.slice(match.index + 1).trim();
   if (!value) return null;
 
-  const protectedLabels = ["nome rete", "network name", "ssid", "nome da rede", "nom du réseau", "nombre de la red", "netzwerkname"];
+  const protectedLabels = ["nome rete", "network name", "ssid", "nome da rede", "nom du réseau", "nombre de la red", "netzwerkname", "netwerknaam"];
   if (!protectedLabels.includes(label)) return null;
 
   const localizedLabels = {
@@ -390,6 +390,7 @@ function preserveWifiValue(text, targetLocale) {
     fr: "Nom du réseau",
     es: "Nombre de la red",
     de: "Netzwerkname",
+    nl: "Netwerknaam",
     pt: "Nome da rede",
     pl: "Nazwa sieci",
     cs: "Název sítě",
@@ -1038,6 +1039,7 @@ function updateEnabledLocales() {
   state = saveTemplate(collectTemplate());
   syncFields();
   setStatus("Lingue visibili aggiornate. L'app ospiti si sincronizza automaticamente.", "success");
+  queueAutoPublish();
 }
 
 function createSectionId() {
