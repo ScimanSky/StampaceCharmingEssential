@@ -1486,6 +1486,10 @@ function cloneItem(item) {
   return item;
 }
 
+function localizedSections(locale) {
+  return Array.isArray(locale?.sections) ? locale.sections : [];
+}
+
 function localizedSectionByIdOrIndex(locale, sectionId, index) {
   const sections = Array.isArray(locale?.sections) ? locale.sections : [];
   return sections.find((section) => section?.id === sectionId) ?? sections[index];
@@ -1495,7 +1499,7 @@ function sameCtaTarget(left, right) {
   if (!isCtaItem(left) || !isCtaItem(right)) return false;
   const leftHref = cleanString(left.href);
   const rightHref = cleanString(right.href);
-  if (leftHref && rightHref && leftHref === rightHref) return true;
+  if (leftHref && rightHref) return leftHref === rightHref;
   return cleanString(left.kind, "web") === cleanString(right.kind, "web") && cleanString(left.icon) === cleanString(right.icon);
 }
 
@@ -1520,6 +1524,80 @@ function localizedGenericItemFor(items, itemIndex, fallbackItems) {
   }
 
   return {};
+}
+
+function itemKind(item) {
+  if (isCtaItem(item)) return "cta";
+  if (isImageItem(item)) return "image";
+  if (typeof item === "string") return "text";
+  if (item && typeof item === "object") return "link";
+  return "empty";
+}
+
+function itemKindCounts(items = []) {
+  return items.reduce((counts, item) => {
+    const kind = itemKind(item);
+    counts[kind] = (counts[kind] ?? 0) + 1;
+    return counts;
+  }, {});
+}
+
+function sectionShapeCompatible(left, right) {
+  const leftCounts = itemKindCounts(left?.items ?? []);
+  const rightCounts = itemKindCounts(right?.items ?? []);
+  return ["cta", "image", "text", "link"].every((kind) => (leftCounts[kind] ?? 0) === (rightCounts[kind] ?? 0));
+}
+
+function sectionCtaScore(italianSection, localizedSection) {
+  const italianCtas = italianSection.items.filter(isCtaItem);
+  if (!italianCtas.length) return 0;
+  const localizedCtas = localizedSection?.items?.filter(isCtaItem) ?? [];
+  return italianCtas.filter((italianItem) => localizedCtas.some((item) => sameCtaTarget(italianItem, item))).length;
+}
+
+function findMatchingSection(sections, predicate, usedIndexes) {
+  return sections.find((section, index) => !usedIndexes.has(index) && predicate(section, index));
+}
+
+function matchingSectionIndex(sections, section) {
+  return sections.findIndex((item) => item === section);
+}
+
+function localizedSectionForItalianSection(italianSection, sectionIndex, localized, localizedDefaults, usedIndexes) {
+  const sections = localizedSections(localized);
+  const defaultSection = localizedSectionByIdOrIndex(localizedDefaults, italianSection.id, sectionIndex);
+
+  const ctaMatch = findMatchingSection(
+    sections,
+    (section) => sectionCtaScore(italianSection, section) > 0,
+    usedIndexes,
+  );
+  if (ctaMatch) return ctaMatch;
+
+  const defaultTitles = [defaultSection?.menuTitle, defaultSection?.sectionTitle].filter(Boolean);
+  const titleMatch = defaultTitles.length
+    ? findMatchingSection(
+        sections,
+        (section) =>
+          sectionShapeCompatible(italianSection, section) &&
+          defaultTitles.some((title) => section.menuTitle === title || section.sectionTitle === title),
+        usedIndexes,
+      )
+    : null;
+  if (titleMatch) return titleMatch;
+
+  const idMatch = findMatchingSection(
+    sections,
+    (section) => section?.id === italianSection.id && sectionShapeCompatible(italianSection, section),
+    usedIndexes,
+  );
+  if (idMatch) return idMatch;
+
+  return findMatchingSection(
+    sections,
+    (_, index) => index === sectionIndex && sectionShapeCompatible(italianSection, sections[index]),
+    usedIndexes,
+  );
 }
 
 function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fallbackItems = [], localeCode = FIXED_LOCALE) {
@@ -1638,6 +1716,7 @@ function mirrorItalianContent(localeMap) {
 
       const localized = localeMap[language.code];
       const localizedDefaults = DEFAULT_LOCALE_CONTENT[language.code];
+      const usedLocalizedSectionIndexes = new Set();
       const pickLocalizedValue = (value, italianValue, fallbackValue) =>
         !value || value === italianValue ? fallbackValue : value;
 
@@ -1646,7 +1725,17 @@ function mirrorItalianContent(localeMap) {
         {
           subtitle: italian.subtitle,
           sections: italian.sections.map((section, index) => {
-            const localizedSection = localizedSectionByIdOrIndex(localized, section.id, index);
+            const localizedSection = localizedSectionForItalianSection(
+              section,
+              index,
+              localized,
+              localizedDefaults,
+              usedLocalizedSectionIndexes,
+            );
+            const localizedSectionIndex = matchingSectionIndex(localizedSections(localized), localizedSection);
+            if (localizedSectionIndex >= 0) {
+              usedLocalizedSectionIndexes.add(localizedSectionIndex);
+            }
             const localizedDefaultSection = localizedSectionByIdOrIndex(localizedDefaults, section.id, index) ?? section;
             const localizedItems = Array.isArray(localizedSection?.items) ? localizedSection.items : [];
             const fallbackItems = Array.isArray(localizedDefaultSection?.items)
