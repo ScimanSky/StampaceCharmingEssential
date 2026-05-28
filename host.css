@@ -564,15 +564,69 @@ select:focus-visible {
 }
 
 .host-cta-item {
+  --host-cta-accent: #d8aa62;
+  --host-cta-accent-strong: #f3d7aa;
+  --host-cta-accent-soft: rgba(216, 170, 98, 0.18);
+  --host-cta-surface: rgba(29, 22, 15, 0.62);
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 0.85rem;
   padding: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.9rem;
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid color-mix(in srgb, var(--host-cta-accent) 28%, rgba(255, 255, 255, 0.08));
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--host-cta-accent) 18%, transparent), transparent 36%),
+    linear-gradient(135deg, rgba(255, 248, 236, 0.08), rgba(255, 248, 236, 0.02) 44%, rgba(0, 0, 0, 0.1)),
+    var(--host-cta-surface);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 14px 30px rgba(0, 0, 0, 0.18),
+    0 0 26px var(--host-cta-accent-soft);
+}
+
+.host-cta-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--host-cta-accent) 28%, transparent), transparent);
+  opacity: 0.28;
+  transform: translateX(-55%);
+}
+
+.host-cta-item--web,
+.host-cta-item--email {
+  --host-cta-accent: #d8aa62;
+  --host-cta-accent-strong: #f3d7aa;
+  --host-cta-accent-soft: rgba(216, 170, 98, 0.2);
+  --host-cta-surface: rgba(31, 23, 15, 0.62);
+}
+
+.host-cta-item--maps {
+  --host-cta-accent: #60aeb9;
+  --host-cta-accent-strong: #c7f2f5;
+  --host-cta-accent-soft: rgba(96, 174, 185, 0.18);
+  --host-cta-surface: rgba(14, 29, 31, 0.6);
+}
+
+.host-cta-item--whatsapp {
+  --host-cta-accent: #6ebf83;
+  --host-cta-accent-strong: #d8f5df;
+  --host-cta-accent-soft: rgba(110, 191, 131, 0.18);
+  --host-cta-surface: rgba(15, 30, 20, 0.6);
+}
+
+.host-cta-item--tel {
+  --host-cta-accent: #d38a54;
+  --host-cta-accent-strong: #f5d0ad;
+  --host-cta-accent-soft: rgba(211, 138, 84, 0.2);
+  --host-cta-surface: rgba(32, 21, 14, 0.62);
 }
 
 .host-cta-meta {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -580,14 +634,20 @@ select:focus-visible {
 }
 
 .host-cta-icon-preview {
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 3rem;
+  height: 3rem;
   display: grid;
   place-items: center;
-  border-radius: 0.72rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--copy);
+  border-radius: 0.92rem;
+  background:
+    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.3), transparent 28%),
+    linear-gradient(145deg, color-mix(in srgb, var(--host-cta-accent) 48%, #fff0d6), color-mix(in srgb, var(--host-cta-accent) 54%, #1a1209));
+  border: 1px solid color-mix(in srgb, var(--host-cta-accent) 36%, rgba(255, 255, 255, 0.08));
+  color: #130f0a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.16),
+    0 10px 22px color-mix(in srgb, var(--host-cta-accent) 25%, transparent);
   flex: 0 0 auto;
 }
 
@@ -615,14 +675,17 @@ select:focus-visible {
 
 .host-cta-heading strong {
   font-weight: 400;
+  color: var(--text);
 }
 
 .host-cta-heading span {
-  color: var(--muted);
+  color: var(--host-cta-accent-strong);
   font-size: 0.82rem;
 }
 
 .host-cta-actions {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   gap: 0.35rem;
   flex: 0 0 auto;
@@ -633,6 +696,8 @@ select:focus-visible {
 }
 
 .host-cta-grid {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 0.85rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -759,6 +824,14 @@ select:focus-visible {
   .host-cta-grid,
   .host-cta-actions {
     display: grid;
+  }
+
+  .host-cta-meta {
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+
+  .host-cta-actions {
+    grid-column: 1 / -1;
   }
 
   .host-cta-grid {

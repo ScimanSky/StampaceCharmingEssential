@@ -690,9 +690,9 @@ function renderSectionCtas(section) {
         const href = normalizeCtaHref(kind, item.href);
         const icon = item.icon || ctaDefaultIcon(kind);
         return `
-        <article class="host-cta-item" data-cta-item data-cta-index="${escapeAttribute(index)}">
+        <article class="host-cta-item host-cta-item--${escapeAttribute(kind)}" data-cta-item data-cta-index="${escapeAttribute(index)}">
           <div class="host-cta-meta">
-            <span class="host-cta-icon-preview" aria-hidden="true">${renderIcon(icon)}</span>
+            <span class="host-cta-icon-preview host-cta-icon-preview--${escapeAttribute(kind)}" aria-hidden="true">${renderIcon(icon)}</span>
             <span class="host-cta-heading">
               <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}</strong>
               <span>${escapeHtml(CTA_KIND_OPTIONS.find((option) => option.value === kind)?.label ?? "Web")}</span>
