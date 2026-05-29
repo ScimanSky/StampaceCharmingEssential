@@ -808,7 +808,7 @@ svg,
   overflow: visible;
   justify-content: start;
   justify-items: start;
-  width: fit-content;
+  width: min(100%, 20.5rem);
   max-width: 100%;
   background: transparent;
   border: 0;
@@ -823,12 +823,13 @@ svg,
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  width: min(100%, 20.5rem);
-  max-width: 100%;
+  width: 100%;
+  max-width: 20.5rem;
   display: grid;
   grid-template-columns: 2.95rem minmax(0, 1fr) 1.9rem;
   align-items: center;
   gap: 0.52rem;
+  height: 3.76rem;
   min-height: 3.76rem;
   padding: 0.54rem 0.58rem;
   color: var(--text);
@@ -915,10 +916,9 @@ svg,
   color: var(--text);
   font-weight: 500;
   letter-spacing: 0.02em;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-  text-wrap: balance;
-  max-width: min(14.8rem, calc(100vw - 8.5rem));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sheet-cta-chevron {
@@ -1085,14 +1085,15 @@ svg,
   }
 
   .sheet-card-cta {
-    width: fit-content;
+    width: min(100%, 19.25rem);
     max-width: 100%;
   }
 
   .sheet-cta {
-    width: min(100%, 19.25rem);
+    width: 100%;
     grid-template-columns: 2.8rem minmax(0, 1fr) 1.72rem;
     gap: 0.46rem;
+    height: 3.62rem;
     min-height: 3.62rem;
     padding: 0.5rem;
   }
@@ -1104,7 +1105,6 @@ svg,
 
   .sheet-cta-label {
     font-size: 0.92rem;
-    max-width: none;
   }
 
   .sheet-image {

@@ -256,7 +256,7 @@ function renderCtaItem(item) {
   `;
 }
 
-function iconForSection(section) {
+function iconFromSectionContent(section) {
   if (!section) return "spark";
 
   const text = `${section.menuTitle ?? ""} ${section.sectionTitle ?? ""} ${section.lead ?? ""}`.toLowerCase();
@@ -268,6 +268,13 @@ function iconForSection(section) {
   if (/mappa|quartiere|dintorn|local/.test(text)) return "pin";
 
   return section.icon || "spark";
+}
+
+function iconForSection(section) {
+  if (!section) return "spark";
+
+  const italianSection = template?.locales?.[FIXED_LOCALE]?.sections?.find((item) => item.id === section.id);
+  return iconFromSectionContent(italianSection ?? section);
 }
 
 function localeState() {
