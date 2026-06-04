@@ -234,14 +234,11 @@ svg,
   object-fit: contain;
   object-position: center;
   display: block;
-  border-radius: 0.16rem;
-  box-shadow:
-    0 2px 7px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  box-shadow: none;
   transition:
     filter 180ms ease,
-    transform 180ms ease,
-    box-shadow 180ms ease;
+    transform 180ms ease;
 }
 
 .locale-chip.is-active {
@@ -250,9 +247,6 @@ svg,
 
 .locale-chip.is-active img {
   filter: saturate(1.14) brightness(1.08);
-  box-shadow:
-    0 3px 9px rgba(0, 0, 0, 0.24),
-    0 0 0 1px rgba(231, 216, 193, 0.3);
 }
 
 .locale-chip:hover img,
@@ -443,8 +437,6 @@ svg,
 .menu-row:focus-visible,
 .host-avatar-button:focus,
 .host-avatar-button:focus-visible,
-.locale-chip:focus,
-.locale-chip:focus-visible,
 .copy-btn:focus,
 .copy-btn:focus-visible,
 .sheet-link:focus,
