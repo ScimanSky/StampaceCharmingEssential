@@ -1,4 +1,4 @@
-const CACHE_NAME = "stampace-essential-v20260604a";
+const CACHE_NAME = "stampace-essential-v20260604b";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
@@ -7,7 +7,7 @@ const STATIC_ASSETS = [
   "./host.css?v=20260528k",
   "./app.js?v=20260529a",
   "./host.js?v=20260528w",
-  "./content.js?v=20260528m",
+  "./content.js?v=20260604b",
   "./supabase.js",
   "./security.js?v=20260528b",
   "./template.json",
@@ -16,20 +16,20 @@ const STATIC_ASSETS = [
   "./img/host-avatar.jpg?v=20260528a",
   "./img/patternlegn.webp",
   "./img/sfondo9.jpeg",
-  "./img/flags/it.svg?v=20260528c",
-  "./img/flags/gb.svg?v=20260528c",
-  "./img/flags/de.svg?v=20260528c",
-  "./img/flags/nl.svg?v=20260528c",
-  "./img/flags/fr.svg?v=20260528c",
-  "./img/flags/es.svg?v=20260528c",
-  "./img/flags/pt.svg?v=20260528c",
-  "./img/flags/pl.svg?v=20260528c",
-  "./img/flags/cs.svg?v=20260528c",
-  "./img/flags/ru.svg?v=20260528c",
-  "./img/flags/zh.svg?v=20260528c",
-  "./img/flags/hi.svg?v=20260528c",
-  "./img/flags/ja.svg?v=20260528c",
-  "./img/flags/sc.svg?v=20260528c"
+  "./img/flags/it.svg?v=20260604b",
+  "./img/flags/gb.svg?v=20260604b",
+  "./img/flags/de.svg?v=20260604b",
+  "./img/flags/nl.svg?v=20260604b",
+  "./img/flags/fr.svg?v=20260604b",
+  "./img/flags/es.svg?v=20260604b",
+  "./img/flags/pt.svg?v=20260604b",
+  "./img/flags/pl.svg?v=20260604b",
+  "./img/flags/cs.svg?v=20260604b",
+  "./img/flags/ru.svg?v=20260604b",
+  "./img/flags/zh.svg?v=20260604b",
+  "./img/flags/hi.svg?v=20260604b",
+  "./img/flags/ja.svg?v=20260604b",
+  "./img/flags/sc.svg?v=20260604b"
 ];
 
 self.addEventListener("install", (event) => {
