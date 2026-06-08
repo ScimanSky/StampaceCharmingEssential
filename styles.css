@@ -839,9 +839,9 @@ svg,
   gap: 0;
   padding: 0;
   overflow: visible;
-  justify-content: start;
-  justify-items: start;
-  width: min(100%, 20.5rem);
+  justify-content: stretch;
+  justify-items: stretch;
+  width: 100%;
   max-width: 100%;
   background: transparent;
   border: 0;
@@ -849,87 +849,53 @@ svg,
 }
 
 .sheet-cta {
-  --cta-accent: #dfc39c;
-  --cta-accent-strong: #e7d8c1;
-  --cta-accent-soft: rgba(223, 195, 156, 0.16);
-  --cta-surface: var(--row);
   position: relative;
-  isolation: isolate;
   overflow: hidden;
   width: 100%;
-  max-width: 20.5rem;
+  max-width: 100%;
   display: grid;
-  grid-template-columns: 2.95rem minmax(0, 1fr);
+  grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
   align-items: center;
-  gap: 0.52rem;
-  height: 3.76rem;
-  min-height: 3.76rem;
-  padding: 0.54rem 0.58rem;
-  color: var(--text);
+  gap: 0.95rem;
+  height: 3.7rem;
+  min-height: 3.7rem;
+  padding: 0 0.9rem 0 0.78rem;
+  color: inherit;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  appearance: none;
+  text-align: left;
   background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--cta-accent) 24%, transparent), transparent 34%),
-    linear-gradient(135deg, rgba(255, 248, 236, 0.13), rgba(255, 248, 236, 0.03) 42%, rgba(0, 0, 0, 0.16)),
-    var(--cta-surface);
-  border: 1px solid color-mix(in srgb, var(--cta-accent) 34%, rgba(255, 255, 255, 0.1));
-  border-radius: 1.08rem;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
-    0 16px 34px rgba(0, 0, 0, 0.26),
-    0 0 28px var(--cta-accent-soft);
-  backdrop-filter: blur(12px) saturate(1.08);
-  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+    linear-gradient(180deg, rgba(255, 244, 224, 0.06), rgba(255, 244, 224, 0.02)),
+    var(--row);
+  border: 1px solid var(--line);
+  border-radius: 0.72rem;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   transition:
-    border-color 220ms ease,
-    background 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease,
-    color 180ms ease;
+    background 190ms ease,
+    border-color 190ms ease,
+    transform 180ms ease;
 }
 
 .sheet-cta:visited,
 .sheet-cta:active {
-  color: var(--text);
+  color: inherit;
 }
 
 .sheet-cta:focus:not(:focus-visible) {
   outline: none;
 }
 
-.sheet-cta::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  z-index: -1;
-  border-radius: inherit;
-  background:
-    linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.13) 42%, transparent 58%);
-  opacity: 0;
-  transform: translateX(-42%);
-  transition:
-    opacity 220ms ease,
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.sheet-cta::after {
-  content: "";
-  position: absolute;
-  inset: auto 1.1rem 0 1.1rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--cta-accent) 62%, transparent), transparent);
-  opacity: 0.72;
-}
-
 .sheet-cta-icon {
   position: relative;
-  width: 2.8rem;
-  height: 2.8rem;
+  width: 2.75rem;
+  height: 2.75rem;
   display: grid;
   place-items: center;
-  border-radius: 0.95rem;
+  border-radius: 0.58rem;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--muted-strong);
@@ -940,71 +906,46 @@ svg,
 }
 
 .sheet-cta-icon svg {
-  width: 1.48rem;
-  height: 1.48rem;
+  width: 1.82rem;
+  height: 1.82rem;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.65;
+  stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .sheet-cta-label {
   min-width: 0;
-  font-size: 0.96rem;
-  line-height: 1.2;
+  justify-self: center;
+  font-size: clamp(0.98rem, 3.7vw, 1.08rem);
+  line-height: 1.1;
   color: var(--text);
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-weight: 400;
+  letter-spacing: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
+  font-family: var(--font-primary), sans-serif;
 }
 
 .sheet-cta:hover,
 .sheet-cta:focus-visible {
   background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--cta-accent) 36%, transparent), transparent 38%),
-    linear-gradient(135deg, rgba(255, 248, 236, 0.16), rgba(255, 248, 236, 0.04) 42%, rgba(0, 0, 0, 0.1)),
-    color-mix(in srgb, var(--cta-surface) 88%, var(--cta-accent) 12%);
-  border-color: color-mix(in srgb, var(--cta-accent) 62%, rgba(255, 255, 255, 0.16));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-    0 20px 42px rgba(0, 0, 0, 0.32),
-    0 0 34px color-mix(in srgb, var(--cta-accent) 32%, transparent);
-  transform: translateY(-2px);
-}
-
-.sheet-cta:hover::before,
-.sheet-cta:focus-visible::before {
-  opacity: 1;
-  transform: translateX(42%);
+    linear-gradient(180deg, rgba(255, 244, 224, 0.09), rgba(255, 244, 224, 0.03)),
+    var(--row-hover);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .sheet-cta:hover .sheet-cta-icon,
 .sheet-cta:focus-visible .sheet-cta-icon {
-  transform: scale(1.035);
   color: var(--copy);
 }
 
 .sheet-cta:active {
-  background:
-    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--cta-accent) 24%, transparent), transparent 34%),
-    linear-gradient(135deg, rgba(255, 248, 236, 0.12), rgba(255, 248, 236, 0.03) 42%, rgba(0, 0, 0, 0.18)),
-    var(--cta-surface);
+  background: var(--row-hover);
   transform: translateY(0) scale(0.985);
-}
-
-.sheet-cta--web,
-.sheet-cta--email,
-.sheet-cta--maps,
-.sheet-cta--whatsapp,
-.sheet-cta--tel {
-  --cta-accent: #dfc39c;
-  --cta-accent-strong: #e7d8c1;
-  --cta-accent-soft: rgba(223, 195, 156, 0.16);
-  --cta-surface: var(--row);
 }
 
 .sheet-card-media-body {
@@ -1085,26 +1026,27 @@ svg,
   }
 
   .sheet-card-cta {
-    width: min(100%, 19.25rem);
+    width: 100%;
     max-width: 100%;
   }
 
   .sheet-cta {
     width: 100%;
-    grid-template-columns: 2.8rem minmax(0, 1fr);
-    gap: 0.46rem;
-    height: 3.62rem;
-    min-height: 3.62rem;
-    padding: 0.5rem;
+    grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
+    gap: 0.75rem;
+    height: 3.7rem;
+    min-height: 3.7rem;
+    padding-left: 0.72rem;
+    padding-right: 0.78rem;
   }
 
   .sheet-cta-icon {
-    width: 2.64rem;
-    height: 2.64rem;
+    width: 2.75rem;
+    height: 2.75rem;
   }
 
   .sheet-cta-label {
-    font-size: 0.92rem;
+    font-size: clamp(0.98rem, 3.7vw, 1.08rem);
   }
 
   .sheet-image {
@@ -1216,10 +1158,6 @@ svg,
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
-  }
-
-  .sheet-cta::before {
-    display: none;
   }
 
   .locale-chip:active img {
