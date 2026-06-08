@@ -624,15 +624,10 @@ select:focus-visible {
   display: grid;
   place-items: center;
   border-radius: 0.92rem;
-  background:
-    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.3), transparent 28%),
-    linear-gradient(145deg, color-mix(in srgb, var(--host-cta-accent) 48%, #fff0d6), color-mix(in srgb, var(--host-cta-accent) 54%, #1a1209));
-  border: 1px solid color-mix(in srgb, var(--host-cta-accent) 36%, rgba(255, 255, 255, 0.08));
-  color: #130f0a;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 -8px 15px rgba(0, 0, 0, 0.16),
-    0 8px 18px color-mix(in srgb, var(--host-cta-accent) 22%, transparent);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(231, 216, 193, 0.88);
+  box-shadow: none;
   flex: 0 0 auto;
 }
 

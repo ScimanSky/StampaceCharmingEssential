@@ -670,11 +670,34 @@ svg,
   display: grid;
   place-items: center;
   cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.sheet-close:hover,
+.sheet-close:focus-visible {
+  background: rgba(231, 216, 193, 0.12);
+  border-color: rgba(231, 216, 193, 0.28);
+  color: var(--copy);
+}
+
+.sheet-close:active {
+  background: rgba(223, 195, 156, 0.16);
+  border-color: rgba(223, 195, 156, 0.34);
+  color: var(--copy);
+  transform: scale(0.94);
 }
 
 .sheet-close span {
   font-size: 1.6rem;
   line-height: 1;
+  pointer-events: none;
 }
 
 .sheet-content {
@@ -878,16 +901,12 @@ svg,
   display: grid;
   place-items: center;
   border-radius: 0.95rem;
-  background:
-    radial-gradient(circle at 34% 24%, rgba(255, 255, 255, 0.3), transparent 28%),
-    linear-gradient(145deg, color-mix(in srgb, var(--cta-accent) 48%, #fff0d6), color-mix(in srgb, var(--cta-accent) 54%, #1a1209));
-  color: #130f0a;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -10px 18px rgba(0, 0, 0, 0.16),
-    0 10px 22px color-mix(in srgb, var(--cta-accent) 28%, transparent);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--muted-strong);
+  box-shadow: none;
   transition:
-    box-shadow 180ms ease,
+    color 180ms ease,
     transform 180ms ease;
 }
 
@@ -957,6 +976,7 @@ svg,
 .sheet-cta:hover .sheet-cta-icon,
 .sheet-cta:focus-visible .sheet-cta-icon {
   transform: scale(1.035);
+  color: var(--copy);
 }
 
 .sheet-cta:hover .sheet-cta-chevron,
