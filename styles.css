@@ -28,6 +28,13 @@ html {
   scroll-behavior: smooth;
   max-width: 100%;
   overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 body {
@@ -35,6 +42,8 @@ body {
   min-height: 100vh;
   max-width: 100%;
   overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   position: relative;
   background: var(--bg);
   color: var(--text);
@@ -578,8 +587,11 @@ svg,
 .sheet-panel {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  overscroll-behavior: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   background: transparent;
   opacity: 0;
@@ -587,6 +599,10 @@ svg,
   transition:
     opacity 300ms ease,
     transform 360ms cubic-bezier(0.2, 0.8, 0.22, 1);
+}
+
+.sheet-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .section-sheet.is-visible .sheet-panel {
