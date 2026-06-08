@@ -250,7 +250,6 @@ function renderCtaItem(item) {
       <a class="sheet-cta sheet-cta--${escapeAttribute(kind)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
         <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(ctaIcon(item))}</span>
         <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
-        <span class="sheet-cta-chevron" aria-hidden="true">↗</span>
       </a>
     </article>
   `;

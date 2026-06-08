@@ -514,6 +514,7 @@ svg,
   inset: 0;
   z-index: 30;
   background: var(--bg);
+  overflow: hidden;
   opacity: 0;
   pointer-events: none;
   transition: opacity 260ms ease;
@@ -577,7 +578,8 @@ svg,
 .sheet-panel {
   position: absolute;
   inset: 0;
-  overflow: auto;
+  overflow: hidden;
+  overscroll-behavior: none;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   background: transparent;
   opacity: 0;
@@ -841,7 +843,7 @@ svg,
   width: 100%;
   max-width: 20.5rem;
   display: grid;
-  grid-template-columns: 2.95rem minmax(0, 1fr) 1.9rem;
+  grid-template-columns: 2.95rem minmax(0, 1fr);
   align-items: center;
   gap: 0.52rem;
   height: 3.76rem;
@@ -849,6 +851,8 @@ svg,
   padding: 0.54rem 0.58rem;
   color: var(--text);
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   background:
     radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--cta-accent) 24%, transparent), transparent 34%),
     linear-gradient(135deg, rgba(255, 248, 236, 0.13), rgba(255, 248, 236, 0.03) 42%, rgba(0, 0, 0, 0.16)),
@@ -868,6 +872,15 @@ svg,
     box-shadow 180ms ease,
     transform 180ms ease,
     color 180ms ease;
+}
+
+.sheet-cta:visited,
+.sheet-cta:active {
+  color: var(--text);
+}
+
+.sheet-cta:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .sheet-cta::before {
@@ -932,26 +945,6 @@ svg,
   white-space: nowrap;
 }
 
-.sheet-cta-chevron {
-  width: 1.78rem;
-  height: 1.78rem;
-  display: grid;
-  place-items: center;
-  justify-self: end;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--cta-accent-strong);
-  font-size: 0.84rem;
-  line-height: 1;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 8px 16px rgba(0, 0, 0, 0.16);
-  transition:
-    background 180ms ease,
-    transform 180ms ease,
-    color 180ms ease;
-}
-
 .sheet-cta:hover,
 .sheet-cta:focus-visible {
   background:
@@ -979,14 +972,11 @@ svg,
   color: var(--copy);
 }
 
-.sheet-cta:hover .sheet-cta-chevron,
-.sheet-cta:focus-visible .sheet-cta-chevron {
-  background: color-mix(in srgb, var(--cta-accent) 20%, rgba(255, 255, 255, 0.08));
-  color: #fff7e8;
-  transform: translateX(2px);
-}
-
 .sheet-cta:active {
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--cta-accent) 24%, transparent), transparent 34%),
+    linear-gradient(135deg, rgba(255, 248, 236, 0.12), rgba(255, 248, 236, 0.03) 42%, rgba(0, 0, 0, 0.18)),
+    var(--cta-surface);
   transform: translateY(0) scale(0.985);
 }
 
@@ -1085,7 +1075,7 @@ svg,
 
   .sheet-cta {
     width: 100%;
-    grid-template-columns: 2.8rem minmax(0, 1fr) 1.72rem;
+    grid-template-columns: 2.8rem minmax(0, 1fr);
     gap: 0.46rem;
     height: 3.62rem;
     min-height: 3.62rem;
