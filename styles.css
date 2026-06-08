@@ -808,10 +808,10 @@ svg,
 }
 
 .sheet-cta {
-  --cta-accent: #d8aa62;
-  --cta-accent-strong: #f0d0a2;
-  --cta-accent-soft: rgba(216, 170, 98, 0.2);
-  --cta-surface: rgba(26, 20, 14, 0.82);
+  --cta-accent: #dfc39c;
+  --cta-accent-strong: #e7d8c1;
+  --cta-accent-soft: rgba(223, 195, 156, 0.16);
+  --cta-surface: var(--row);
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -971,32 +971,14 @@ svg,
 }
 
 .sheet-cta--web,
-.sheet-cta--email {
-  --cta-accent: #d8aa62;
-  --cta-accent-strong: #f3d7aa;
-  --cta-accent-soft: rgba(216, 170, 98, 0.22);
-  --cta-surface: rgba(29, 22, 15, 0.86);
-}
-
-.sheet-cta--maps {
-  --cta-accent: #60aeb9;
-  --cta-accent-strong: #c7f2f5;
-  --cta-accent-soft: rgba(96, 174, 185, 0.22);
-  --cta-surface: rgba(14, 28, 30, 0.84);
-}
-
-.sheet-cta--whatsapp {
-  --cta-accent: #6ebf83;
-  --cta-accent-strong: #d8f5df;
-  --cta-accent-soft: rgba(110, 191, 131, 0.22);
-  --cta-surface: rgba(16, 30, 21, 0.84);
-}
-
+.sheet-cta--email,
+.sheet-cta--maps,
+.sheet-cta--whatsapp,
 .sheet-cta--tel {
-  --cta-accent: #d38a54;
-  --cta-accent-strong: #f5d0ad;
-  --cta-accent-soft: rgba(211, 138, 84, 0.24);
-  --cta-surface: rgba(31, 20, 13, 0.86);
+  --cta-accent: #dfc39c;
+  --cta-accent-strong: #e7d8c1;
+  --cta-accent-soft: rgba(223, 195, 156, 0.16);
+  --cta-surface: var(--row);
 }
 
 .sheet-card-media-body {
