@@ -8,7 +8,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260609b";
+} from "./content.js?v=20260609c";
 import {
   escapeAttribute,
   escapeHtml,
@@ -904,7 +904,7 @@ function render() {
   renderHostShortcut();
   renderLocaleBar();
   dom.subtitle.textContent = localeTemplate.subtitle;
-  dom.heroMeta.innerHTML = (template.heroMeta || [])
+  dom.heroMeta.innerHTML = (localeTemplate.heroMeta || template.heroMeta || [])
     .map((line) => `<span>${escapeHtml(line)}</span>`)
     .join("");
   dom.footerName.textContent = template.footer.name;

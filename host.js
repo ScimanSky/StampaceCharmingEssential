@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260609b";
+} from "./content.js?v=20260609c";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -750,6 +750,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
   if (targetLocale === "sc") {
     return {
+      heroMeta: [...(italianLocale.heroMeta ?? [])],
       subtitle: italianLocale.subtitle,
       sections: italianLocale.sections.map((section, sectionIndex) => {
         const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
@@ -798,6 +799,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   }
 
   const draftLocale = {
+    heroMeta: [],
     subtitle: "",
     sections: italianLocale.sections.map((section) => ({
       id: section.id,
@@ -811,6 +813,14 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
   const texts = [];
   const appliers = [];
+
+  (italianLocale.heroMeta ?? []).forEach((line) => {
+    const nextIndex = draftLocale.heroMeta.push("") - 1;
+    texts.push(line);
+    appliers.push((value) => {
+      draftLocale.heroMeta[nextIndex] = value;
+    });
+  });
 
   italianLocale.sections.forEach((section, sectionIndex) => {
     const targetSection = draftLocale.sections[sectionIndex];
@@ -1296,7 +1306,7 @@ function syncFields() {
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
   fillDesignSelects(theme);
   dom.subtitle.value = localeState.subtitle;
-  dom.heroMeta.value = serializeFooterLines(state.heroMeta || []);
+  dom.heroMeta.value = serializeFooterLines(localeState.heroMeta || state.heroMeta || []);
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
   dom.footerLines.value = serializeFooterLines(state.footer.lines);
@@ -1354,7 +1364,10 @@ function collectTemplate() {
   next.appName = dom.appName.value;
   next.address = dom.address.value;
   next.license = dom.license.value;
-  next.heroMeta = parseFooterLines(dom.heroMeta.value);
+  const heroMeta = parseFooterLines(dom.heroMeta.value);
+  if (selectedEditorLocale === FIXED_LOCALE) {
+    next.heroMeta = heroMeta;
+  }
   next.footer = {
     name: dom.footerName.value,
     subtitle: dom.footerSubtitle.value,
@@ -1364,6 +1377,7 @@ function collectTemplate() {
   next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {
     ...next.locales[selectedEditorLocale],
+    heroMeta,
     subtitle: dom.subtitle.value,
     sections,
   };

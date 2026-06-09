@@ -1381,6 +1381,10 @@ function cleanString(value, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
 
+function cleanLines(value) {
+  return Array.isArray(value) ? value.map((line) => cleanString(line)).filter(Boolean) : [];
+}
+
 function cleanThemeGroup(source = {}, fallback = {}) {
   const next = {};
   Object.entries(fallback).forEach(([key, fallbackValue]) => {
@@ -1536,6 +1540,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       : baseLocale.sections;
 
   return {
+    heroMeta: cleanLines(localeData?.heroMeta ?? baseLocale.heroMeta),
     subtitle:
       localeCode === FIXED_LOCALE
         ? cleanString(localeData?.subtitle, baseLocale.subtitle)
@@ -1735,9 +1740,11 @@ function mirrorItalianContent(localeMap) {
       }
 
       if (language.code === "sc") {
+        const localized = localeMap[language.code];
         return [
           language.code,
           {
+            heroMeta: localized?.heroMeta?.length ? localized.heroMeta : italian.heroMeta,
             subtitle: italian.subtitle,
             sections: italian.sections.map((section, sectionIndex) => {
               const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
@@ -1787,6 +1794,7 @@ function mirrorItalianContent(localeMap) {
       return [
         language.code,
         {
+          heroMeta: localized?.heroMeta?.length ? localized.heroMeta : italian.heroMeta,
           subtitle: italian.subtitle,
           sections: italian.sections.map((section, index) => {
             const localizedSection = localizedSectionForItalianSection(
@@ -1833,6 +1841,7 @@ function mirrorItalianContent(localeMap) {
 function buildLocaleMap(rawTemplate = {}) {
   const rawLocales = rawTemplate.locales && typeof rawTemplate.locales === "object" ? rawTemplate.locales : {};
   const legacyItLocale = {
+    heroMeta: rawTemplate.heroMeta,
     subtitle: rawTemplate.subtitle,
     sections: rawTemplate.sections,
   };
@@ -1840,9 +1849,13 @@ function buildLocaleMap(rawTemplate = {}) {
   const localeMap = Object.fromEntries(
     AVAILABLE_LANGUAGES.map((language) => {
       const baseLocale = localeBaseContent(language.code);
-      const rawLocale =
+      const rawLocaleSource =
         rawLocales[language.code] ??
         (language.code === FIXED_LOCALE ? legacyItLocale : {});
+      const rawLocale =
+        language.code === FIXED_LOCALE && !Array.isArray(rawLocaleSource?.heroMeta) && Array.isArray(rawTemplate.heroMeta)
+          ? { ...rawLocaleSource, heroMeta: rawTemplate.heroMeta }
+          : rawLocaleSource;
       return [language.code, normalizeLocaleContent(rawLocale, baseLocale, language.code)];
     }),
   );
@@ -1856,9 +1869,7 @@ export function normalizeTemplate(rawTemplate = {}) {
   const resolvedAppName = cleanString(rawTemplate.appName, defaultTemplate.appName);
   const resolvedAddress = cleanString(rawTemplate.address, defaultTemplate.address);
   const resolvedLicense = cleanString(rawTemplate.license, defaultTemplate.license);
-  const heroMeta = Array.isArray(rawTemplate.heroMeta)
-    ? rawTemplate.heroMeta.map((line) => cleanString(line)).filter(Boolean)
-    : [];
+  const heroMeta = cleanLines(rawTemplate.heroMeta);
   const footerLines = Array.isArray(footerSource.lines)
     ? footerSource.lines.map((line) => cleanString(line)).filter(Boolean)
     : [cleanString(footerSource.address, resolvedAddress), cleanString(footerSource.license, resolvedLicense)].filter(Boolean);
