@@ -37,10 +37,18 @@ const iconPaths = {
     '<path d="M12 3l6 2.7v5.7c0 3.7-2.3 6.9-6 8.6-3.7-1.7-6-4.9-6-8.6V5.7L12 3z"/><path d="M9.4 11.8 11 13.4l3.7-3.8"/>',
   wifi:
     '<path d="M1 8 A 15.5 15.5 0 0 1 23 8"/><path d="M4.5 11.5 A 10.6 10.6 0 0 1 19.5 11.5"/><path d="M8 15 A 5.6 5.6 0 0 1 16 15"/><circle cx="12" cy="19.5" r="1.5" style="fill: currentColor; stroke: none;"/>',
+  bolt:
+    '<path d="M13.2 3.8 6.8 13h4.6l-.7 7.2 6.5-9.3h-4.8z"/>',
+  clock:
+    '<circle cx="12" cy="12" r="8"/><path d="M12 7.8v4.6l3 1.8"/>',
+  calendar:
+    '<rect x="5" y="6" width="14" height="13" rx="2"/><path d="M8 4.8v2.4"/><path d="M16 4.8v2.4"/><path d="M5 9.5h14"/>',
   spark:
     '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
   key:
     '<circle cx="8.3" cy="14.2" r="3.2"/><path d="M11.2 14.2H20"/><path d="M16.4 14.2v-2.4"/><path d="M13.8 14.2v2.4"/>',
+  lock:
+    '<rect x="6.2" y="10.2" width="11.6" height="9" rx="2"/><path d="M8.7 10.2V8.3a3.3 3.3 0 0 1 6.6 0v1.9"/>',
   safe:
     '<rect x="5" y="4.5" width="14" height="15" rx="2.2"/><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5v5"/><path d="M9.5 12H14.5"/>',
   pin:
@@ -67,8 +75,22 @@ const iconPaths = {
     '<rect x="4" y="6.2" width="16" height="11.6" rx="2"/><path d="m5.3 7.7 6.7 5 6.7-5"/>',
   home:
     '<path d="M4.5 10.2 12 4l7.5 6.2"/><path d="M6.5 9.4V19h11V9.4"/>',
+  luggage:
+    '<rect x="6.4" y="7.2" width="11.2" height="11.4" rx="2"/><path d="M9.7 7.2V5.8c0-.8.7-1.4 1.5-1.4h1.6c.8 0 1.5.6 1.5 1.4v1.4"/><path d="M12 10v5"/>',
   car:
     '<path d="M5.2 14.8h13.6"/><path d="m7 14.8 1-4.2c.2-.7.8-1.2 1.5-1.2h5c.7 0 1.3.5 1.5 1.2l1 4.2"/><circle cx="8.3" cy="16.8" r="1.3"/><circle cx="15.7" cy="16.8" r="1.3"/>',
+  bus:
+    '<rect x="6.3" y="4.8" width="11.4" height="12" rx="2"/><path d="M8.5 8h2.6"/><path d="M13 8h2.5"/><path d="M8 18.2 6.9 20"/><path d="M17.1 18.2 16 20"/><circle cx="9" cy="15.2" r="0.7" fill="currentColor" stroke="none"/><circle cx="15" cy="15.2" r="0.7" fill="currentColor" stroke="none"/>',
+  cart:
+    '<circle cx="10" cy="17.5" r="1.2"/><circle cx="16" cy="17.5" r="1.2"/><path d="M5 6h1.6l1.2 7h8.2l1.6-5.2H8.3"/>',
+  utensils:
+    '<path d="M7 3.8v7.8"/><path d="M5.2 3.8v4.4"/><path d="M8.8 3.8v4.4"/><path d="M7 11.6V20"/><path d="M15.5 3.8c1.4 1.5 2 3 2 4.8 0 2-.8 3.5-2.4 4.6V20"/><path d="M14.2 3.8v8.2"/>',
+  cross:
+    '<path d="M12 5.4v13.2"/><path d="M5.4 12h13.2"/>',
+  train:
+    '<rect x="7" y="5.2" width="10" height="11.6" rx="2"/><path d="M9.5 8.2h5"/><path d="M9.5 11.2h5"/><path d="M9.2 18.2 8 20"/><path d="M14.8 18.2 16 20"/>',
+  wave:
+    '<path d="M3.8 15.2c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1"/><path d="M4 10.5c1 0 1-.8 2-.8s1 .8 2 .8 1-.8 2-.8 1 .8 2 .8 1-.8 2-.8 1 .8 2 .8"/>',
   route:
     '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
   link:
@@ -79,6 +101,14 @@ const iconPaths = {
     '<path d="M3.2 6.1 8.6 4l6.8 2.1 5.4-2.1v13.9l-5.4 2.1-6.8-2.1-5.4 2.1z"/><path d="M8.6 4v13.9"/><path d="M15.4 6.1V20"/>',
   ticket:
     '<path d="M4.2 8.2A2.2 2.2 0 0 0 6.4 6h11.2a2.2 2.2 0 0 0 2.2 2.2v2.2a2.2 2.2 0 0 0-2.2 2.2H6.4a2.2 2.2 0 0 0-2.2-2.2z"/><path d="M12 6v8.8"/><path d="M12 8.2v1.2"/><path d="M12 11.4v1.2"/>',
+  skyline:
+    '<path d="M3.8 18.2h16.4"/><path d="M5.3 18.2V10.8h3.2v7.4"/><path d="M9.7 18.2V7.8h3.6v10.4"/><path d="M14.8 18.2V9.6h3v8.6"/><path d="M11.5 7.8V5.4h1.1v2.4"/>',
+  trail:
+    '<path d="M4.2 9.3 7.6 5.6 10.1 8.2 13 5l3.1 3.7 2.2-2.4 1.5 1.7"/><path d="M12.5 19.5c.3-1.8.6-3.2 1.4-4.4l1.2-1.8"/><circle cx="10.9" cy="12.1" r="1.2"/><path d="M10.9 13.3 9.2 15.5"/><path d="M10.6 14.4 12.9 16"/><path d="M9.2 15.5 7.8 19.4"/><path d="M13 16l2 3.4"/><path d="M15.2 19.4h3.1"/>',
+  id:
+    '<rect x="4.8" y="6" width="14.4" height="12" rx="2"/><circle cx="9.3" cy="11" r="1.6"/><path d="M7.2 14.4c.7-1.1 1.5-1.6 2.1-1.6s1.4.5 2.1 1.6"/><path d="M13.6 10h3.1"/><path d="M13.6 13h3.1"/>',
+  receipt:
+    '<path d="M7 4.8h10v14.4l-1.4-.8-1.6.8-1.6-.8-1.6.8-1.6-.8-1.2.8z"/><path d="M9.3 8h5.4"/><path d="M9.3 11h5.4"/><path d="M9.3 14h3.2"/>',
 };
 
 const AUTO_PUBLISH_DELAY = 2500;
@@ -166,6 +196,36 @@ const CTA_ICON_OPTIONS = [
   { value: "home", label: "Casa" },
   { value: "key", label: "Chiave" },
 ];
+const SECTION_ICON_OPTIONS = [
+  { value: "spark", label: "Automatica" },
+  { value: "checkin", label: "Check-in" },
+  { value: "notepad", label: "Regole" },
+  { value: "wifi", label: "Wi-Fi" },
+  { value: "keypad", label: "Key-box / Codici" },
+  { value: "key", label: "Chiavi" },
+  { value: "lock", label: "Serratura" },
+  { value: "vault", label: "Cassaforte" },
+  { value: "bolt", label: "Energia / Contatore" },
+  { value: "luggage", label: "Bagagli" },
+  { value: "pin", label: "Posizione" },
+  { value: "map", label: "Mappa" },
+  { value: "route", label: "Percorso" },
+  { value: "car", label: "Auto / Parcheggio" },
+  { value: "bus", label: "Bus / Transfer" },
+  { value: "train", label: "Treno" },
+  { value: "utensils", label: "Ristoranti" },
+  { value: "cart", label: "Spesa" },
+  { value: "cross", label: "Farmacia / Emergenze" },
+  { value: "wave", label: "Mare" },
+  { value: "trail", label: "Escursioni" },
+  { value: "binoculars", label: "Dintorni" },
+  { value: "receipt", label: "Pagamenti" },
+  { value: "id", label: "Documenti" },
+  { value: "phone", label: "Telefono" },
+  { value: "mail", label: "Email" },
+  { value: "home", label: "Casa" },
+  { value: "user", label: "Host" },
+];
 const CTA_PRESET_OPTIONS = [
   { kind: "web", label: "CTA Web" },
   { kind: "maps", label: "CTA Mappa" },
@@ -188,6 +248,50 @@ function parseFooterLines(value) {
 
 function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
+}
+
+function normalizedSectionText(section) {
+  return `${section?.menuTitle ?? ""} ${section?.sectionTitle ?? ""} ${section?.lead ?? ""}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function inferSectionIcon(section) {
+  const text = normalizedSectionText(section);
+
+  if (/key[-\s]?box|keybox|lockbox|cassetta.*chiav|chiav.*cassetta|tastier|keypad|codic/.test(text)) return "keypad";
+  if (/contator|elettric|corrente|energia|salvavita|quadro|luce/.test(text)) return "bolt";
+  if (/bagagli|bagaglio|valig|deposito|luggage|baggage/.test(text)) return "luggage";
+  if (/wifi|wi-fi|rete|password|connession/.test(text)) return "wifi";
+  if (/check[-\s]?in|check[-\s]?out|arriv|partenz|orari/.test(text)) return "checkin";
+  if (/regol|vietat|divieto|fum|rumor|silenzio/.test(text)) return "notepad";
+  if (/cassafort|safe|valori/.test(text)) return "vault";
+  if (/chiav|serratur|porta|access/.test(text)) return "key";
+  if (/escursion|tour|gita|trek|experience|esperienz|sentier/.test(text)) return "trail";
+  if (/ristorant|locali|bar|aperitiv|food|drink|cibo|spesa|market|supermercat/.test(text)) return "utensils";
+  if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "skyline";
+  if (/noleggio|rent|auto|car rental|vehicle|parchegg/.test(text)) return "car";
+  if (/farmacia|emergenz|medic|ospedal/.test(text)) return "cross";
+  if (/spiagg|mare|poetto/.test(text)) return "wave";
+  if (/mappa|quartiere|dintorn|local|posizion|indirizz|come arrivare/.test(text)) return "pin";
+
+  return "";
+}
+
+function resolvedSectionIcon(section) {
+  if (section?.icon && section.icon !== "spark" && iconPaths[section.icon]) return section.icon;
+  return inferSectionIcon(section) || (iconPaths[section?.icon] ? section.icon : "spark");
+}
+
+function sectionIconOptions(selectedIcon = "spark") {
+  if (!selectedIcon || SECTION_ICON_OPTIONS.some((option) => option.value === selectedIcon)) {
+    return SECTION_ICON_OPTIONS;
+  }
+  return [
+    ...SECTION_ICON_OPTIONS,
+    { value: selectedIcon, label: `Icona salvata (${selectedIcon})` },
+  ];
 }
 
 function applyTheme(theme) {
@@ -838,7 +942,7 @@ function renderSectionEditors() {
           <div class="host-section-meta">
             <div class="host-section-meta-main">
               <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
-                <span class="host-section-icon">${renderIcon(section.icon)}</span>
+                <span class="host-section-icon" data-section-icon-preview>${renderIcon(resolvedSectionIcon(section))}</span>
                 <span class="host-section-heading">
                   <span>
                     <p class="host-kicker">${escapeHtml(section.id)}</p>
@@ -873,6 +977,12 @@ function renderSectionEditors() {
               <label>
                 <span>Titolo sezione</span>
                 <input data-field="sectionTitle" type="text" value="${escapeAttribute(section.sectionTitle)}" />
+              </label>
+              <label>
+                <span>Icona sezione</span>
+                <select data-field="icon" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                  ${sectionIconOptions(section.icon).map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === section.icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                </select>
               </label>
               <label>
                 <span>Testo introduttivo</span>
@@ -988,9 +1098,10 @@ function collectTemplate() {
       caption: item.querySelector('[data-image-field="caption"]').value,
       size: item.querySelector('[data-image-field="size"]')?.value || "grande",
     })).filter((item) => item.src);
+    const selectedIcon = card.querySelector('[data-field="icon"]')?.value || base.icon || "spark";
     return {
       id,
-      icon: base.icon,
+      icon: selectedIcon.trim() || "spark",
       hidden: card.dataset.sectionHidden === "true",
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
@@ -1023,6 +1134,23 @@ function collectTemplate() {
   };
 
   return normalizeTemplate(next);
+}
+
+function sectionDraftFromCard(sectionCard) {
+  if (!sectionCard) return null;
+  return {
+    icon: sectionCard.querySelector('[data-field="icon"]')?.value || "spark",
+    menuTitle: sectionCard.querySelector('[data-field="menuTitle"]')?.value || "",
+    sectionTitle: sectionCard.querySelector('[data-field="sectionTitle"]')?.value || "",
+    lead: sectionCard.querySelector('[data-field="lead"]')?.value || "",
+  };
+}
+
+function updateSectionIconPreview(sectionCard) {
+  const preview = sectionCard?.querySelector("[data-section-icon-preview]");
+  const draft = sectionDraftFromCard(sectionCard);
+  if (!preview || !draft) return;
+  preview.innerHTML = renderIcon(resolvedSectionIcon(draft));
 }
 
 function switchEditorLocale(nextLocale) {
@@ -1521,6 +1649,9 @@ function bindEditorEvents() {
 
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
+    if (event.target.matches('[data-field="menuTitle"], [data-field="sectionTitle"], [data-field="lead"]')) {
+      updateSectionIconPreview(event.target.closest("[data-section-id]"));
+    }
     queueAutoPublish();
   });
 
@@ -1553,6 +1684,11 @@ function bindEditorEvents() {
   });
 
   dom.sections.addEventListener("change", (event) => {
+    if (event.target.matches('[data-field="icon"]')) {
+      updateSectionIconPreview(event.target.closest("[data-section-id]"));
+      queueAutoPublish();
+      return;
+    }
     if (!event.target.matches('[data-cta-field], [data-image-field="size"]')) return;
     queueAutoPublish();
   });

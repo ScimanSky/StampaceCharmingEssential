@@ -28,6 +28,8 @@ const iconPaths = {
     '<rect x="5" y="6" width="14" height="13" rx="2"/><path d="M8 4.8v2.4"/><path d="M16 4.8v2.4"/><path d="M5 9.5h14"/>',
   wifi:
     '<path d="M1 8 A 15.5 15.5 0 0 1 23 8"/><path d="M4.5 11.5 A 10.6 10.6 0 0 1 19.5 11.5"/><path d="M8 15 A 5.6 5.6 0 0 1 16 15"/><circle cx="12" cy="19.5" r="1.5" style="fill: currentColor; stroke: none;"/>',
+  bolt:
+    '<path d="M13.2 3.8 6.8 13h4.6l-.7 7.2 6.5-9.3h-4.8z"/>',
   spark:
     '<path d="M12 3.8 13.3 8 17.5 9.3 13.3 10.6 12 14.8 10.7 10.6 6.5 9.3 10.7 8 12 3.8z"/><path d="M18.2 14.5 19 16.6l2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1z"/>',
   key:
@@ -283,15 +285,31 @@ function renderCtaItem(item) {
 function iconFromSectionContent(section) {
   if (!section) return "spark";
 
-  const text = `${section.menuTitle ?? ""} ${section.sectionTitle ?? ""} ${section.lead ?? ""}`.toLowerCase();
+  const explicitIcon = section.icon && section.icon !== "spark" && iconPaths[section.icon] ? section.icon : "";
+  if (explicitIcon) return explicitIcon;
 
-  if (/escursion|tour|gita|trek|experience|esperienz/.test(text)) return "trail";
-  if (/ristorant|locali|bar|aperitiv|food|drink/.test(text)) return "utensils";
+  const text = `${section.menuTitle ?? ""} ${section.sectionTitle ?? ""} ${section.lead ?? ""}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  if (/key[-\s]?box|keybox|lockbox|cassetta.*chiav|chiav.*cassetta|tastier|keypad|codic/.test(text)) return "keypad";
+  if (/contator|elettric|corrente|energia|salvavita|quadro|luce/.test(text)) return "bolt";
+  if (/bagagli|bagaglio|valig|deposito|luggage|baggage/.test(text)) return "luggage";
+  if (/wifi|wi-fi|rete|password|connession/.test(text)) return "wifi";
+  if (/check[-\s]?in|check[-\s]?out|arriv|partenz|orari/.test(text)) return "checkin";
+  if (/regol|vietat|divieto|fum|rumor|silenzio/.test(text)) return "notepad";
+  if (/cassafort|safe|valori/.test(text)) return "vault";
+  if (/chiav|serratur|porta|access/.test(text)) return "key";
+  if (/escursion|tour|gita|trek|experience|esperienz|sentier/.test(text)) return "trail";
+  if (/ristorant|locali|bar|aperitiv|food|drink|cibo|spesa|market|supermercat/.test(text)) return "utensils";
   if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "skyline";
-  if (/noleggio|rent|auto|car rental|vehicle/.test(text)) return "rental";
-  if (/mappa|quartiere|dintorn|local/.test(text)) return "pin";
+  if (/noleggio|rent|auto|car rental|vehicle|parchegg/.test(text)) return "car";
+  if (/farmacia|emergenz|medic|ospedal/.test(text)) return "cross";
+  if (/spiagg|mare|poetto/.test(text)) return "wave";
+  if (/mappa|quartiere|dintorn|local|posizion|indirizz|come arrivare/.test(text)) return "pin";
 
-  return section.icon || "spark";
+  return iconPaths[section.icon] ? section.icon : "spark";
 }
 
 function iconForSection(section) {
