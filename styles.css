@@ -1096,8 +1096,14 @@ svg,
 }
 
 .sheet-host-action--airbnb {
-  color: #ff5a5f;
-  border-color: rgba(255, 90, 95, 0.35);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.sheet-host-action--airbnb svg {
+  width: 3.25rem;
+  height: 3.25rem;
 }
 
 .sheet-host-action--booking {

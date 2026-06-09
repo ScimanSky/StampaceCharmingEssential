@@ -700,6 +700,16 @@ select:focus-visible {
   stroke-linejoin: round;
 }
 
+.host-cta-icon-preview--airbnb {
+  border-color: transparent;
+  background: transparent;
+}
+
+.host-cta-icon-preview--airbnb svg {
+  width: 2.65rem;
+  height: 2.65rem;
+}
+
 .host-cta-heading {
   min-width: 0;
   flex: 1 1 auto;

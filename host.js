@@ -71,7 +71,7 @@ const iconPaths = {
   avatar:
     '<path d="M6.5 11c1.8-2 4-2 5.5-1c1.8-1 4-1 5.5.5c.5-4-1-6-5.5-6s-6 2-5.5 6.5z" style="fill: currentColor;"/><path d="M6.5 11a1.8 1.8 0 0 0 0 3.6M17.5 11a1.8 1.8 0 0 1 0 3.6"/><path d="M6.5 12.5v2.5a5.5 5.5 0 0 0 11 0v-2.5"/><circle cx="9.8" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><circle cx="14.2" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><path d="M11.5 14.2a0.5 0.5 0 0 0 1 0"/><path d="M9.5 16a2.5 2.5 0 0 0 5 0"/>',
   airbnb:
-    '<path d="M12 4.5c-2.8 3.4-5.2 7.4-5.2 10.1a3.2 3.2 0 0 0 5.2 2.5 3.2 3.2 0 0 0 5.2-2.5c0-2.7-2.4-6.7-5.2-10.1z"/><path d="M9.7 13.4a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 0 0-4.6 0z"/><path d="M12 17.1c-1.8-1.3-3.7-3-3.7-5.2a3.7 3.7 0 0 1 7.4 0c0 2.2-1.9 3.9-3.7 5.2z"/>',
+    '<circle cx="12" cy="12" r="11.4" fill="#ff3b30" stroke="none"/><path d="M14.2 10.8 21 17.6a11.4 11.4 0 0 1-8.6 5.8L8.7 19.8z" fill="#bd2f28" opacity=".28" stroke="none"/><path d="M12 5.6c-2.7 3.4-4.8 7.2-4.8 9.7a3.25 3.25 0 0 0 5 2.7 3.25 3.25 0 0 0 4.6-3c0-2.4-2.1-6.3-4.8-9.4z" fill="none" stroke="#fff" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.8 13.5a2.2 2.2 0 1 1 4.4 0c0 1.35-1.12 3-2.2 4.5-1.08-1.5-2.2-3.15-2.2-4.5z" fill="none" stroke="#fff" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>',
   booking:
     '<rect x="5.2" y="4.2" width="13.6" height="15.6" rx="3"/><path d="M9 7.8h4.1a2.3 2.3 0 0 1 0 4.6H9z"/><path d="M9 12.4h4.7a2.4 2.4 0 0 1 0 4.8H9z"/><path d="M9 7.8v9.4"/>',
   phone:
