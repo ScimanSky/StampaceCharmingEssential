@@ -138,6 +138,8 @@ svg,
 .topbar-copy {
   min-width: 0;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   width: 100%;
 }
@@ -1019,7 +1021,14 @@ svg,
 }
 
 .sheet-contact-button--whatsapp {
-  background: linear-gradient(180deg, #33d374, #128c4a);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.sheet-contact-button--whatsapp svg {
+  width: 3.15rem;
+  height: 3.15rem;
 }
 
 .sheet-contact-button--gmail {
@@ -1065,13 +1074,9 @@ svg,
   border-radius: 999px;
   color: var(--icon-custom-color, var(--muted-strong));
   text-decoration: none;
-  border: 1px solid rgba(231, 216, 193, 0.18);
-  background:
-    linear-gradient(145deg, rgba(255, 248, 232, 0.14), rgba(255, 248, 232, 0.04)),
-    rgba(20, 17, 13, 0.72);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 14px 28px rgba(0, 0, 0, 0.24);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   transition:
@@ -1094,8 +1099,11 @@ svg,
 
 .sheet-host-action--whatsapp {
   color: #fff;
-  border-color: rgba(68, 199, 122, 0.45);
-  background: linear-gradient(180deg, #35d978, #138d4d);
+}
+
+.sheet-host-action--whatsapp svg {
+  width: 3.25rem;
+  height: 3.25rem;
 }
 
 .sheet-host-action--gmail {
@@ -1138,10 +1146,7 @@ svg,
 .sheet-host-action:hover,
 .sheet-host-action:focus-visible {
   transform: translateY(-1px);
-  border-color: rgba(231, 216, 193, 0.32);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 18px 34px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
 }
 
 .sheet-host-action:active {

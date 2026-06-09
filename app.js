@@ -49,6 +49,8 @@ const iconPaths = {
     '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
   mail:
     '<rect x="4" y="6.2" width="16" height="11.6" rx="2"/><path d="m5.3 7.7 6.7 5 6.7-5"/>',
+  whatsapp:
+    '<defs><radialGradient id="whatsapp-green-icon" cx="64%" cy="22%" r="82%"><stop offset="0%" stop-color="#7fff5b"/><stop offset="48%" stop-color="#19d119"/><stop offset="100%" stop-color="#007a05"/></radialGradient></defs><circle cx="12" cy="12" r="11.4" fill="url(#whatsapp-green-icon)" stroke="none"/><path d="M5.55 19.3 6.75 15.7a6.95 6.95 0 1 1 2.25 2.05z" fill="none" stroke="#fff" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.05 8.35c.28-.55.48-.6.83-.6h.45c.22 0 .42.15.52.42l.72 1.72c.1.28.06.48-.15.72l-.48.55c.72 1.24 1.68 2.16 2.95 2.82l.6-.67c.2-.22.42-.26.72-.12l1.62.78c.28.14.42.34.42.65v.45c0 .35-.2.66-.56.82-.75.34-1.78.28-3.05-.3-2.18-.96-4.34-3.1-5.2-5.28-.46-1.17-.33-1.84-.05-2.48z" fill="#fff" stroke="none"/>',
   gmail:
     '<circle cx="12" cy="12" r="11.4" fill="#fff" stroke="none"/><path d="M5.2 8.2v7.6c0 1 .8 1.8 1.8 1.8h1.3V10.5z" fill="#4285f4" stroke="none"/><path d="M15.7 10.5v7.1H17c1 0 1.8-.8 1.8-1.8V8.2z" fill="#34a853" stroke="none"/><path d="M8.3 10.5 12 13.3l3.7-2.8V7.9L12 10.7 8.3 7.9z" fill="#ea4335" stroke="none"/><path d="M5.2 8.2 8.3 10.5V7.9l-.8-.6c-.9-.7-2.3 0-2.3.9z" fill="#c5221f" stroke="none"/><path d="M18.8 8.2c0-.9-1.4-1.6-2.3-.9l-.8.6v2.6z" fill="#fbbc04" stroke="none"/>',
   card:
@@ -245,8 +247,16 @@ function normalizePhoneDigits(value) {
 function renderWhatsAppBrandIcon() {
   return `
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5.1 19.1 6 15.8a7.2 7.2 0 1 1 2.7 2.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-      <path d="M8.8 8.9c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.6 1.4c.1.3.1.5-.1.7l-.4.5c.7 1.2 1.6 2.1 2.9 2.8l.6-.6c.2-.2.4-.2.7-.1l1.4.7c.3.1.4.3.4.6v.4c0 .3-.2.6-.5.7-.6.3-1.6.3-2.8-.2-2.1-.8-4.4-3.1-5.2-5.2-.5-1.1-.4-1.8-.1-2.2z" fill="currentColor" stroke="none"/>
+      <defs>
+        <radialGradient id="whatsapp-green" cx="64%" cy="22%" r="82%">
+          <stop offset="0%" stop-color="#7fff5b"/>
+          <stop offset="48%" stop-color="#19d119"/>
+          <stop offset="100%" stop-color="#007a05"/>
+        </radialGradient>
+      </defs>
+      <circle cx="12" cy="12" r="11.4" fill="url(#whatsapp-green)" stroke="none"/>
+      <path d="M5.55 19.3 6.75 15.7a6.95 6.95 0 1 1 2.25 2.05z" fill="none" stroke="#fff" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9.05 8.35c.28-.55.48-.6.83-.6h.45c.22 0 .42.15.52.42l.72 1.72c.1.28.06.48-.15.72l-.48.55c.72 1.24 1.68 2.16 2.95 2.82l.6-.67c.2-.22.42-.26.72-.12l1.62.78c.28.14.42.34.42.65v.45c0 .35-.2.66-.56.82-.75.34-1.78.28-3.05-.3-2.18-.96-4.34-3.1-5.2-5.28-.46-1.17-.33-1.84-.05-2.48z" fill="#fff" stroke="none"/>
     </svg>
   `;
 }
@@ -447,7 +457,7 @@ function ctaIcon(item) {
   const kindFallback = {
     web: "link",
     maps: "map",
-    whatsapp: "chat",
+    whatsapp: "whatsapp",
     email: "gmail",
     tel: "phone",
     airbnb: "airbnb",

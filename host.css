@@ -710,6 +710,16 @@ select:focus-visible {
   height: 2.65rem;
 }
 
+.host-cta-icon-preview--whatsapp {
+  border-color: transparent;
+  background: transparent;
+}
+
+.host-cta-icon-preview--whatsapp svg {
+  width: 2.65rem;
+  height: 2.65rem;
+}
+
 .host-cta-icon-preview--email {
   border-color: transparent;
   background: transparent;
