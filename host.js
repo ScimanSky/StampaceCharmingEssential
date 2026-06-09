@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260609a";
+} from "./content.js?v=20260609b";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -131,6 +131,7 @@ const dom = {
   optionalLocale: document.querySelector("#field-optional-locale"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
+  heroMeta: document.querySelector("#field-hero-meta"),
   address: document.querySelector("#field-address"),
   license: document.querySelector("#field-license"),
   fontPrimary: document.querySelector("#field-font-primary"),
@@ -1191,6 +1192,7 @@ function syncFields() {
   setFieldValue(dom.contentGap, layout.contentGap);
   setFieldValue(dom.sheetAnimation, motion.sheetAnimation);
   dom.subtitle.value = localeState.subtitle;
+  dom.heroMeta.value = serializeFooterLines(state.heroMeta || []);
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
   dom.footerLines.value = serializeFooterLines(state.footer.lines);
@@ -1248,6 +1250,7 @@ function collectTemplate() {
   next.appName = dom.appName.value;
   next.address = dom.address.value;
   next.license = dom.license.value;
+  next.heroMeta = parseFooterLines(dom.heroMeta.value);
   next.footer = {
     name: dom.footerName.value,
     subtitle: dom.footerSubtitle.value,

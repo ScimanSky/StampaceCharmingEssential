@@ -358,6 +358,10 @@ svg,
   white-space: normal;
 }
 
+.hero-meta:empty {
+  display: none;
+}
+
 .hero-meta span {
   display: block;
   max-width: 100%;
@@ -865,6 +869,66 @@ svg,
 .sheet-link:focus-visible {
   color: var(--copy);
   text-decoration-color: rgba(231, 216, 193, 0.7);
+}
+
+.sheet-contact-card .sheet-card-copy {
+  display: grid;
+  gap: 0.72rem;
+  align-content: center;
+}
+
+.sheet-contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.sheet-contact-button {
+  width: 3.15rem;
+  height: 3.15rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 14px 28px rgba(0, 0, 0, 0.24);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease;
+}
+
+.sheet-contact-button svg {
+  width: 1.72rem;
+  height: 1.72rem;
+  display: block;
+}
+
+.sheet-contact-button--whatsapp {
+  background: linear-gradient(180deg, #33d374, #128c4a);
+}
+
+.sheet-contact-button--gmail {
+  background: linear-gradient(180deg, #f8f4ef, #e6ded3);
+}
+
+.sheet-contact-button:hover,
+.sheet-contact-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 18px 34px rgba(0, 0, 0, 0.3);
+}
+
+.sheet-contact-button:active {
+  transform: scale(0.96);
 }
 
 .sheet-card-media {

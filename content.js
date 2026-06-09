@@ -1363,6 +1363,7 @@ export const defaultTemplate = {
   appName: "Stampace Charming",
   address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
   license: "CIN: IT092009C2000R8066",
+  heroMeta: [],
   footer: {
     name: "Stampace Charming",
     subtitle: "Luxury apartment",
@@ -1855,6 +1856,9 @@ export function normalizeTemplate(rawTemplate = {}) {
   const resolvedAppName = cleanString(rawTemplate.appName, defaultTemplate.appName);
   const resolvedAddress = cleanString(rawTemplate.address, defaultTemplate.address);
   const resolvedLicense = cleanString(rawTemplate.license, defaultTemplate.license);
+  const heroMeta = Array.isArray(rawTemplate.heroMeta)
+    ? rawTemplate.heroMeta.map((line) => cleanString(line)).filter(Boolean)
+    : [];
   const footerLines = Array.isArray(footerSource.lines)
     ? footerSource.lines.map((line) => cleanString(line)).filter(Boolean)
     : [cleanString(footerSource.address, resolvedAddress), cleanString(footerSource.license, resolvedLicense)].filter(Boolean);
@@ -1864,6 +1868,7 @@ export function normalizeTemplate(rawTemplate = {}) {
     appName: resolvedAppName,
     address: resolvedAddress,
     license: resolvedLicense,
+    heroMeta,
     footer: {
       name: cleanString(footerSource.name, resolvedAppName || fallbackFooter.name),
       subtitle: cleanString(footerSource.subtitle, fallbackFooter.subtitle),

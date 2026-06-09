@@ -8,7 +8,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260609a";
+} from "./content.js?v=20260609b";
 import {
   escapeAttribute,
   escapeHtml,
@@ -120,8 +120,7 @@ const dom = {
   hostAvatarLabel: document.querySelector("#host-avatar-label"),
   localeBar: document.querySelector("#locale-bar"),
   subtitle: document.querySelector("#hero-subtitle"),
-  address: document.querySelector("#footer-address"),
-  license: document.querySelector("#footer-license"),
+  heroMeta: document.querySelector("#hero-meta"),
   footerName: document.querySelector("#app-footer-name"),
   footerSubtitle: document.querySelector("#app-footer-subtitle"),
   footerMeta: document.querySelector("#app-footer-meta"),
@@ -175,6 +174,25 @@ function normalizePhoneDigits(value) {
   return cleaned;
 }
 
+function renderWhatsAppBrandIcon() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5.1 19.1 6 15.8a7.2 7.2 0 1 1 2.7 2.6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M8.8 8.9c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.6 1.4c.1.3.1.5-.1.7l-.4.5c.7 1.2 1.6 2.1 2.9 2.8l.6-.6c.2-.2.4-.2.7-.1l1.4.7c.3.1.4.3.4.6v.4c0 .3-.2.6-.5.7-.6.3-1.6.3-2.8-.2-2.1-.8-4.4-3.1-5.2-5.2-.5-1.1-.4-1.8-.1-2.2z" fill="currentColor" stroke="none"/>
+    </svg>
+  `;
+}
+
+function renderGmailBrandIcon() {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="6.2" width="16" height="11.6" rx="2.2" fill="#fff"/>
+      <path d="M5.8 8.2 12 13.1l6.2-4.9" fill="none" stroke="#ea4335" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M5.6 16.3V8.6l6.4 5.1 6.4-5.1v7.7" fill="none" stroke="#c5221f" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  `;
+}
+
 function renderHostStringItem(item, marker) {
   const text = String(item).trim();
   const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
@@ -186,11 +204,15 @@ function renderHostStringItem(item, marker) {
     const email = emailMatch[0];
     const label = text.slice(0, emailMatch.index).replace(/[:：]\s*$/, "").trim();
     return `
-      <article class="sheet-card">
+      <article class="sheet-card sheet-contact-card">
         ${marker}
         <div class="sheet-card-copy">
-          ${label ? `<strong>${escapeHtml(label)}</strong>` : ""}
-          <a class="sheet-link" href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a>
+          <strong>${escapeHtml(label || "Email")}</strong>
+          <div class="sheet-contact-actions">
+            <a class="sheet-contact-button sheet-contact-button--gmail" href="mailto:${escapeAttribute(email)}" aria-label="Invia email a ${escapeAttribute(email)}">
+              ${renderGmailBrandIcon()}
+            </a>
+          </div>
         </div>
       </article>
     `;
@@ -201,11 +223,15 @@ function renderHostStringItem(item, marker) {
     const waNumber = normalizePhoneDigits(rawNumber);
     const label = text.slice(0, phoneMatch.index).replace(/[:：]\s*$/, "").trim();
     return `
-      <article class="sheet-card">
+      <article class="sheet-card sheet-contact-card">
         ${marker}
         <div class="sheet-card-copy">
-          ${label ? `<strong>${escapeHtml(label)}</strong>` : ""}
-          <a class="sheet-link" href="https://wa.me/${escapeHtml(waNumber)}" target="_blank" rel="noopener noreferrer">${escapeHtml(rawNumber)}</a>
+          <strong>${escapeHtml(label || "WhatsApp")}</strong>
+          <div class="sheet-contact-actions">
+            <a class="sheet-contact-button sheet-contact-button--whatsapp" href="https://wa.me/${escapeAttribute(waNumber)}" target="_blank" rel="noopener noreferrer" aria-label="Apri WhatsApp ${escapeAttribute(rawNumber)}">
+              ${renderWhatsAppBrandIcon()}
+            </a>
+          </div>
         </div>
       </article>
     `;
@@ -809,8 +835,9 @@ function render() {
   renderHostShortcut();
   renderLocaleBar();
   dom.subtitle.textContent = localeTemplate.subtitle;
-  dom.address.textContent = template.address;
-  dom.license.textContent = template.license;
+  dom.heroMeta.innerHTML = (template.heroMeta || [])
+    .map((line) => `<span>${escapeHtml(line)}</span>`)
+    .join("");
   dom.footerName.textContent = template.footer.name;
   dom.footerSubtitle.textContent = template.footer.subtitle;
   dom.footerMeta.innerHTML = template.footer.lines
