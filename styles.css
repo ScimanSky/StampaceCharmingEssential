@@ -464,19 +464,36 @@ svg,
   display: grid;
   place-items: center;
   color: var(--muted-strong);
-  border-radius: 0.58rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .menu-icon svg {
-  width: 1.82rem;
-  height: 1.82rem;
+  width: 2.06rem;
+  height: 2.06rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.menu-row--wifi .menu-icon,
+.menu-row--icon-wifi .menu-icon,
+.sheet-icon--wifi,
+.sheet-icon--icon-wifi {
+  color: #5fa8ff;
+}
+
+.menu-row--map .menu-icon,
+.menu-row--location .menu-icon,
+.menu-row--position .menu-icon,
+.menu-row--icon-map .menu-icon,
+.menu-row--icon-pin .menu-icon,
+.sheet-icon--map,
+.sheet-icon--location,
+.sheet-icon--position,
+.sheet-icon--icon-map,
+.sheet-icon--icon-pin {
+  color: #e45f53;
 }
 
 .menu-copy strong,
@@ -630,14 +647,11 @@ svg,
   display: grid;
   place-items: center;
   color: var(--muted-strong);
-  border-radius: 0.65rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .sheet-icon svg {
-  width: 1.95rem;
-  height: 1.95rem;
+  width: 2.18rem;
+  height: 2.18rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
@@ -895,9 +909,6 @@ svg,
   height: 2.75rem;
   display: grid;
   place-items: center;
-  border-radius: 0.58rem;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.05);
   color: var(--muted-strong);
   box-shadow: none;
   transition:
@@ -906,8 +917,8 @@ svg,
 }
 
 .sheet-cta-icon svg {
-  width: 1.82rem;
-  height: 1.82rem;
+  width: 2.06rem;
+  height: 2.06rem;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
@@ -946,6 +957,10 @@ svg,
 .sheet-cta:active {
   background: var(--row-hover);
   transform: translateY(0) scale(0.985);
+}
+
+.sheet-host-template-cta {
+  margin-top: 0.85rem;
 }
 
 .sheet-card-media-body {

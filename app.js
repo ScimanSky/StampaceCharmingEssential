@@ -4,6 +4,7 @@ import {
   getLocaleContent,
   getVisibleLocales,
   isCtaItem,
+  isHostPrivateItem,
   isImageItem,
   loadTemplate,
   normalizeTemplate,
@@ -156,6 +157,10 @@ function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
 }
 
+function sectionClassToken(sectionId) {
+  return String(sectionId).replace(/[^a-z0-9_-]/gi, "-");
+}
+
 function normalizePhoneDigits(value) {
   const cleaned = String(value).replace(/[^\d+]/g, "");
   if (cleaned.startsWith("+")) return cleaned.slice(1);
@@ -212,6 +217,26 @@ function renderGenericLinkItem(item, marker, sectionId) {
   const body = item.body ? `<p>${escapeHtml(item.body)}</p>` : "";
   const label = item.label || item.href;
   const href = sanitizeHref(item.href);
+
+  if (sectionId === "host" && isHostPrivateItem(item)) {
+    return `
+      <article class="sheet-card sheet-card-link sheet-card-host-template">
+        ${marker}
+        <div class="sheet-card-copy">
+          ${title}
+          ${body}
+          ${
+            href
+              ? `<a class="sheet-cta sheet-host-template-cta" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
+                  <span class="sheet-cta-icon" aria-hidden="true">${renderIcon("user")}</span>
+                  <span class="sheet-cta-label">${escapeHtml(label)}</span>
+                </a>`
+              : ""
+          }
+        </div>
+      </article>
+    `;
+  }
 
   return `
     <article class="sheet-card sheet-card-link">
@@ -340,7 +365,7 @@ function renderMenu(sections) {
     .filter((section) => section.id !== "host" && !section.hidden)
     .map(
       (section) => `
-        <button class="menu-row" type="button" data-section-id="${escapeAttribute(section.id)}">
+        <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(iconForSection(section)))}" type="button" data-section-id="${escapeAttribute(section.id)}">
           <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
           <span class="menu-copy">
             <strong>${escapeHtml(section.menuTitle)}</strong>
@@ -496,6 +521,7 @@ function renderOpenSection(sectionId) {
 
   activeSectionId = section.id;
   dom.sheetIcon.innerHTML = renderIcon(iconForSection(section));
+  dom.sheetIcon.className = `sheet-icon sheet-icon--${sectionClassToken(section.id)} sheet-icon--icon-${sectionClassToken(iconForSection(section))}`;
   dom.sheetBrand.textContent = template.appName;
   dom.sheetTitle.textContent = section.sectionTitle;
   dom.sheetLead.textContent = section.lead;
