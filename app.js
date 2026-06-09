@@ -163,6 +163,7 @@ const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";
 
 const dom = {
   appName: document.querySelector("#app-name"),
+  topbarSubtitle: document.querySelector("#topbar-subtitle"),
   hostAvatarButton: document.querySelector("#host-avatar-button"),
   hostAvatarLabel: document.querySelector("#host-avatar-label"),
   guestShareButton: document.querySelector("#guest-share-button"),
@@ -1146,6 +1147,7 @@ function render() {
   applyTheme(template.theme);
   const localeTemplate = localeState();
   dom.appName.textContent = template.appName;
+  dom.topbarSubtitle.textContent = localeTemplate.subtitle;
   renderHostShortcut();
   renderLocaleBar();
   dom.subtitle.textContent = localeTemplate.subtitle;

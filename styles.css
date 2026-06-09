@@ -166,6 +166,19 @@ svg,
   text-transform: uppercase;
 }
 
+.topbar-subtitle {
+  display: block;
+  margin-top: 0.28rem;
+  font-family: var(--font-secondary), sans-serif;
+  font-size: clamp(0.74rem, 2.3vw, 0.86rem);
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(231, 216, 193, 0.72);
+  text-align: center;
+  font-weight: 400;
+}
+
 .top-controls {
   position: relative;
   display: flex;
