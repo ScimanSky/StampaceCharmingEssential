@@ -710,6 +710,16 @@ select:focus-visible {
   height: 2.65rem;
 }
 
+.host-cta-icon-preview--email {
+  border-color: transparent;
+  background: transparent;
+}
+
+.host-cta-icon-preview--email svg {
+  width: 2.65rem;
+  height: 2.65rem;
+}
+
 .host-cta-icon-preview--booking {
   border-color: transparent;
   background: transparent;

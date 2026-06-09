@@ -78,6 +78,8 @@ const iconPaths = {
     '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
   mail:
     '<rect x="4" y="6.2" width="16" height="11.6" rx="2"/><path d="m5.3 7.7 6.7 5 6.7-5"/>',
+  gmail:
+    '<circle cx="12" cy="12" r="11.4" fill="#fff" stroke="none"/><path d="M5.2 8.2v7.6c0 1 .8 1.8 1.8 1.8h1.3V10.5z" fill="#4285f4" stroke="none"/><path d="M15.7 10.5v7.1H17c1 0 1.8-.8 1.8-1.8V8.2z" fill="#34a853" stroke="none"/><path d="M8.3 10.5 12 13.3l3.7-2.8V7.9L12 10.7 8.3 7.9z" fill="#ea4335" stroke="none"/><path d="M5.2 8.2 8.3 10.5V7.9l-.8-.6c-.9-.7-2.3 0-2.3.9z" fill="#c5221f" stroke="none"/><path d="M18.8 8.2c0-.9-1.4-1.6-2.3-.9l-.8.6v2.6z" fill="#fbbc04" stroke="none"/>',
   home:
     '<path d="M4.5 10.2 12 4l7.5 6.2"/><path d="M6.5 9.4V19h11V9.4"/>',
   luggage:
@@ -373,6 +375,7 @@ const CTA_ICON_OPTIONS = [
   { value: "map", label: "Mappa" },
   { value: "phone", label: "Telefono" },
   { value: "mail", label: "Email" },
+  { value: "gmail", label: "Gmail" },
   { value: "chat", label: "Chat" },
   { value: "link", label: "Link" },
   { value: "route", label: "Percorso" },
@@ -586,7 +589,7 @@ function ctaDefaultIcon(kind = "web") {
     web: "link",
     maps: "map",
     whatsapp: "chat",
-    email: "mail",
+    email: "gmail",
     tel: "phone",
     airbnb: "airbnb",
     booking: "booking",

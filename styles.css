@@ -1023,7 +1023,14 @@ svg,
 }
 
 .sheet-contact-button--gmail {
-  background: linear-gradient(180deg, #f8f4ef, #e6ded3);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.sheet-contact-button--gmail svg {
+  width: 3.15rem;
+  height: 3.15rem;
 }
 
 .sheet-contact-button:hover,
@@ -1092,7 +1099,14 @@ svg,
 }
 
 .sheet-host-action--gmail {
-  background: linear-gradient(180deg, #f8f4ef, #e6ded3);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.sheet-host-action--gmail svg {
+  width: 3.25rem;
+  height: 3.25rem;
 }
 
 .sheet-host-action--airbnb {
