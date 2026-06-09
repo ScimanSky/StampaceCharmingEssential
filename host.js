@@ -784,6 +784,53 @@ async function translateBatch(texts, targetLocale) {
   return translated;
 }
 
+async function translateSingleText(text, targetLocale) {
+  if (!text || targetLocale === FIXED_LOCALE) return text;
+  const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
+  const key = translationKey(targetLocale, `heroMeta::${text}`);
+  if (translationCache.has(key)) return translationCache.get(key);
+
+  const params = new URLSearchParams({
+    client: "gtx",
+    sl: FIXED_LOCALE,
+    tl: serviceLocale,
+    dt: "t",
+    q: text,
+  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), TRANSLATE_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${TRANSLATE_ENDPOINT}?${params.toString()}`, {
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error("Servizio di traduzione non disponibile.");
+    }
+    const payload = await response.json();
+    const translated = (payload[0] ?? []).map((part) => part[0] ?? "").join("").trim();
+    if (!translated || translated === text) {
+      throw new Error("Traduzione vuota o invariata.");
+    }
+    translationCache.set(key, translated);
+    return translated;
+  } catch {
+    translationCache.delete(key);
+    lastTranslationFallbackLocales.push(targetLocale);
+    return text;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+async function translateHeroMeta(lines = [], targetLocale) {
+  const translated = [];
+  for (const line of lines) {
+    translated.push(await translateSingleText(line, targetLocale));
+  }
+  return translated;
+}
+
 async function translateTexts(texts, targetLocale) {
   const results = new Array(texts.length);
   const missingTexts = [];
@@ -936,13 +983,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   const texts = [];
   const appliers = [];
 
-  (italianLocale.heroMeta ?? []).forEach((line) => {
-    const nextIndex = draftLocale.heroMeta.push("") - 1;
-    texts.push(line);
-    appliers.push((value) => {
-      draftLocale.heroMeta[nextIndex] = value;
-    });
-  });
+  draftLocale.heroMeta = await translateHeroMeta(italianLocale.heroMeta ?? [], targetLocale);
 
   italianLocale.sections.forEach((section, sectionIndex) => {
     const targetSection = draftLocale.sections[sectionIndex];
