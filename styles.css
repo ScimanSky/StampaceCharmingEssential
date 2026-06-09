@@ -523,6 +523,12 @@ svg,
   color: #e45f53;
 }
 
+.menu-row--icon-map .menu-icon svg,
+.menu-row--icon-pin .menu-icon svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
 .menu-copy strong,
 .menu-copy span {
   display: block;
