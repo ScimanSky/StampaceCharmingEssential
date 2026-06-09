@@ -39,7 +39,7 @@ const iconPaths = {
   safe:
     '<rect x="5" y="4.5" width="14" height="15" rx="2.2"/><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5v5"/><path d="M9.5 12H14.5"/>',
   pin:
-    '<path d="M12 20s5-4.7 5-9a5 5 0 1 0-10 0c0 4.3 5 9 5 9z"/><circle cx="12" cy="11" r="1.8"/>',
+    '<path d="M12 21.5s6.5-5.5 6.5-11a6.5 6.5 0 1 0-13 0c0 5.5 6.5 11 6.5 11z"/><circle cx="12" cy="10.5" r="2.2"/>',
   user:
     '<circle cx="12" cy="8.7" r="3.2"/><path d="M6.4 19.2a6.5 6.5 0 0 1 11.2 0"/>',
   image:
