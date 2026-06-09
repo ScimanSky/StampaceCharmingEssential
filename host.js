@@ -1876,7 +1876,7 @@ async function logout() {
 }
 
 function guestAppUrl() {
-  return new URL("./guest/", window.location.href).toString();
+  return "https://stampacecharming.pages.dev/";
 }
 
 function guestSharePayload() {
