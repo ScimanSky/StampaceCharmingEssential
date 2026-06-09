@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260609c";
+} from "./content.js?v=20260609d";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -28,9 +28,10 @@ import {
   escapeHtml,
   normalizeCtaHref,
   normalizeCtaKind,
+  sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260528b";
+} from "./security.js?v=20260609c";
 
 const iconPaths = {
   shield:
@@ -280,6 +281,17 @@ const SOLID_COLOR_OPTIONS = [
   { value: "#e45f53", label: "Rosso terracotta" },
   { value: "#44c77a", label: "Verde WhatsApp" },
 ];
+const ICON_COLOR_OPTIONS = [
+  { value: "", label: "Automatico" },
+  { value: "#dfc39c", label: "Oro caldo" },
+  { value: "#e7d8c1", label: "Oro chiaro" },
+  { value: "#5fa8ff", label: "Blu elegante" },
+  { value: "#e45f53", label: "Rosso terracotta" },
+  { value: "#44c77a", label: "Verde WhatsApp" },
+  { value: "#3fc7b0", label: "Teal mediterraneo" },
+  { value: "#c98252", label: "Rame caldo" },
+  { value: "#f3eadc", label: "Avorio" },
+];
 const SOFT_COLOR_OPTIONS = [
   { value: "rgba(231, 216, 193, 0.58)", label: "Molto discreto" },
   { value: "rgba(231, 216, 193, 0.72)", label: "Discreto" },
@@ -513,6 +525,18 @@ function optionsHtml(options, selectedValue) {
   ).join("");
 }
 
+function iconColorOptionsHtml(selectedValue = "") {
+  const selected = sanitizeCssColor(selectedValue);
+  return ICON_COLOR_OPTIONS.map(
+    (option) => `<option value="${escapeAttribute(option.value)}" ${option.value === selected ? "selected" : ""}>${escapeHtml(option.label)}</option>`,
+  ).join("");
+}
+
+function iconColorStyle(value) {
+  const color = sanitizeCssColor(value);
+  return color ? ` style="--icon-custom-color: ${escapeAttribute(color)};"` : "";
+}
+
 function setFieldValue(field, value) {
   if (field) field.value = value ?? "";
 }
@@ -609,6 +633,7 @@ function buildCtaPreset(kind = "web") {
     label: ctaDefaultLabel(kind),
     href: ctaDefaultHref(kind),
     icon: ctaDefaultIcon(kind),
+    iconColor: "",
   };
 }
 
@@ -789,6 +814,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
         return {
           id: section.id,
           icon: section.icon,
+          iconColor: section.iconColor,
           menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
           sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
           lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
@@ -804,6 +830,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
     sections: italianLocale.sections.map((section) => ({
       id: section.id,
       icon: section.icon,
+      iconColor: section.iconColor,
       menuTitle: "",
       sectionTitle: "",
       lead: "",
@@ -1090,10 +1117,11 @@ function renderSectionCtas(section) {
         const kind = normalizeCtaKind(item.kind);
         const href = normalizeCtaHref(kind, item.href);
         const icon = item.icon || ctaDefaultIcon(kind);
+        const iconColor = sanitizeCssColor(item.iconColor);
         return `
         <article class="host-cta-item host-cta-item--${escapeAttribute(kind)}" data-cta-item data-cta-index="${escapeAttribute(index)}">
           <div class="host-cta-meta">
-            <span class="host-cta-icon-preview host-cta-icon-preview--${escapeAttribute(kind)}" aria-hidden="true">${renderIcon(icon)}</span>
+            <span class="host-cta-icon-preview host-cta-icon-preview--${escapeAttribute(kind)}" aria-hidden="true"${iconColorStyle(iconColor)}>${renderIcon(icon)}</span>
             <span class="host-cta-heading">
               <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}</strong>
               <span>${escapeHtml(CTA_KIND_OPTIONS.find((option) => option.value === kind)?.label ?? "Web")}</span>
@@ -1115,6 +1143,12 @@ function renderSectionCtas(section) {
               <span>Icona</span>
               <select data-cta-field="icon" ${!editable ? "disabled" : ""}>
                 ${CTA_ICON_OPTIONS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+              </select>
+            </label>
+            <label>
+              <span>Colore icona</span>
+              <select data-cta-field="iconColor" ${!editable ? "disabled" : ""}>
+                ${iconColorOptionsHtml(iconColor)}
               </select>
             </label>
             <label>
@@ -1188,7 +1222,7 @@ function renderSectionEditors() {
           <div class="host-section-meta">
             <div class="host-section-meta-main">
               <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
-                <span class="host-section-icon" data-section-icon-preview>${renderIcon(resolvedSectionIcon(section))}</span>
+                <span class="host-section-icon" data-section-icon-preview${iconColorStyle(section.iconColor)}>${renderIcon(resolvedSectionIcon(section))}</span>
                 <span class="host-section-heading">
                   <span>
                     <p class="host-kicker">${escapeHtml(section.id)}</p>
@@ -1228,6 +1262,12 @@ function renderSectionEditors() {
                 <span>Icona sezione</span>
                 <select data-field="icon" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
                   ${sectionIconOptions(section.icon).map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === section.icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                </select>
+              </label>
+              <label>
+                <span>Colore icona</span>
+                <select data-field="iconColor" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                  ${iconColorOptionsHtml(section.iconColor)}
                 </select>
               </label>
               <label>
@@ -1329,12 +1369,14 @@ function collectTemplate() {
       const label = item.querySelector('[data-cta-field="label"]').value.trim();
       const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
       const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
+      const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value);
       return {
         type: CTA_ITEM_TYPE,
         kind,
         label,
         href,
         icon,
+        iconColor,
       };
     }).filter((item) => item.label && item.href);
     const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
@@ -1346,9 +1388,11 @@ function collectTemplate() {
       size: item.querySelector('[data-image-field="size"]')?.value || "grande",
     })).filter((item) => item.src);
     const selectedIcon = card.querySelector('[data-field="icon"]')?.value || base.icon || "spark";
+    const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value);
     return {
       id,
       icon: selectedIcon.trim() || "spark",
+      iconColor,
       hidden: card.dataset.sectionHidden === "true",
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
@@ -1389,6 +1433,7 @@ function sectionDraftFromCard(sectionCard) {
   if (!sectionCard) return null;
   return {
     icon: sectionCard.querySelector('[data-field="icon"]')?.value || "spark",
+    iconColor: sanitizeCssColor(sectionCard.querySelector('[data-field="iconColor"]')?.value),
     menuTitle: sectionCard.querySelector('[data-field="menuTitle"]')?.value || "",
     sectionTitle: sectionCard.querySelector('[data-field="sectionTitle"]')?.value || "",
     lead: sectionCard.querySelector('[data-field="lead"]')?.value || "",
@@ -1400,6 +1445,25 @@ function updateSectionIconPreview(sectionCard) {
   const draft = sectionDraftFromCard(sectionCard);
   if (!preview || !draft) return;
   preview.innerHTML = renderIcon(resolvedSectionIcon(draft));
+  const iconColor = sanitizeCssColor(draft.iconColor);
+  if (iconColor) {
+    preview.style.setProperty("--icon-custom-color", iconColor);
+  } else {
+    preview.style.removeProperty("--icon-custom-color");
+  }
+}
+
+function updateCtaIconPreview(ctaCard) {
+  const preview = ctaCard?.querySelector(".host-cta-icon-preview");
+  if (!preview) return;
+  const icon = ctaCard.querySelector('[data-cta-field="icon"]')?.value || "link";
+  const iconColor = sanitizeCssColor(ctaCard.querySelector('[data-cta-field="iconColor"]')?.value);
+  preview.innerHTML = renderIcon(icon);
+  if (iconColor) {
+    preview.style.setProperty("--icon-custom-color", iconColor);
+  } else {
+    preview.style.removeProperty("--icon-custom-color");
+  }
 }
 
 function switchEditorLocale(nextLocale) {
@@ -1437,6 +1501,7 @@ function addSection() {
   currentLocaleState().sections.push({
     id: createSectionId(),
     icon: "spark",
+    iconColor: "",
     hidden: false,
     menuTitle: "Nuovo pulsante",
     sectionTitle: "Nuova sezione",
@@ -1970,8 +2035,13 @@ function bindEditorEvents() {
   });
 
   dom.sections.addEventListener("change", (event) => {
-    if (event.target.matches('[data-field="icon"]')) {
+    if (event.target.matches('[data-field="icon"], [data-field="iconColor"]')) {
       updateSectionIconPreview(event.target.closest("[data-section-id]"));
+      queueAutoPublish();
+      return;
+    }
+    if (event.target.matches('[data-cta-field="icon"], [data-cta-field="iconColor"]')) {
+      updateCtaIconPreview(event.target.closest("[data-cta-item]"));
       queueAutoPublish();
       return;
     }

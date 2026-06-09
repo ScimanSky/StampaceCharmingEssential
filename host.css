@@ -674,7 +674,7 @@ select:focus-visible {
   border-radius: 0.92rem;
   background: rgba(255, 255, 255, 0.07);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  color: rgba(231, 216, 193, 0.88);
+  color: var(--icon-custom-color, rgba(231, 216, 193, 0.88));
   box-shadow: none;
   flex: 0 0 auto;
 }
@@ -739,6 +739,7 @@ select:focus-visible {
   border-radius: 0.7rem;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--icon-custom-color, rgba(231, 216, 193, 0.88));
 }
 
 .host-section-icon svg {

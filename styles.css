@@ -551,7 +551,7 @@ svg,
   height: 2.75rem;
   display: grid;
   place-items: center;
-  color: var(--muted-strong);
+  color: var(--icon-custom-color, var(--muted-strong));
 }
 
 .menu-icon svg {
@@ -582,6 +582,13 @@ svg,
 .sheet-icon--icon-map,
 .sheet-icon--icon-pin {
   color: #e45f53;
+}
+
+.menu-row[style*="--icon-custom-color"] .menu-icon,
+.sheet-icon[style*="--icon-custom-color"],
+.sheet-card-index[style*="--icon-custom-color"],
+.sheet-cta-icon[style*="--icon-custom-color"] {
+  color: var(--icon-custom-color);
 }
 
 .menu-copy strong,
@@ -735,7 +742,7 @@ svg,
   height: 3rem;
   display: grid;
   place-items: center;
-  color: var(--muted-strong);
+  color: var(--icon-custom-color, var(--muted-strong));
 }
 
 .sheet-icon svg {
@@ -851,7 +858,7 @@ svg,
   height: 2.8rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
-  color: var(--muted-strong);
+  color: var(--icon-custom-color, var(--muted-strong));
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
@@ -1060,7 +1067,7 @@ svg,
   height: 2.75rem;
   display: grid;
   place-items: center;
-  color: var(--muted-strong);
+  color: var(--icon-custom-color, var(--muted-strong));
   box-shadow: none;
   transition:
     color 180ms ease,
@@ -1100,7 +1107,7 @@ svg,
 }
 
 .sheet-cta:focus-visible .sheet-cta-icon {
-  color: var(--copy);
+  color: var(--icon-custom-color, var(--copy));
 }
 
 .sheet-cta:active {
@@ -1329,7 +1336,7 @@ svg,
   }
 
   .sheet-cta:hover .sheet-cta-icon {
-    color: var(--copy);
+    color: var(--icon-custom-color, var(--copy));
   }
 }
 

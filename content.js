@@ -1385,6 +1385,15 @@ function cleanLines(value) {
   return Array.isArray(value) ? value.map((line) => cleanString(line)).filter(Boolean) : [];
 }
 
+function cleanIconColor(value, fallback = "") {
+  const raw = cleanString(value, fallback);
+  if (!raw) return "";
+  if (/^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(raw)) return raw;
+  if (/^rgba?\(\s*(?:\d{1,3}\s*,\s*){2}\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i.test(raw)) return raw;
+  if (/^var\(--[a-z0-9_-]+\)$/i.test(raw)) return raw;
+  return "";
+}
+
 function cleanThemeGroup(source = {}, fallback = {}) {
   const next = {};
   Object.entries(fallback).forEach(([key, fallbackValue]) => {
@@ -1442,6 +1451,7 @@ function normalizeItems(items, fallbackItems) {
             label: cleanString(item.label),
             href: cleanString(item.href),
             icon: cleanString(item.icon),
+            iconColor: cleanIconColor(item.iconColor),
           };
         }
         return {
@@ -1490,6 +1500,7 @@ function buildFallbackSection(section = {}, index = 0) {
   return {
     id: cleanString(section?.id, `custom-${index + 1}`),
     icon: cleanString(section?.icon, "spark"),
+    iconColor: cleanIconColor(section?.iconColor),
     hidden: Boolean(section?.hidden),
     menuTitle: fallbackTitle,
     sectionTitle: cleanString(section?.sectionTitle, fallbackTitle),
@@ -1503,6 +1514,7 @@ function normalizeSection(section, baseSection, localeCode) {
   return {
     id: baseSection.id,
     icon: baseSection.id.startsWith("custom-") ? cleanString(section?.icon, baseSection.icon) : baseSection.icon,
+    iconColor: cleanIconColor(section?.iconColor, baseSection.iconColor),
     hidden: Boolean(section?.hidden ?? baseSection.hidden),
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
@@ -1694,6 +1706,7 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
       return {
         ...cloneItem(italianItem),
         label: cleanString(localizedItem?.label, italianItem.label),
+        iconColor: cleanIconColor(localizedItem?.iconColor, italianItem.iconColor),
       };
     }
 
@@ -1774,6 +1787,7 @@ function mirrorItalianContent(localeMap) {
               return {
                 id: section.id,
                 icon: section.icon,
+                iconColor: section.iconColor,
                 hidden: Boolean(section.hidden),
                 menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
                 sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
@@ -1822,6 +1836,7 @@ function mirrorItalianContent(localeMap) {
             return {
               id: section.id,
               icon: section.icon,
+              iconColor: section.iconColor,
               hidden: Boolean(section.hidden),
               menuTitle: pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle),
               sectionTitle: pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle),

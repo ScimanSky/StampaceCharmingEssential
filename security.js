@@ -1,6 +1,7 @@
 const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 const SAFE_WEB_PROTOCOLS = new Set(["http:", "https:"]);
 const CTA_KINDS = new Set(["web", "maps", "whatsapp", "email", "tel"]);
+const SAFE_CSS_NAMED_COLORS = new Set(["currentcolor", "transparent"]);
 
 export function escapeHtml(value) {
   return String(value ?? "")
@@ -12,6 +13,16 @@ export function escapeHtml(value) {
 }
 
 export const escapeAttribute = escapeHtml;
+
+export function sanitizeCssColor(value, fallback = "") {
+  const raw = String(value ?? "").trim();
+  if (!raw) return fallback;
+  if (/^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(raw)) return raw;
+  if (/^rgba?\(\s*(?:\d{1,3}\s*,\s*){2}\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i.test(raw)) return raw;
+  if (/^var\(--[a-z0-9_-]+\)$/i.test(raw)) return raw;
+  if (SAFE_CSS_NAMED_COLORS.has(raw.toLowerCase())) return raw;
+  return fallback;
+}
 
 function isRelativeUrl(value) {
   return !/^[a-z][a-z0-9+.-]*:/i.test(value) && !value.startsWith("//");

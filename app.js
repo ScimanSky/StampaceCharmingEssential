@@ -8,15 +8,16 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260609c";
+} from "./content.js?v=20260609d";
 import {
   escapeAttribute,
   escapeHtml,
   normalizeCtaHref,
   normalizeCtaKind,
+  sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260528b";
+} from "./security.js?v=20260609c";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -171,6 +172,20 @@ function themeValue(group, key, fallback) {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
 
+function iconColorValue(value) {
+  return sanitizeCssColor(value);
+}
+
+function iconColorStyle(value) {
+  const color = iconColorValue(value);
+  return color ? ` style="--icon-custom-color: ${escapeAttribute(color)};"` : "";
+}
+
+function sectionIconColor(section) {
+  const italianSection = template?.locales?.[FIXED_LOCALE]?.sections?.find((item) => item.id === section?.id);
+  return iconColorValue(italianSection?.iconColor || section?.iconColor);
+}
+
 function normalizePhoneDigits(value) {
   const cleaned = String(value).replace(/[^\d+]/g, "");
   if (cleaned.startsWith("+")) return cleaned.slice(1);
@@ -314,7 +329,7 @@ function renderCtaItem(item) {
   return `
     <article class="sheet-card sheet-card-cta">
       <a class="sheet-cta sheet-cta--${escapeAttribute(kind)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
-        <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(ctaIcon(item))}</span>
+        <span class="sheet-cta-icon" aria-hidden="true"${iconColorStyle(item.iconColor)}>${renderIcon(ctaIcon(item))}</span>
         <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
       </a>
     </article>
@@ -422,7 +437,7 @@ function renderMenu(sections) {
     .filter((section) => section.id !== "host" && !section.hidden)
     .map(
       (section) => `
-        <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(iconForSection(section)))}" type="button" data-section-id="${escapeAttribute(section.id)}">
+        <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(iconForSection(section)))}" type="button" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
           <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
           <span class="menu-copy">
             <strong>${escapeHtml(section.menuTitle)}</strong>
@@ -470,6 +485,8 @@ function renderHostShortcut() {
 
 function renderSectionItems(items, sectionId) {
   let safeItemIndex = 0;
+  const section = localeState().sections.find((item) => item.id === sectionId);
+  const markerColorStyle = iconColorStyle(sectionIconColor(section));
 
   // For Wi-Fi section, identify the network name and password by colon presence order
   let wifiColonStrings = [];
@@ -495,8 +512,8 @@ function renderSectionItems(items, sectionId) {
       const itemIcon = renderIcon(iconForItem(item, sectionId));
       const useSafeNumbers = sectionId === "safe" && !isImageItem(item);
       const marker = useSafeNumbers
-        ? `<span class="sheet-card-index sheet-card-number" aria-hidden="true">${++safeItemIndex}</span>`
-        : `<span class="sheet-card-index sheet-card-icon" aria-hidden="true">${itemIcon}</span>`;
+        ? `<span class="sheet-card-index sheet-card-number" aria-hidden="true"${markerColorStyle}>${++safeItemIndex}</span>`
+        : `<span class="sheet-card-index sheet-card-icon" aria-hidden="true"${markerColorStyle}>${itemIcon}</span>`;
 
       if (isImageItem(item)) {
         const src = sanitizeImageSrc(item.src);
@@ -579,6 +596,12 @@ function renderOpenSection(sectionId) {
   activeSectionId = section.id;
   dom.sheetIcon.innerHTML = renderIcon(iconForSection(section));
   dom.sheetIcon.className = `sheet-icon sheet-icon--${sectionClassToken(section.id)} sheet-icon--icon-${sectionClassToken(iconForSection(section))}`;
+  const iconColor = sectionIconColor(section);
+  if (iconColor) {
+    dom.sheetIcon.style.setProperty("--icon-custom-color", iconColor);
+  } else {
+    dom.sheetIcon.style.removeProperty("--icon-custom-color");
+  }
   dom.sheetBrand.textContent = template.appName;
   dom.sheetTitle.textContent = section.sectionTitle;
   dom.sheetLead.textContent = section.lead;
