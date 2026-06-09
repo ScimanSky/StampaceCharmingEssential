@@ -470,13 +470,13 @@ function renderCtaItem(item) {
   `;
 }
 
-function renderImageItem(item) {
+function renderImageItem(item, { plain = false } = {}) {
   const src = sanitizeImageSrc(item.src);
   if (!src) return "";
   return `
-    <article class="sheet-card sheet-card-media">
+    <article class="sheet-card sheet-card-media${plain ? " sheet-card-media--plain" : ""}">
       <div class="sheet-card-media-body">
-        <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
+        <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}${plain ? " sheet-image--plain" : ""}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
         ${
           item.caption
             ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
@@ -692,7 +692,7 @@ function renderSectionItems(items, sectionId) {
       }
 
       if (isImageItem(item)) {
-        mediaCards.push(renderImageItem(item));
+        mediaCards.push(renderImageItem(item, { plain: true }));
         return;
       }
 
