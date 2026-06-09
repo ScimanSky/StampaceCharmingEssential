@@ -143,6 +143,7 @@ let remoteTemplateUpdatedAt = null;
 let unsubscribeRealtime = null;
 let lastFocusedElement = null;
 let sheetCloseTimer = null;
+let lastInteractionWasKeyboard = false;
 const SHEET_HISTORY_KEY = "stampaceSectionId";
 const GUEST_SHARE_URL = "https://stampacecharming.pages.dev/";
 const GUEST_SHARE_TITLE = "Guest Book- Stampace Charming";
@@ -614,7 +615,11 @@ function focusSheet() {
 }
 
 function openSection(sectionId, { pushHistory = true } = {}) {
-  lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const focusSource = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  lastFocusedElement = lastInteractionWasKeyboard ? focusSource : null;
+  if (!lastInteractionWasKeyboard) {
+    focusSource?.blur();
+  }
 
   if (pushHistory) {
     window.history.pushState(
@@ -670,6 +675,26 @@ function bindHostShortcut() {
   dom.hostAvatarButton.addEventListener("click", () => {
     openSection("host");
   });
+}
+
+function bindInputModality() {
+  window.addEventListener(
+    "pointerdown",
+    () => {
+      lastInteractionWasKeyboard = false;
+    },
+    { capture: true },
+  );
+
+  window.addEventListener(
+    "keydown",
+    (event) => {
+      if (["Tab", "Enter", " ", "Escape", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)) {
+        lastInteractionWasKeyboard = true;
+      }
+    },
+    { capture: true },
+  );
 }
 
 async function shareGuestApp() {
@@ -958,6 +983,7 @@ async function init() {
     currentLocale = FIXED_LOCALE;
   }
   render();
+  bindInputModality();
   bindMenu();
   bindHostShortcut();
   bindGuestShare();
