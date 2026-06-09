@@ -155,6 +155,8 @@ const iconPaths = {
     '<path d="M6.5 11c1.8-2 4-2 5.5-1c1.8-1 4-1 5.5.5c.5-4-1-6-5.5-6s-6 2-5.5 6.5z" style="fill: currentColor;"/><path d="M6.5 11a1.8 1.8 0 0 0 0 3.6M17.5 11a1.8 1.8 0 0 1 0 3.6"/><path d="M6.5 12.5v2.5a5.5 5.5 0 0 0 11 0v-2.5"/><circle cx="9.8" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><circle cx="14.2" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><path d="M11.5 14.2a0.5 0.5 0 0 0 1 0"/><path d="M9.5 16a2.5 2.5 0 0 0 5 0"/>',
 };
 
+const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";
+
 const dom = {
   appName: document.querySelector("#app-name"),
   hostAvatarButton: document.querySelector("#host-avatar-button"),
@@ -543,6 +545,14 @@ function renderHostShortcut() {
   dom.hostAvatarLabel.textContent = "Host";
 }
 
+function renderHostAvatarMedia(className = "sheet-host-avatar-media") {
+  return `
+    <span class="${escapeAttribute(className)}">
+      <img src="${escapeAttribute(sanitizeImageSrc(HOST_AVATAR_SRC))}" alt="" loading="lazy" decoding="async" />
+    </span>
+  `;
+}
+
 function renderSectionItems(items, sectionId) {
   let safeItemIndex = 0;
   const section = localeState().sections.find((item) => item.id === sectionId);
@@ -654,9 +664,16 @@ function renderOpenSection(sectionId) {
   }
 
   activeSectionId = section.id;
-  dom.sheetIcon.innerHTML = renderIcon(iconForSection(section));
-  dom.sheetIcon.className = `sheet-icon sheet-icon--${sectionClassToken(section.id)} sheet-icon--icon-${sectionClassToken(iconForSection(section))}`;
-  const iconColor = sectionIconColor(section);
+  if (section.id === "host") {
+    dom.sheetIcon.innerHTML = renderHostAvatarMedia();
+    dom.sheetIcon.className = "sheet-icon sheet-icon--host sheet-icon--host-avatar";
+    dom.sheetIcon.style.removeProperty("--icon-custom-color");
+  } else {
+    const sectionIcon = iconForSection(section);
+    dom.sheetIcon.innerHTML = renderIcon(sectionIcon);
+    dom.sheetIcon.className = `sheet-icon sheet-icon--${sectionClassToken(section.id)} sheet-icon--icon-${sectionClassToken(sectionIcon)}`;
+  }
+  const iconColor = section.id === "host" ? "" : sectionIconColor(section);
   if (iconColor) {
     dom.sheetIcon.style.setProperty("--icon-custom-color", iconColor);
   } else {

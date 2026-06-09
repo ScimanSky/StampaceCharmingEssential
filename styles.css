@@ -755,6 +755,32 @@ svg,
   stroke-linejoin: round;
 }
 
+.sheet-icon--host-avatar {
+  place-items: center;
+}
+
+.sheet-host-avatar-media {
+  width: 2.72rem;
+  height: 2.72rem;
+  border-radius: 999px;
+  overflow: hidden;
+  display: block;
+  border: 1px solid rgba(231, 216, 193, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 12px 22px rgba(0, 0, 0, 0.26);
+}
+
+.sheet-host-avatar-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  filter: grayscale(1) contrast(1.03);
+}
+
 .sheet-title-block {
   min-width: 0;
 }
