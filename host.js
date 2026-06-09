@@ -1876,14 +1876,14 @@ async function logout() {
 }
 
 function guestAppUrl() {
-  return new URL("./", window.location.href).toString();
+  return new URL("./guest/", window.location.href).toString();
 }
 
 function guestSharePayload() {
   const url = guestAppUrl();
   return {
-    title: "Guest App - Stampace Charming",
-    text: "Ciao, qui trovi la Guest App con tutte le informazioni utili per il soggiorno:",
+    title: "Guest Book- Stampace Charming",
+    text: "Guest Book- Stampace Charming",
     url,
   };
 }
@@ -1901,7 +1901,7 @@ async function shareGuestApp() {
     }
   }
 
-  const message = `${payload.text}\n${payload.title}\n${payload.url}`;
+  const message = `${payload.text}\n${payload.url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
   setStatus("WhatsApp aperto. Scegli il contatto a cui inviare la Guest App.", "success");
 }
