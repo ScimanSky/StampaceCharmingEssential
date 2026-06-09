@@ -1156,7 +1156,7 @@ svg,
 
 @media (min-width: 961px) {
   .hero-block {
-    background-position: center 44%;
+    background-position: center bottom;
   }
 
   .sheet-image {

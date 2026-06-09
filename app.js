@@ -193,6 +193,10 @@ function renderGmailBrandIcon() {
   `;
 }
 
+function gmailComposeHref(email) {
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+}
+
 function renderHostStringItem(item, marker) {
   const text = String(item).trim();
   const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
@@ -209,7 +213,7 @@ function renderHostStringItem(item, marker) {
         <div class="sheet-card-copy">
           <strong>${escapeHtml(label || "Email")}</strong>
           <div class="sheet-contact-actions">
-            <a class="sheet-contact-button sheet-contact-button--gmail" href="mailto:${escapeAttribute(email)}" aria-label="Invia email a ${escapeAttribute(email)}">
+            <a class="sheet-contact-button sheet-contact-button--gmail" href="${escapeAttribute(gmailComposeHref(email))}" target="_blank" rel="noopener noreferrer" aria-label="Apri Gmail per ${escapeAttribute(email)}">
               ${renderGmailBrandIcon()}
             </a>
           </div>
