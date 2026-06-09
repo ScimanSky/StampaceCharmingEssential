@@ -312,9 +312,10 @@ svg,
   position: relative;
   overflow: hidden;
   min-height: var(--hero-height);
+  aspect-ratio: 4 / 3;
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
-  background: url("./img/sfondo9.jpeg") center 46% / cover no-repeat;
+  background: url("./img/sfondo9.jpeg") center center / cover no-repeat;
   box-shadow: var(--shadow);
 }
 
@@ -1155,10 +1156,6 @@ svg,
 }
 
 @media (min-width: 961px) {
-  .hero-block {
-    background-position: center bottom;
-  }
-
   .sheet-image {
     max-height: min(60vh, 26rem);
   }
