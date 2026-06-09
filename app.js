@@ -156,7 +156,7 @@ const iconPaths = {
   airbnb:
     '<circle cx="12" cy="12" r="11.4" fill="#ff3b30" stroke="none"/><path d="M14.2 10.8 21 17.6a11.4 11.4 0 0 1-8.6 5.8L8.7 19.8z" fill="#bd2f28" opacity=".28" stroke="none"/><path d="M12 5.6c-2.7 3.4-4.8 7.2-4.8 9.7a3.25 3.25 0 0 0 5 2.7 3.25 3.25 0 0 0 4.6-3c0-2.4-2.1-6.3-4.8-9.4z" fill="none" stroke="#fff" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.8 13.5a2.2 2.2 0 1 1 4.4 0c0 1.35-1.12 3-2.2 4.5-1.08-1.5-2.2-3.15-2.2-4.5z" fill="none" stroke="#fff" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>',
   booking:
-    '<rect x="5.2" y="4.2" width="13.6" height="15.6" rx="3"/><path d="M9 7.8h4.1a2.3 2.3 0 0 1 0 4.6H9z"/><path d="M9 12.4h4.7a2.4 2.4 0 0 1 0 4.8H9z"/><path d="M9 7.8v9.4"/>',
+    '<circle cx="12" cy="12" r="11.4" fill="#003b8f" stroke="none"/><path d="M7.8 6.4h5.2c2.2 0 3.7 1.3 3.7 3.2 0 1.2-.6 2.1-1.6 2.6 1.3.5 2.1 1.5 2.1 3 0 2.1-1.6 3.5-4 3.5H7.8z" fill="#fff" stroke="none"/><path d="M10.6 8.8v2.4h2.1c.8 0 1.3-.5 1.3-1.2s-.5-1.2-1.3-1.2z" fill="#003b8f" stroke="none"/><path d="M10.6 13.5v2.8h2.4c.9 0 1.4-.5 1.4-1.4s-.5-1.4-1.4-1.4z" fill="#003b8f" stroke="none"/><circle cx="18.4" cy="17.4" r="1.35" fill="#fff" stroke="none"/>',
 };
 
 const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";

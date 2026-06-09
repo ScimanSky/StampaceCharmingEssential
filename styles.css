@@ -1107,8 +1107,14 @@ svg,
 }
 
 .sheet-host-action--booking {
-  color: #5fa8ff;
-  border-color: rgba(95, 168, 255, 0.36);
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.sheet-host-action--booking svg {
+  width: 3.25rem;
+  height: 3.25rem;
 }
 
 .sheet-host-action--host {
