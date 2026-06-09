@@ -17,7 +17,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260609c";
+} from "./security.js?v=20260609d";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -153,6 +153,10 @@ const iconPaths = {
     '<path d="M2 5.5l6.7-3.5 6.7 3.5 6.7-3.5v15l-6.7 3.5-6.7-3.5-6.7 3.5Z M8.7 2v15 M15.4 5.5v15"/>',
   avatar:
     '<path d="M6.5 11c1.8-2 4-2 5.5-1c1.8-1 4-1 5.5.5c.5-4-1-6-5.5-6s-6 2-5.5 6.5z" style="fill: currentColor;"/><path d="M6.5 11a1.8 1.8 0 0 0 0 3.6M17.5 11a1.8 1.8 0 0 1 0 3.6"/><path d="M6.5 12.5v2.5a5.5 5.5 0 0 0 11 0v-2.5"/><circle cx="9.8" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><circle cx="14.2" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><path d="M11.5 14.2a0.5 0.5 0 0 0 1 0"/><path d="M9.5 16a2.5 2.5 0 0 0 5 0"/>',
+  airbnb:
+    '<path d="M12 4.5c-2.8 3.4-5.2 7.4-5.2 10.1a3.2 3.2 0 0 0 5.2 2.5 3.2 3.2 0 0 0 5.2-2.5c0-2.7-2.4-6.7-5.2-10.1z"/><path d="M9.7 13.4a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 0 0-4.6 0z"/><path d="M12 17.1c-1.8-1.3-3.7-3-3.7-5.2a3.7 3.7 0 0 1 7.4 0c0 2.2-1.9 3.9-3.7 5.2z"/>',
+  booking:
+    '<rect x="5.2" y="4.2" width="13.6" height="15.6" rx="3"/><path d="M9 7.8h4.1a2.3 2.3 0 0 1 0 4.6H9z"/><path d="M9 12.4h4.7a2.4 2.4 0 0 1 0 4.8H9z"/><path d="M9 7.8v9.4"/>',
 };
 
 const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";
@@ -254,6 +258,14 @@ function renderGmailBrandIcon() {
   `;
 }
 
+function renderAirbnbBrandIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.airbnb}</svg>`;
+}
+
+function renderBookingBrandIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.booking}</svg>`;
+}
+
 function gmailComposeHref(email) {
   return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
 }
@@ -310,6 +322,88 @@ function renderHostStringItem(item, marker) {
   `;
 }
 
+function hostActionFromStringItem(item) {
+  const text = String(item).trim();
+  const emailMatch = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  const phoneMatch = text.match(/(?:\+|00)?\d[\d\s().-]{6,}\d/);
+  const lower = text.toLowerCase();
+  const isWhatsapp = /whatsapp|wa\b/.test(lower);
+
+  if (emailMatch) {
+    const email = emailMatch[0];
+    const label = text.slice(0, emailMatch.index).replace(/[:：]\s*$/, "").trim() || "Gmail";
+    return {
+      kind: "gmail",
+      label,
+      href: gmailComposeHref(email),
+      icon: "mail",
+    };
+  }
+
+  if (phoneMatch && isWhatsapp) {
+    const rawNumber = phoneMatch[0].trim();
+    return {
+      kind: "whatsapp",
+      label: text.slice(0, phoneMatch.index).replace(/[:：]\s*$/, "").trim() || "WhatsApp",
+      href: `https://wa.me/${normalizePhoneDigits(rawNumber)}`,
+      icon: "chat",
+    };
+  }
+
+  return null;
+}
+
+function hostActionFromCtaItem(item) {
+  const kind = normalizeCtaKind(item.kind);
+  const href = normalizeCtaHref(kind, item.href);
+  if (!href) return null;
+
+  const email = kind === "email" && href.startsWith("mailto:") ? href.replace(/^mailto:/i, "") : "";
+  return {
+    kind: kind === "email" ? "gmail" : kind,
+    label: item.label || ctaIcon(item),
+    href: email ? gmailComposeHref(email) : href,
+    icon: ctaIcon(item),
+    iconColor: item.iconColor,
+  };
+}
+
+function hostActionFromPrivateItem(item) {
+  const href = sanitizeHref(item.href);
+  if (!href) return null;
+  return {
+    kind: "host",
+    label: item.label || item.title || "Area Host",
+    href,
+    icon: "shield",
+  };
+}
+
+function renderHostActionIcon(action) {
+  if (action.kind === "whatsapp") return renderWhatsAppBrandIcon();
+  if (action.kind === "gmail") return renderGmailBrandIcon();
+  if (action.kind === "airbnb") return renderAirbnbBrandIcon();
+  if (action.kind === "booking") return renderBookingBrandIcon();
+  return renderIcon(action.icon || "link");
+}
+
+function renderHostActions(actions) {
+  if (!actions.length) return "";
+  return `
+    <div class="sheet-host-actions" aria-label="Contatti e link host">
+      ${actions
+        .map(
+          (action) => `
+            <a class="sheet-host-action sheet-host-action--${escapeAttribute(action.kind)}" href="${escapeAttribute(action.href)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttribute(action.label)}"${iconColorStyle(action.iconColor)}>
+              ${renderHostActionIcon(action)}
+            </a>
+          `,
+        )
+        .join("")}
+    </div>
+  `;
+}
+
 function renderGenericLinkItem(item, marker, sectionId) {
   const title = item.title ? `<strong>${escapeHtml(item.title)}</strong>` : "";
   const body = item.body ? `<p>${escapeHtml(item.body)}</p>` : "";
@@ -359,6 +453,8 @@ function ctaIcon(item) {
     whatsapp: "chat",
     email: "mail",
     tel: "phone",
+    airbnb: "airbnb",
+    booking: "booking",
   };
   return item.icon || kindFallback[item.kind] || "link";
 }
@@ -374,6 +470,23 @@ function renderCtaItem(item) {
         <span class="sheet-cta-icon" aria-hidden="true"${iconColorStyle(item.iconColor)}>${renderIcon(ctaIcon(item))}</span>
         <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
       </a>
+    </article>
+  `;
+}
+
+function renderImageItem(item) {
+  const src = sanitizeImageSrc(item.src);
+  if (!src) return "";
+  return `
+    <article class="sheet-card sheet-card-media">
+      <div class="sheet-card-media-body">
+        <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
+        ${
+          item.caption
+            ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
+            : ""
+        }
+      </div>
     </article>
   `;
 }
@@ -554,6 +667,51 @@ function renderHostAvatarMedia(className = "sheet-host-avatar-media") {
 }
 
 function renderSectionItems(items, sectionId) {
+  if (sectionId === "host") {
+    const section = localeState().sections.find((item) => item.id === sectionId);
+    const markerColorStyle = iconColorStyle(sectionIconColor(section));
+    const actions = [];
+    const cards = [];
+
+    items.forEach((item) => {
+      const action =
+        typeof item === "string"
+          ? hostActionFromStringItem(item)
+          : isCtaItem(item)
+            ? hostActionFromCtaItem(item)
+            : isHostPrivateItem(item)
+              ? hostActionFromPrivateItem(item)
+              : null;
+
+      if (action) {
+        actions.push(action);
+        return;
+      }
+
+      if (isImageItem(item)) {
+        cards.push(renderImageItem(item));
+        return;
+      }
+
+      const itemIcon = renderIcon(iconForItem(item, sectionId));
+      const marker = `<span class="sheet-card-index sheet-card-icon" aria-hidden="true"${markerColorStyle}>${itemIcon}</span>`;
+
+      if (typeof item === "string") {
+        cards.push(`
+          <article class="sheet-card">
+            ${marker}
+            <p>${escapeHtml(item)}</p>
+          </article>
+        `);
+        return;
+      }
+
+      cards.push(renderGenericLinkItem(item, marker, sectionId));
+    });
+
+    return `${cards.join("")}${renderHostActions(actions)}`;
+  }
+
   let safeItemIndex = 0;
   const section = localeState().sections.find((item) => item.id === sectionId);
   const markerColorStyle = iconColorStyle(sectionIconColor(section));
@@ -586,20 +744,7 @@ function renderSectionItems(items, sectionId) {
         : `<span class="sheet-card-index sheet-card-icon" aria-hidden="true"${markerColorStyle}>${itemIcon}</span>`;
 
       if (isImageItem(item)) {
-        const src = sanitizeImageSrc(item.src);
-        if (!src) return "";
-        return `
-          <article class="sheet-card sheet-card-media">
-            <div class="sheet-card-media-body">
-              <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
-              ${
-                item.caption
-                  ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
-                  : ""
-              }
-            </div>
-          </article>
-        `;
+        return renderImageItem(item);
       }
 
       if (typeof item === "string") {

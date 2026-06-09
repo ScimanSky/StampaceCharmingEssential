@@ -31,7 +31,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260609c";
+} from "./security.js?v=20260609d";
 
 const iconPaths = {
   shield:
@@ -70,6 +70,10 @@ const iconPaths = {
     '<path d="M2 5.5l6.7-3.5 6.7 3.5 6.7-3.5v15l-6.7 3.5-6.7-3.5-6.7 3.5Z M8.7 2v15 M15.4 5.5v15"/>',
   avatar:
     '<path d="M6.5 11c1.8-2 4-2 5.5-1c1.8-1 4-1 5.5.5c.5-4-1-6-5.5-6s-6 2-5.5 6.5z" style="fill: currentColor;"/><path d="M6.5 11a1.8 1.8 0 0 0 0 3.6M17.5 11a1.8 1.8 0 0 1 0 3.6"/><path d="M6.5 12.5v2.5a5.5 5.5 0 0 0 11 0v-2.5"/><circle cx="9.8" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><circle cx="14.2" cy="12.5" r="1" style="fill: currentColor; stroke: none;"/><path d="M11.5 14.2a0.5 0.5 0 0 0 1 0"/><path d="M9.5 16a2.5 2.5 0 0 0 5 0"/>',
+  airbnb:
+    '<path d="M12 4.5c-2.8 3.4-5.2 7.4-5.2 10.1a3.2 3.2 0 0 0 5.2 2.5 3.2 3.2 0 0 0 5.2-2.5c0-2.7-2.4-6.7-5.2-10.1z"/><path d="M9.7 13.4a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 0 0-4.6 0z"/><path d="M12 17.1c-1.8-1.3-3.7-3-3.7-5.2a3.7 3.7 0 0 1 7.4 0c0 2.2-1.9 3.9-3.7 5.2z"/>',
+  booking:
+    '<rect x="5.2" y="4.2" width="13.6" height="15.6" rx="3"/><path d="M9 7.8h4.1a2.3 2.3 0 0 1 0 4.6H9z"/><path d="M9 12.4h4.7a2.4 2.4 0 0 1 0 4.8H9z"/><path d="M9 7.8v9.4"/>',
   phone:
     '<path d="M7.2 5.8c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-1 1c1 1.9 2.6 3.5 4.5 4.5l1-1c.5-.5 1.2-.5 1.7 0l1.5 1.5c.5.5.5 1.2 0 1.7l-.9.9c-.8.8-2 1.1-3.1.8-2.6-.7-5.2-2.2-7.2-4.2s-3.5-4.6-4.2-7.2c-.3-1.1 0-2.3.8-3.1z"/>',
   mail:
@@ -362,6 +366,8 @@ const CTA_KIND_OPTIONS = [
   { value: "whatsapp", label: "WhatsApp" },
   { value: "email", label: "Email" },
   { value: "tel", label: "Telefono" },
+  { value: "airbnb", label: "Airbnb" },
+  { value: "booking", label: "Booking" },
 ];
 const CTA_ICON_OPTIONS = [
   { value: "map", label: "Mappa" },
@@ -397,6 +403,8 @@ const CTA_ICON_OPTIONS = [
   { value: "ticket", label: "Ticket" },
   { value: "home", label: "Casa" },
   { value: "key", label: "Chiave" },
+  { value: "airbnb", label: "Airbnb" },
+  { value: "booking", label: "Booking" },
 ];
 const SECTION_ICON_OPTIONS = [
   { value: "spark", label: "Automatica" },
@@ -454,6 +462,8 @@ const CTA_PRESET_OPTIONS = [
   { kind: "whatsapp", label: "CTA WhatsApp" },
   { kind: "email", label: "CTA Email" },
   { kind: "tel", label: "CTA Telefono" },
+  { kind: "airbnb", label: "Icona Airbnb" },
+  { kind: "booking", label: "Icona Booking" },
 ];
 
 function serializeFooterLines(lines = []) {
@@ -578,6 +588,8 @@ function ctaDefaultIcon(kind = "web") {
     whatsapp: "chat",
     email: "mail",
     tel: "phone",
+    airbnb: "airbnb",
+    booking: "booking",
   };
   return fallbackMap[kind] ?? "link";
 }
@@ -589,6 +601,8 @@ function ctaDefaultLabel(kind = "web") {
     whatsapp: "Scrivi su WhatsApp",
     email: "Invia email",
     tel: "Chiama",
+    airbnb: "Airbnb",
+    booking: "Booking",
   };
   return fallbackMap[kind] ?? "Apri link";
 }
@@ -600,6 +614,8 @@ function ctaDefaultHref(kind = "web") {
     whatsapp: "+39",
     email: "email@example.com",
     tel: "+39",
+    airbnb: "https://www.airbnb.it/",
+    booking: "https://www.booking.com/",
   };
   return fallbackMap[kind] ?? "https://example.com";
 }
@@ -1393,7 +1409,7 @@ function renderSectionEditors() {
               >↕</button>
               <button class="ghost-button host-section-secondary" type="button" data-action="duplicate-section" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>Duplica</button>
               <button class="ghost-button host-section-secondary" type="button" data-action="toggle-section-visibility" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>${section.hidden ? "Mostra" : "Nascondi"}</button>
-              <button class="ghost-button host-remove-section" type="button" data-action="remove-section">Rimuovi pulsante</button>
+              <button class="ghost-button host-remove-section" type="button" data-action="remove-section" ${section.id === "host" ? "disabled" : ""}>Rimuovi pulsante</button>
             </div>
           </div>
           <div class="host-section-body">
@@ -1428,7 +1444,7 @@ function renderSectionEditors() {
               </label>
               <div class="host-content-tools">
                 <button class="ghost-button" type="button" data-action="add-link">Aggiungi link</button>
-                <button class="ghost-button" type="button" data-action="add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
+                <button class="ghost-button" type="button" data-action="add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${section.id === "host" ? "Aggiungi icona" : "Aggiungi pulsante grafico"}</button>
                 <div class="host-cta-presets">
                   ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="add-cta-preset" data-cta-kind="${escapeAttribute(preset.kind)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${escapeHtml(preset.label)}</button>`).join("")}
                 </div>
@@ -1438,8 +1454,8 @@ function renderSectionEditors() {
             <div class="host-cta-editor">
               <div class="host-section-media-head">
                 <div>
-                  <p class="host-kicker">Pulsanti grafici</p>
-                  <p class="host-media-note">CTA larghe con icona, etichetta e destinazione. Si aprono sempre in una nuova scheda.</p>
+                  <p class="host-kicker">${section.id === "host" ? "Icone rapide" : "Pulsanti grafici"}</p>
+                  <p class="host-media-note">${section.id === "host" ? "Icone tonde affiancate nella sezione Host. WhatsApp ed email mantengono il link automatico." : "CTA larghe con icona, etichetta e destinazione. Si aprono sempre in una nuova scheda."}</p>
                 </div>
               </div>
               <div class="host-cta-list">
@@ -1468,7 +1484,7 @@ function renderSectionEditors() {
             </div>
             ${
               section.id === "host"
-                ? `<p class="host-lock-note">La voce "${escapeHtml(localeHostPrivateItem.title)}" viene reinserita automaticamente e non può essere eliminata.</p>`
+                ? `<p class="host-lock-note">L'accesso riservato resta sempre disponibile come icona tonda nella sezione Host.</p>`
                 : ""
             }
           </div>
@@ -1778,6 +1794,10 @@ function removeSection(sectionId) {
   const sections = currentLocaleState().sections;
   const target = sections.find((section) => section.id === sectionId);
   if (!target) return;
+  if (target.id === "host") {
+    setStatus("La sezione Host resta sempre presente per mantenere l'accesso rapido.", "error");
+    return;
+  }
 
   const confirmed = window.confirm(`Vuoi rimuovere il pulsante "${target.menuTitle}"?`);
   if (!confirmed) return;

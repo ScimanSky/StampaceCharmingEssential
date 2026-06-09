@@ -1026,6 +1026,89 @@ svg,
   transform: scale(0.96);
 }
 
+.sheet-host-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.72rem;
+  width: min(100%, var(--sheet-max-width));
+  margin: 0.2rem auto 0;
+  padding: 0.1rem 0;
+}
+
+.sheet-host-action {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--icon-custom-color, var(--muted-strong));
+  text-decoration: none;
+  border: 1px solid rgba(231, 216, 193, 0.18);
+  background:
+    linear-gradient(145deg, rgba(255, 248, 232, 0.14), rgba(255, 248, 232, 0.04)),
+    rgba(20, 17, 13, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 14px 28px rgba(0, 0, 0, 0.24);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease,
+    background 170ms ease;
+}
+
+.sheet-host-action svg {
+  width: 1.78rem;
+  height: 1.78rem;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sheet-host-action--whatsapp {
+  color: #fff;
+  border-color: rgba(68, 199, 122, 0.45);
+  background: linear-gradient(180deg, #35d978, #138d4d);
+}
+
+.sheet-host-action--gmail {
+  background: linear-gradient(180deg, #f8f4ef, #e6ded3);
+}
+
+.sheet-host-action--airbnb {
+  color: #ff5a5f;
+  border-color: rgba(255, 90, 95, 0.35);
+}
+
+.sheet-host-action--booking {
+  color: #5fa8ff;
+  border-color: rgba(95, 168, 255, 0.36);
+}
+
+.sheet-host-action--host {
+  color: var(--copy);
+}
+
+.sheet-host-action:hover,
+.sheet-host-action:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(231, 216, 193, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 18px 34px rgba(0, 0, 0, 0.3);
+}
+
+.sheet-host-action:active {
+  transform: scale(0.96);
+}
+
 .sheet-card-media {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;

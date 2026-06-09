@@ -1,6 +1,6 @@
 const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 const SAFE_WEB_PROTOCOLS = new Set(["http:", "https:"]);
-const CTA_KINDS = new Set(["web", "maps", "whatsapp", "email", "tel"]);
+const CTA_KINDS = new Set(["web", "maps", "whatsapp", "email", "tel", "airbnb", "booking"]);
 const SAFE_CSS_NAMED_COLORS = new Set(["currentcolor", "transparent"]);
 
 export function escapeHtml(value) {
@@ -122,5 +122,6 @@ export function normalizeCtaHref(kind, href) {
   if (safeKind === "email") return normalizeEmailHref(href);
   if (safeKind === "tel") return normalizeTelHref(href);
   if (safeKind === "maps") return sanitizeWebHref(href);
+  if (safeKind === "airbnb" || safeKind === "booking") return sanitizeWebHref(href);
   return sanitizeWebHref(href);
 }
