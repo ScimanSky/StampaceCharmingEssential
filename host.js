@@ -121,6 +121,7 @@ const dom = {
   password: document.querySelector("#host-password"),
   login: document.querySelector("#host-login"),
   logout: document.querySelector("#host-logout"),
+  shareGuest: document.querySelector("#host-share-guest"),
   status: document.querySelector("#host-status"),
   save: document.querySelector("#host-save"),
   reset: document.querySelector("#host-reset"),
@@ -1874,12 +1875,44 @@ async function logout() {
   setStatus("Sessione host chiusa.", "success");
 }
 
+function guestAppUrl() {
+  return new URL("./", window.location.href).toString();
+}
+
+function guestSharePayload() {
+  const url = guestAppUrl();
+  return {
+    title: "Guest App - Stampace Charming",
+    text: "Ciao, qui trovi la Guest App con tutte le informazioni utili per il soggiorno:",
+    url,
+  };
+}
+
+async function shareGuestApp() {
+  const payload = guestSharePayload();
+  const mobileShare = navigator.share && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (mobileShare) {
+    try {
+      await navigator.share(payload);
+      setStatus("Condivisione app guest avviata.", "success");
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+
+  const message = `${payload.text}\n${payload.title}\n${payload.url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
+  setStatus("WhatsApp aperto. Scegli il contatto a cui inviare la Guest App.", "success");
+}
+
 function bindEditorEvents() {
   if (editorBound) return;
   editorBound = true;
 
   dom.addSection.addEventListener("click", addSection);
   dom.logout.addEventListener("click", logout);
+  dom.shareGuest.addEventListener("click", shareGuestApp);
 
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
