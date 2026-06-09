@@ -118,6 +118,7 @@ const dom = {
   appName: document.querySelector("#app-name"),
   hostAvatarButton: document.querySelector("#host-avatar-button"),
   hostAvatarLabel: document.querySelector("#host-avatar-label"),
+  guestShareButton: document.querySelector("#guest-share-button"),
   localeBar: document.querySelector("#locale-bar"),
   subtitle: document.querySelector("#hero-subtitle"),
   heroMeta: document.querySelector("#hero-meta"),
@@ -143,6 +144,8 @@ let unsubscribeRealtime = null;
 let lastFocusedElement = null;
 let sheetCloseTimer = null;
 const SHEET_HISTORY_KEY = "stampaceSectionId";
+const GUEST_SHARE_URL = "https://stampacecharming.pages.dev/";
+const GUEST_SHARE_TITLE = "Guest Book- Stampace Charming";
 const LOCALE_STORAGE_KEY = "stampace_essential_guest_locale";
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -595,6 +598,15 @@ function setSyncStatus(message = "") {
   dom.syncStatus.classList.toggle("is-visible", Boolean(message));
 }
 
+function setTransientStatus(message) {
+  setSyncStatus(message);
+  window.setTimeout(() => {
+    if (dom.syncStatus?.textContent === message) {
+      setSyncStatus("");
+    }
+  }, 2400);
+}
+
 function focusSheet() {
   window.requestAnimationFrame(() => {
     dom.sheetClose.focus({ preventScroll: true });
@@ -658,6 +670,34 @@ function bindHostShortcut() {
   dom.hostAvatarButton.addEventListener("click", () => {
     openSection("host");
   });
+}
+
+async function shareGuestApp() {
+  const payload = {
+    title: GUEST_SHARE_TITLE,
+    text: GUEST_SHARE_TITLE,
+    url: GUEST_SHARE_URL,
+  };
+
+  if (navigator.share) {
+    try {
+      await navigator.share(payload);
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(GUEST_SHARE_URL);
+    setTransientStatus("Link copied.");
+  } catch {
+    window.location.href = `mailto:?subject=${encodeURIComponent(GUEST_SHARE_TITLE)}&body=${encodeURIComponent(GUEST_SHARE_URL)}`;
+  }
+}
+
+function bindGuestShare() {
+  dom.guestShareButton.addEventListener("click", shareGuestApp);
 }
 
 function bindLocaleBar() {
@@ -920,6 +960,7 @@ async function init() {
   render();
   bindMenu();
   bindHostShortcut();
+  bindGuestShare();
   bindLocaleBar();
   bindSheet();
   bindCopyButtons();

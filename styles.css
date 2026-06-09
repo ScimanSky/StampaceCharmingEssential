@@ -199,6 +199,65 @@ svg,
   z-index: 10;
 }
 
+.guest-share-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(231, 216, 193, 0.18);
+  border-radius: 999px;
+  background:
+    linear-gradient(145deg, rgba(255, 248, 232, 0.1), rgba(255, 248, 232, 0.02)),
+    rgba(17, 14, 11, 0.36);
+  color: var(--muted-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 22px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background 190ms ease,
+    border-color 190ms ease,
+    box-shadow 190ms ease,
+    color 190ms ease,
+    transform 190ms ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  flex: 0 0 auto;
+  z-index: 10;
+}
+
+.guest-share-button svg {
+  width: 1.22rem;
+  height: 1.22rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.guest-share-button:hover,
+.guest-share-button:focus-visible {
+  color: var(--icon);
+  border-color: rgba(231, 216, 193, 0.34);
+  background:
+    linear-gradient(145deg, rgba(255, 248, 232, 0.15), rgba(255, 248, 232, 0.04)),
+    rgba(30, 24, 18, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 12px 26px rgba(0, 0, 0, 0.24),
+    0 0 18px rgba(223, 195, 156, 0.11);
+  transform: translateY(calc(-50% - 1px));
+}
+
+.guest-share-button:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
 .host-avatar-media {
   width: 1.98rem;
   height: 1.98rem;
@@ -473,6 +532,8 @@ svg,
 .menu-row:focus-visible,
 .host-avatar-button:focus,
 .host-avatar-button:focus-visible,
+.guest-share-button:focus,
+.guest-share-button:focus-visible,
 .copy-btn:focus,
 .copy-btn:focus-visible,
 .sheet-link:focus,
