@@ -673,6 +673,7 @@ function renderSectionItems(items, sectionId) {
     const markerColorStyle = iconColorStyle(sectionIconColor(section));
     const actions = [];
     const cards = [];
+    const mediaCards = [];
 
     items.forEach((item) => {
       const action =
@@ -690,7 +691,7 @@ function renderSectionItems(items, sectionId) {
       }
 
       if (isImageItem(item)) {
-        cards.push(renderImageItem(item));
+        mediaCards.push(renderImageItem(item));
         return;
       }
 
@@ -710,7 +711,7 @@ function renderSectionItems(items, sectionId) {
       cards.push(renderGenericLinkItem(item, marker, sectionId));
     });
 
-    return `${cards.join("")}${renderHostActions(actions)}`;
+    return `${cards.join("")}${renderHostActions(actions)}${mediaCards.join("")}`;
   }
 
   let safeItemIndex = 0;
