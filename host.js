@@ -1068,6 +1068,11 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
 async function buildPublishedTemplate(template) {
   const next = JSON.parse(JSON.stringify(template));
+  next.locales = next.locales && typeof next.locales === "object" ? next.locales : {};
+  next.locales[FIXED_LOCALE] = next.locales[FIXED_LOCALE] || {};
+  if (!Array.isArray(next.locales[FIXED_LOCALE].heroMeta) || !next.locales[FIXED_LOCALE].heroMeta.length) {
+    next.locales[FIXED_LOCALE].heroMeta = Array.isArray(next.heroMeta) ? [...next.heroMeta] : [];
+  }
   const italianLocale = next.locales[FIXED_LOCALE];
   const enabledLocaleCodes = new Set(next.enabledLocales ?? REQUIRED_LOCALES);
   lastTranslationFallbackLocales = [];
