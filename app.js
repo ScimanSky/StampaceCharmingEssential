@@ -8,7 +8,7 @@ import {
   isImageItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260528m";
+} from "./content.js?v=20260609a";
 import {
   escapeAttribute,
   escapeHtml,
@@ -161,6 +161,11 @@ function renderIcon(name) {
 
 function sectionClassToken(sectionId) {
   return String(sectionId).replace(/[^a-z0-9_-]/gi, "-");
+}
+
+function themeValue(group, key, fallback) {
+  const value = group?.[key];
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
 }
 
 function normalizePhoneDigits(value) {
@@ -724,6 +729,11 @@ function preventCopy() {
 function applyTheme(theme) {
   const primaryFont = theme?.fontPrimary || "Roboto";
   const secondaryFont = theme?.fontSecondary || "Roboto";
+  const colors = theme?.colors || {};
+  const typography = theme?.typography || {};
+  const layout = theme?.layout || {};
+  const buttons = theme?.buttons || {};
+  const motion = theme?.motion || {};
 
   const serifFonts = ["Playfair Display", "Lora", "Cormorant Garamond"];
   const primaryFallback = serifFonts.includes(primaryFont) ? "serif" : "sans-serif";
@@ -731,6 +741,38 @@ function applyTheme(theme) {
 
   document.documentElement.style.setProperty("--font-primary", `"${primaryFont}", ${primaryFallback}`);
   document.documentElement.style.setProperty("--font-secondary", `"${secondaryFont}", ${secondaryFallback}`);
+  document.documentElement.style.setProperty("--bg", themeValue(colors, "background", "#070605"));
+  document.documentElement.style.setProperty("--copy", themeValue(colors, "text", "#e7d8c1"));
+  document.documentElement.style.setProperty("--text", "var(--copy)");
+  document.documentElement.style.setProperty("--muted", themeValue(colors, "muted", "rgba(231, 216, 193, 0.72)"));
+  document.documentElement.style.setProperty("--muted-strong", themeValue(colors, "muted", "rgba(231, 216, 193, 0.88)"));
+  document.documentElement.style.setProperty("--icon", themeValue(colors, "icon", "#dfc39c"));
+  document.documentElement.style.setProperty("--line", themeValue(colors, "line", "rgba(224, 205, 177, 0.12)"));
+  document.documentElement.style.setProperty("--row", themeValue(colors, "row", "rgba(17, 14, 11, 0.34)"));
+  document.documentElement.style.setProperty("--row-hover", themeValue(colors, "rowHover", "rgba(27, 22, 17, 0.48)"));
+  document.documentElement.style.setProperty("--sheet-bg", themeValue(colors, "sheet", "rgba(10, 8, 6, 0.92)"));
+  document.documentElement.style.setProperty("--title-size", themeValue(typography, "titleSize", "1.18rem"));
+  document.documentElement.style.setProperty("--subtitle-size", themeValue(typography, "subtitleSize", "0.98rem"));
+  document.documentElement.style.setProperty("--menu-size", themeValue(typography, "menuSize", "1.04rem"));
+  document.documentElement.style.setProperty("--section-title-size", themeValue(typography, "sectionTitleSize", "1.32rem"));
+  document.documentElement.style.setProperty("--body-size", themeValue(typography, "bodySize", "0.96rem"));
+  document.documentElement.style.setProperty("--menu-weight", themeValue(typography, "menuWeight", "400"));
+  document.documentElement.style.setProperty("--body-weight", themeValue(typography, "bodyWeight", "400"));
+  document.documentElement.style.setProperty("--app-max-width", themeValue(layout, "appWidth", "34rem"));
+  document.documentElement.style.setProperty("--page-padding-x", themeValue(layout, "pagePadding", "1rem"));
+  document.documentElement.style.setProperty("--hero-height", themeValue(layout, "heroHeight", "15.5rem"));
+  document.documentElement.style.setProperty("--menu-height", themeValue(layout, "buttonHeight", "3.7rem"));
+  document.documentElement.style.setProperty("--menu-radius", themeValue(layout, "buttonRadius", "0.72rem"));
+  document.documentElement.style.setProperty("--menu-list-gap", themeValue(layout, "buttonGap", "0.55rem"));
+  document.documentElement.style.setProperty("--sheet-max-width", themeValue(layout, "sheetWidth", "34rem"));
+  document.documentElement.style.setProperty("--sheet-radius", themeValue(layout, "sheetRadius", "1.8rem"));
+  document.documentElement.style.setProperty("--content-gap", themeValue(layout, "contentGap", "0.8rem"));
+  document.documentElement.style.setProperty("--menu-icon-size", themeValue(buttons, "iconSize", "2.06rem"));
+  document.documentElement.style.setProperty("--chevron-display", themeValue(buttons, "showChevron", "true") === "false" ? "none" : "block");
+  const animation = themeValue(motion, "sheetAnimation", "slide");
+  document.documentElement.style.setProperty("--sheet-enter-y", animation === "slide" ? "2.5rem" : "0");
+  document.documentElement.style.setProperty("--sheet-enter-scale", animation === "scale" ? "0.96" : "1");
+  document.documentElement.style.setProperty("--sheet-motion-duration", animation === "none" ? "1ms" : "300ms");
 
   const fontsToLoad = new Set([primaryFont, secondaryFont]);
   const linkId = "google-fonts-dynamic";

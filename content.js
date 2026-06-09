@@ -1317,6 +1317,48 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
   },
 });
 
+const DEFAULT_THEME = Object.freeze({
+  fontPrimary: "Roboto",
+  fontSecondary: "Roboto",
+  colors: {
+    background: "#070605",
+    text: "#e7d8c1",
+    muted: "rgba(231, 216, 193, 0.72)",
+    icon: "#dfc39c",
+    line: "rgba(224, 205, 177, 0.12)",
+    row: "rgba(17, 14, 11, 0.34)",
+    rowHover: "rgba(27, 22, 17, 0.48)",
+    sheet: "rgba(10, 8, 6, 0.92)",
+  },
+  typography: {
+    titleSize: "1.18rem",
+    subtitleSize: "0.98rem",
+    menuSize: "1.04rem",
+    sectionTitleSize: "1.32rem",
+    bodySize: "0.96rem",
+    menuWeight: "400",
+    bodyWeight: "400",
+  },
+  layout: {
+    appWidth: "34rem",
+    pagePadding: "1rem",
+    heroHeight: "15.5rem",
+    buttonHeight: "3.7rem",
+    buttonRadius: "0.72rem",
+    buttonGap: "0.55rem",
+    sheetWidth: "34rem",
+    sheetRadius: "1.8rem",
+    contentGap: "0.8rem",
+  },
+  buttons: {
+    iconSize: "2.06rem",
+    showChevron: "true",
+  },
+  motion: {
+    sheetAnimation: "slide",
+  },
+});
+
 export const defaultTemplate = {
   appName: "Stampace Charming",
   address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
@@ -1326,10 +1368,7 @@ export const defaultTemplate = {
     subtitle: "Luxury apartment",
     lines: ["Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia", "CIN: IT092009C2000R8066"],
   },
-  theme: {
-    fontPrimary: "Roboto",
-    fontSecondary: "Roboto",
-  },
+  theme: DEFAULT_THEME,
   enabledLocales: ["it", "en", "de"],
   locales: DEFAULT_LOCALE_CONTENT,
 };
@@ -1339,6 +1378,14 @@ const SARDINIAN_TEMPLATE_BASE = DEFAULT_LOCALE_CONTENT.sc;
 
 function cleanString(value, fallback = "") {
   return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
+function cleanThemeGroup(source = {}, fallback = {}) {
+  const next = {};
+  Object.entries(fallback).forEach(([key, fallbackValue]) => {
+    next[key] = cleanString(source?.[key], fallbackValue);
+  });
+  return next;
 }
 
 function cleanLocaleCode(value) {
@@ -1812,7 +1859,7 @@ export function normalizeTemplate(rawTemplate = {}) {
     ? footerSource.lines.map((line) => cleanString(line)).filter(Boolean)
     : [cleanString(footerSource.address, resolvedAddress), cleanString(footerSource.license, resolvedLicense)].filter(Boolean);
   const themeSource = rawTemplate.theme && typeof rawTemplate.theme === "object" ? rawTemplate.theme : {};
-  const fallbackTheme = defaultTemplate.theme || { fontPrimary: "Roboto", fontSecondary: "Roboto" };
+  const fallbackTheme = defaultTemplate.theme || DEFAULT_THEME;
   return {
     appName: resolvedAppName,
     address: resolvedAddress,
@@ -1825,6 +1872,11 @@ export function normalizeTemplate(rawTemplate = {}) {
     theme: {
       fontPrimary: cleanString(themeSource.fontPrimary, fallbackTheme.fontPrimary),
       fontSecondary: cleanString(themeSource.fontSecondary, fallbackTheme.fontSecondary),
+      colors: cleanThemeGroup(themeSource.colors, fallbackTheme.colors),
+      typography: cleanThemeGroup(themeSource.typography, fallbackTheme.typography),
+      layout: cleanThemeGroup(themeSource.layout, fallbackTheme.layout),
+      buttons: cleanThemeGroup(themeSource.buttons, fallbackTheme.buttons),
+      motion: cleanThemeGroup(themeSource.motion, fallbackTheme.motion),
     },
     enabledLocales: normalizeEnabledLocales(rawTemplate.enabledLocales ?? rawTemplate.visibleLocales ?? defaultTemplate.enabledLocales),
     locales: buildLocaleMap(rawTemplate),

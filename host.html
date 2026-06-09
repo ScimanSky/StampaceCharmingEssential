@@ -13,7 +13,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./host.css?v=20260608b" />
+    <link rel="stylesheet" href="./host.css?v=20260609a" />
   </head>
   <body>
     <main class="host-shell">
@@ -54,8 +54,8 @@
           <button class="host-panel-toggle" type="button" data-action="toggle-panel" aria-expanded="true">
             <span class="host-panel-heading">
               <span>
-                <p class="host-kicker">Template</p>
-                <h2>Dati generali</h2>
+                <p class="host-kicker">Contenuti</p>
+                <h2>Struttura e lingue</h2>
               </span>
               <span class="host-section-chevron" aria-hidden="true">⌄</span>
             </span>
@@ -88,14 +88,6 @@
                 <input id="field-license" type="text" />
               </label>
               <label>
-                <span>Font principale (Titoli)</span>
-                <select id="field-font-primary"></select>
-              </label>
-              <label>
-                <span>Font secondario (Testi)</span>
-                <select id="field-font-secondary"></select>
-              </label>
-              <label>
                 <span>Footer: nome struttura</span>
                 <input id="field-footer-name" type="text" />
               </label>
@@ -107,6 +99,163 @@
                 <span>Footer: contenuti liberi, una riga per voce</span>
                 <textarea id="field-footer-lines"></textarea>
               </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="host-card host-panel" data-panel-id="design">
+          <button class="host-panel-toggle" type="button" data-action="toggle-panel" aria-expanded="true">
+            <span class="host-panel-heading">
+              <span>
+                <p class="host-kicker">Aspetto</p>
+                <h2>Design app ospiti</h2>
+              </span>
+              <span class="host-section-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </button>
+          <div class="host-panel-body">
+            <div class="host-design-groups">
+              <section class="host-design-group">
+                <p class="host-kicker">Tipografia</p>
+                <div class="host-grid">
+                  <label>
+                    <span>Font titoli</span>
+                    <select id="field-font-primary"></select>
+                  </label>
+                  <label>
+                    <span>Font testi</span>
+                    <select id="field-font-secondary"></select>
+                  </label>
+                  <label>
+                    <span>Dimensione titolo app</span>
+                    <input id="field-title-size" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Dimensione sottotitolo</span>
+                    <input id="field-subtitle-size" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Dimensione pulsanti</span>
+                    <input id="field-menu-size" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Peso testo pulsanti</span>
+                    <select id="field-menu-weight" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Dimensione titolo finestra</span>
+                    <input id="field-section-title-size" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Dimensione testi interni</span>
+                    <input id="field-body-size" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Peso testi interni</span>
+                    <select id="field-body-weight" data-theme-field></select>
+                  </label>
+                </div>
+              </section>
+
+              <section class="host-design-group">
+                <p class="host-kicker">Colori</p>
+                <div class="host-grid">
+                  <label>
+                    <span>Sfondo app</span>
+                    <input id="field-color-background" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Testo principale</span>
+                    <input id="field-color-text" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Testo secondario</span>
+                    <input id="field-color-muted" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Icone</span>
+                    <input id="field-color-icon" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Bordi</span>
+                    <input id="field-color-line" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Pulsanti</span>
+                    <input id="field-color-row" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Pulsanti hover/tap</span>
+                    <input id="field-color-row-hover" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Sfondo finestre</span>
+                    <input id="field-color-sheet" data-theme-field type="text" />
+                  </label>
+                </div>
+              </section>
+
+              <section class="host-design-group">
+                <p class="host-kicker">Layout e componenti</p>
+                <div class="host-grid">
+                  <label>
+                    <span>Larghezza massima app</span>
+                    <input id="field-app-width" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Padding laterale pagina</span>
+                    <input id="field-page-padding" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Altezza immagine hero</span>
+                    <input id="field-hero-height" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Altezza pulsanti</span>
+                    <input id="field-button-height" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Raggio pulsanti</span>
+                    <input id="field-button-radius" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Distanza pulsanti</span>
+                    <input id="field-button-gap" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Dimensione icone pulsanti</span>
+                    <input id="field-icon-size" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Freccia pulsanti</span>
+                    <select id="field-show-chevron" data-theme-field>
+                      <option value="true">Visibile</option>
+                      <option value="false">Nascosta</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>Larghezza finestre</span>
+                    <input id="field-sheet-width" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Raggio finestre</span>
+                    <input id="field-sheet-radius" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Spaziatura contenuti finestra</span>
+                    <input id="field-content-gap" data-theme-field type="text" />
+                  </label>
+                  <label>
+                    <span>Animazione finestre</span>
+                    <select id="field-sheet-animation" data-theme-field>
+                      <option value="slide">Slide</option>
+                      <option value="fade">Fade</option>
+                      <option value="scale">Scale</option>
+                      <option value="none">Nessuna</option>
+                    </select>
+                  </label>
+                </div>
+              </section>
             </div>
           </div>
         </section>
@@ -136,6 +285,6 @@
       </section>
     </main>
 
-    <script type="module" src="./host.js?v=20260609a"></script>
+    <script type="module" src="./host.js?v=20260609b"></script>
   </body>
 </html>

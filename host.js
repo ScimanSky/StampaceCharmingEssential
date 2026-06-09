@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260528m";
+} from "./content.js?v=20260609a";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -135,6 +135,33 @@ const dom = {
   license: document.querySelector("#field-license"),
   fontPrimary: document.querySelector("#field-font-primary"),
   fontSecondary: document.querySelector("#field-font-secondary"),
+  titleSize: document.querySelector("#field-title-size"),
+  subtitleSize: document.querySelector("#field-subtitle-size"),
+  menuSize: document.querySelector("#field-menu-size"),
+  menuWeight: document.querySelector("#field-menu-weight"),
+  sectionTitleSize: document.querySelector("#field-section-title-size"),
+  bodySize: document.querySelector("#field-body-size"),
+  bodyWeight: document.querySelector("#field-body-weight"),
+  colorBackground: document.querySelector("#field-color-background"),
+  colorText: document.querySelector("#field-color-text"),
+  colorMuted: document.querySelector("#field-color-muted"),
+  colorIcon: document.querySelector("#field-color-icon"),
+  colorLine: document.querySelector("#field-color-line"),
+  colorRow: document.querySelector("#field-color-row"),
+  colorRowHover: document.querySelector("#field-color-row-hover"),
+  colorSheet: document.querySelector("#field-color-sheet"),
+  appWidth: document.querySelector("#field-app-width"),
+  pagePadding: document.querySelector("#field-page-padding"),
+  heroHeight: document.querySelector("#field-hero-height"),
+  buttonHeight: document.querySelector("#field-button-height"),
+  buttonRadius: document.querySelector("#field-button-radius"),
+  buttonGap: document.querySelector("#field-button-gap"),
+  iconSize: document.querySelector("#field-icon-size"),
+  showChevron: document.querySelector("#field-show-chevron"),
+  sheetWidth: document.querySelector("#field-sheet-width"),
+  sheetRadius: document.querySelector("#field-sheet-radius"),
+  contentGap: document.querySelector("#field-content-gap"),
+  sheetAnimation: document.querySelector("#field-sheet-animation"),
   footerName: document.querySelector("#field-footer-name"),
   footerSubtitle: document.querySelector("#field-footer-subtitle"),
   footerLines: document.querySelector("#field-footer-lines"),
@@ -163,7 +190,7 @@ const translationCache = new Map();
 let lastTranslationFallbackLocales = [];
 const expandedSectionIds = new Set();
 let shouldSeedExpandedSection = true;
-const expandedPanelIds = new Set(["general", "sections"]);
+const expandedPanelIds = new Set(["general", "design", "sections"]);
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
 const SARDINIAN_TEMPLATE_BASE = defaultTemplate.locales.sc;
 const LINK_ITEM_PREFIX = "LINK";
@@ -175,6 +202,12 @@ const AVAILABLE_FONTS = [
   { value: "Lora", label: "Lora (Serif editoriale leggibile)" },
   { value: "Montserrat", label: "Montserrat (Sans-serif bold moderno)" },
   { value: "Cormorant Garamond", label: "Cormorant Garamond (Serif lusso tradizionale)" }
+];
+const FONT_WEIGHT_OPTIONS = [
+  { value: "300", label: "Leggero" },
+  { value: "400", label: "Normale" },
+  { value: "500", label: "Medio" },
+  { value: "600", label: "Grassetto" },
 ];
 let draggingSectionId = null;
 const CTA_KIND_OPTIONS = [
@@ -250,6 +283,11 @@ function renderIcon(name) {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths[name] ?? iconPaths.spark}</svg>`;
 }
 
+function themeValue(group, key, fallback) {
+  const value = group?.[key];
+  return typeof value === "string" && value.trim() ? value.trim() : fallback;
+}
+
 function normalizedSectionText(section) {
   return `${section?.menuTitle ?? ""} ${section?.sectionTitle ?? ""} ${section?.lead ?? ""}`
     .toLowerCase()
@@ -297,6 +335,7 @@ function sectionIconOptions(selectedIcon = "spark") {
 function applyTheme(theme) {
   const primaryFont = theme?.fontPrimary || "Roboto";
   const secondaryFont = theme?.fontSecondary || "Roboto";
+  const colors = theme?.colors || {};
 
   const serifFonts = ["Playfair Display", "Lora", "Cormorant Garamond"];
   const primaryFallback = serifFonts.includes(primaryFont) ? "serif" : "sans-serif";
@@ -304,6 +343,10 @@ function applyTheme(theme) {
 
   document.documentElement.style.setProperty("--font-primary", `"${primaryFont}", ${primaryFallback}`);
   document.documentElement.style.setProperty("--font-secondary", `"${secondaryFont}", ${secondaryFallback}`);
+  document.documentElement.style.setProperty("--copy", themeValue(colors, "text", "#e7d8c1"));
+  document.documentElement.style.setProperty("--text", "var(--copy)");
+  document.documentElement.style.setProperty("--muted", themeValue(colors, "muted", "rgba(231, 216, 193, 0.72)"));
+  document.documentElement.style.setProperty("--line", themeValue(colors, "line", "rgba(224, 205, 177, 0.12)"));
 
   const fontsToLoad = new Set([primaryFont, secondaryFont]);
   const linkId = "google-fonts-dynamic";
@@ -364,6 +407,60 @@ function ctaDefaultHref(kind = "web") {
     tel: "+39",
   };
   return fallbackMap[kind] ?? "https://example.com";
+}
+
+function optionsHtml(options, selectedValue) {
+  return options.map(
+    (option) => `<option value="${escapeAttribute(option.value)}" ${option.value === selectedValue ? "selected" : ""}>${escapeHtml(option.label)}</option>`,
+  ).join("");
+}
+
+function setFieldValue(field, value) {
+  if (field) field.value = value ?? "";
+}
+
+function themeDraftFromFields() {
+  return {
+    fontPrimary: dom.fontPrimary.value,
+    fontSecondary: dom.fontSecondary.value,
+    colors: {
+      background: dom.colorBackground.value,
+      text: dom.colorText.value,
+      muted: dom.colorMuted.value,
+      icon: dom.colorIcon.value,
+      line: dom.colorLine.value,
+      row: dom.colorRow.value,
+      rowHover: dom.colorRowHover.value,
+      sheet: dom.colorSheet.value,
+    },
+    typography: {
+      titleSize: dom.titleSize.value,
+      subtitleSize: dom.subtitleSize.value,
+      menuSize: dom.menuSize.value,
+      sectionTitleSize: dom.sectionTitleSize.value,
+      bodySize: dom.bodySize.value,
+      menuWeight: dom.menuWeight.value,
+      bodyWeight: dom.bodyWeight.value,
+    },
+    layout: {
+      appWidth: dom.appWidth.value,
+      pagePadding: dom.pagePadding.value,
+      heroHeight: dom.heroHeight.value,
+      buttonHeight: dom.buttonHeight.value,
+      buttonRadius: dom.buttonRadius.value,
+      buttonGap: dom.buttonGap.value,
+      sheetWidth: dom.sheetWidth.value,
+      sheetRadius: dom.sheetRadius.value,
+      contentGap: dom.contentGap.value,
+    },
+    buttons: {
+      iconSize: dom.iconSize.value,
+      showChevron: dom.showChevron.value,
+    },
+    motion: {
+      sheetAnimation: dom.sheetAnimation.value,
+    },
+  };
 }
 
 function buildCtaPreset(kind = "web") {
@@ -1046,19 +1143,53 @@ function renderSectionEditors() {
 
 function syncFields() {
   if (dom.fontPrimary && dom.fontPrimary.options.length === 0) {
-    const optionsHtml = AVAILABLE_FONTS.map(
-      (font) => `<option value="${escapeAttribute(font.value)}">${escapeHtml(font.label)}</option>`
-    ).join("");
-    dom.fontPrimary.innerHTML = optionsHtml;
-    dom.fontSecondary.innerHTML = optionsHtml;
+    const fontOptions = optionsHtml(AVAILABLE_FONTS);
+    const weightOptions = optionsHtml(FONT_WEIGHT_OPTIONS);
+    dom.fontPrimary.innerHTML = fontOptions;
+    dom.fontSecondary.innerHTML = fontOptions;
+    dom.menuWeight.innerHTML = weightOptions;
+    dom.bodyWeight.innerHTML = weightOptions;
   }
   applyTheme(state.theme);
   const localeState = currentLocaleState();
+  const theme = state.theme || {};
+  const colors = theme.colors || {};
+  const typography = theme.typography || {};
+  const layout = theme.layout || {};
+  const buttons = theme.buttons || {};
+  const motion = theme.motion || {};
   dom.appName.value = state.appName;
   dom.address.value = state.address;
   dom.license.value = state.license;
   dom.fontPrimary.value = state.theme?.fontPrimary || "Roboto";
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
+  setFieldValue(dom.titleSize, typography.titleSize);
+  setFieldValue(dom.subtitleSize, typography.subtitleSize);
+  setFieldValue(dom.menuSize, typography.menuSize);
+  setFieldValue(dom.menuWeight, typography.menuWeight);
+  setFieldValue(dom.sectionTitleSize, typography.sectionTitleSize);
+  setFieldValue(dom.bodySize, typography.bodySize);
+  setFieldValue(dom.bodyWeight, typography.bodyWeight);
+  setFieldValue(dom.colorBackground, colors.background);
+  setFieldValue(dom.colorText, colors.text);
+  setFieldValue(dom.colorMuted, colors.muted);
+  setFieldValue(dom.colorIcon, colors.icon);
+  setFieldValue(dom.colorLine, colors.line);
+  setFieldValue(dom.colorRow, colors.row);
+  setFieldValue(dom.colorRowHover, colors.rowHover);
+  setFieldValue(dom.colorSheet, colors.sheet);
+  setFieldValue(dom.appWidth, layout.appWidth);
+  setFieldValue(dom.pagePadding, layout.pagePadding);
+  setFieldValue(dom.heroHeight, layout.heroHeight);
+  setFieldValue(dom.buttonHeight, layout.buttonHeight);
+  setFieldValue(dom.buttonRadius, layout.buttonRadius);
+  setFieldValue(dom.buttonGap, layout.buttonGap);
+  setFieldValue(dom.iconSize, buttons.iconSize);
+  setFieldValue(dom.showChevron, buttons.showChevron);
+  setFieldValue(dom.sheetWidth, layout.sheetWidth);
+  setFieldValue(dom.sheetRadius, layout.sheetRadius);
+  setFieldValue(dom.contentGap, layout.contentGap);
+  setFieldValue(dom.sheetAnimation, motion.sheetAnimation);
   dom.subtitle.value = localeState.subtitle;
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
@@ -1122,10 +1253,7 @@ function collectTemplate() {
     subtitle: dom.footerSubtitle.value,
     lines: parseFooterLines(dom.footerLines.value),
   };
-  next.theme = {
-    fontPrimary: dom.fontPrimary.value,
-    fontSecondary: dom.fontSecondary.value,
-  };
+  next.theme = themeDraftFromFields();
   next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {
     ...next.locales[selectedEditorLocale],
@@ -1672,6 +1800,11 @@ function bindEditorEvents() {
   dom.fontSecondary.addEventListener("change", () => {
     state = saveTemplate(collectTemplate());
     syncFields();
+    queueAutoPublish();
+  });
+
+  dom.app.addEventListener("change", (event) => {
+    if (!event.target.matches("[data-theme-field]")) return;
     queueAutoPublish();
   });
 

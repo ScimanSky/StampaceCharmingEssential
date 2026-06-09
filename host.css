@@ -297,6 +297,27 @@ select:focus-visible {
   margin-top: 0.9rem;
 }
 
+.host-design-groups {
+  display: grid;
+  gap: 1rem;
+}
+
+.host-design-group {
+  display: grid;
+  gap: 0.85rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.host-design-group:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.host-design-group .host-grid {
+  margin-top: 0;
+}
+
 .host-grid-wide {
   grid-column: 1 / -1;
 }

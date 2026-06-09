@@ -18,6 +18,28 @@
   --radius-md: 0.95rem;
   --font-primary: "Roboto", sans-serif;
   --font-secondary: "Roboto", sans-serif;
+  --app-max-width: 34rem;
+  --page-padding-x: 1rem;
+  --hero-height: 15.5rem;
+  --menu-height: 3.7rem;
+  --menu-radius: 0.72rem;
+  --menu-list-gap: 0.72rem;
+  --menu-size: 1.04rem;
+  --menu-weight: 500;
+  --menu-icon-size: 2.06rem;
+  --title-size: 1.18rem;
+  --subtitle-size: 0.98rem;
+  --section-title-size: 1.32rem;
+  --body-size: 0.96rem;
+  --body-weight: 400;
+  --sheet-bg: rgba(10, 8, 6, 0.92);
+  --sheet-max-width: 34rem;
+  --sheet-radius: 1.8rem;
+  --content-gap: 0.8rem;
+  --chevron-display: block;
+  --sheet-enter-y: 1.5rem;
+  --sheet-enter-scale: 0.985;
+  --sheet-motion-duration: 300ms;
 }
 
 * {
@@ -97,9 +119,9 @@ svg,
 }
 
 .page-shell {
-  width: min(100%, 34rem);
+  width: min(100%, var(--app-max-width));
   margin: 0 auto;
-  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
+  padding: max(1rem, env(safe-area-inset-top)) var(--page-padding-x) max(1.4rem, env(safe-area-inset-bottom));
   position: relative;
   overflow-x: clip;
 }
@@ -127,7 +149,7 @@ svg,
 .topbar-name {
   display: block;
   font-family: var(--font-primary), sans-serif;
-  font-size: clamp(1.06rem, 4.2vw, 1.28rem);
+  font-size: var(--title-size);
   line-height: 1.1;
   letter-spacing: clamp(0.05em, 0.42vw, 0.12em);
   color: var(--muted-strong);
@@ -289,7 +311,7 @@ svg,
 .hero-block {
   position: relative;
   overflow: hidden;
-  min-height: 15.5rem;
+  min-height: var(--hero-height);
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
   background: url("./img/sfondo9.jpeg") center 46% / cover no-repeat;
@@ -312,7 +334,7 @@ svg,
 .hero-subtitle {
   margin: 0;
   color: var(--copy);
-  font-size: clamp(0.9rem, 3.4vw, 0.98rem);
+  font-size: var(--subtitle-size);
   line-height: 1.2;
   letter-spacing: clamp(0.08em, 0.45vw, 0.14em);
   text-transform: uppercase;
@@ -346,7 +368,7 @@ svg,
 
 .main-menu {
   display: grid;
-  gap: 0.72rem;
+  gap: var(--menu-list-gap);
   margin-top: 1.05rem;
   perspective: 900px;
 }
@@ -402,10 +424,10 @@ svg,
   grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
   align-items: center;
   gap: 0.95rem;
-  min-height: 3.7rem;
+  min-height: var(--menu-height);
   padding: 0 0.9rem 0 0.78rem;
   border: 1px solid var(--line);
-  border-radius: 0.72rem;
+  border-radius: var(--menu-radius);
   background:
     linear-gradient(180deg, rgba(255, 244, 224, 0.06), rgba(255, 244, 224, 0.02)),
     var(--row);
@@ -467,8 +489,8 @@ svg,
 }
 
 .menu-icon svg {
-  width: 2.06rem;
-  height: 2.06rem;
+  width: var(--menu-icon-size);
+  height: var(--menu-icon-size);
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
@@ -509,8 +531,8 @@ svg,
 }
 
 .menu-copy strong {
-  font-size: clamp(0.98rem, 3.7vw, 1.08rem);
-  font-weight: 500;
+  font-size: var(--menu-size);
+  font-weight: var(--menu-weight);
   color: var(--text);
   line-height: 1.1;
   text-align: center;
@@ -525,6 +547,7 @@ svg,
 }
 
 .menu-chevron {
+  display: var(--chevron-display);
   justify-self: end;
   color: var(--muted-soft);
   font-size: 1.02rem;
@@ -610,12 +633,12 @@ svg,
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
-  background: transparent;
+  background: var(--sheet-bg);
   opacity: 0;
-  transform: translateY(1.5rem) scale(0.985);
+  transform: translateY(var(--sheet-enter-y)) scale(var(--sheet-enter-scale));
   transition:
-    opacity 300ms ease,
-    transform 360ms cubic-bezier(0.2, 0.8, 0.22, 1);
+    opacity var(--sheet-motion-duration) ease,
+    transform var(--sheet-motion-duration) cubic-bezier(0.2, 0.8, 0.22, 1);
 }
 
 .sheet-panel::-webkit-scrollbar {
@@ -629,7 +652,7 @@ svg,
 
 .section-sheet.is-closing .sheet-panel {
   opacity: 0;
-  transform: translateY(1.15rem) scale(0.985);
+  transform: translateY(var(--sheet-enter-y)) scale(var(--sheet-enter-scale));
 }
 
 .sheet-header {
@@ -638,7 +661,7 @@ svg,
   align-items: start;
   gap: 0.95rem;
   margin: 0 auto;
-  width: min(100%, 34rem);
+  width: min(100%, var(--sheet-max-width));
 }
 
 .sheet-icon {
@@ -674,7 +697,7 @@ svg,
 
 .sheet-title-block h2 {
   margin: 0.3rem 0 0;
-  font-size: clamp(1.16rem, 5vw, 1.42rem);
+  font-size: var(--section-title-size);
   line-height: 1.1;
   font-weight: 400;
   overflow-wrap: anywhere;
@@ -687,7 +710,8 @@ svg,
   margin: 0.45rem 0 0;
   color: var(--muted);
   line-height: 1.45;
-  font-size: 0.94rem;
+  font-size: var(--body-size);
+  font-weight: var(--body-weight);
   overflow-wrap: anywhere;
   text-wrap: pretty;
 }
@@ -734,9 +758,9 @@ svg,
 
 .sheet-content {
   display: grid;
-  gap: 0.8rem;
+  gap: var(--content-gap);
   margin: 1rem auto 0;
-  width: min(100%, 34rem);
+  width: min(100%, var(--sheet-max-width));
   min-width: 0;
 }
 
@@ -747,7 +771,7 @@ svg,
   align-items: start;
   padding: 0.95rem 1rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0.9rem;
+  border-radius: min(var(--sheet-radius), 1.2rem);
   background: rgba(17, 14, 11, 0.42);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
   min-width: 0;
@@ -785,7 +809,8 @@ svg,
   margin: 0;
   line-height: 1.5;
   color: var(--muted-strong);
-  font-size: 0.96rem;
+  font-size: var(--body-size);
+  font-weight: var(--body-weight);
   white-space: pre-line;
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -871,8 +896,8 @@ svg,
   grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
   align-items: center;
   gap: 0.95rem;
-  height: 3.7rem;
-  min-height: 3.7rem;
+  height: var(--menu-height);
+  min-height: var(--menu-height);
   padding: 0 0.9rem 0 0.78rem;
   color: inherit;
   text-decoration: none;
@@ -884,7 +909,7 @@ svg,
     linear-gradient(180deg, rgba(255, 244, 224, 0.06), rgba(255, 244, 224, 0.02)),
     var(--row);
   border: 1px solid var(--line);
-  border-radius: 0.72rem;
+  border-radius: var(--menu-radius);
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -917,8 +942,8 @@ svg,
 }
 
 .sheet-cta-icon svg {
-  width: 2.06rem;
-  height: 2.06rem;
+  width: var(--menu-icon-size);
+  height: var(--menu-icon-size);
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
@@ -929,10 +954,10 @@ svg,
 .sheet-cta-label {
   min-width: 0;
   justify-self: center;
-  font-size: clamp(0.98rem, 3.7vw, 1.08rem);
+  font-size: var(--menu-size);
   line-height: 1.1;
   color: var(--text);
-  font-weight: 400;
+  font-weight: var(--menu-weight);
   letter-spacing: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1015,10 +1040,6 @@ svg,
     margin-bottom: 0.8rem;
   }
 
-  .hero-block {
-    min-height: 13.8rem;
-  }
-
   .menu-row {
     gap: 0.75rem;
     padding-left: 0.72rem;
@@ -1049,8 +1070,6 @@ svg,
     width: 100%;
     grid-template-columns: 2.85rem minmax(0, 1fr) 0.9rem;
     gap: 0.75rem;
-    height: 3.7rem;
-    min-height: 3.7rem;
     padding-left: 0.72rem;
     padding-right: 0.78rem;
   }
@@ -1058,10 +1077,6 @@ svg,
   .sheet-cta-icon {
     width: 2.75rem;
     height: 2.75rem;
-  }
-
-  .sheet-cta-label {
-    font-size: clamp(0.98rem, 3.7vw, 1.08rem);
   }
 
   .sheet-image {
@@ -1077,7 +1092,6 @@ svg,
 
 @media (min-width: 961px) {
   .hero-block {
-    min-height: 18.75rem;
     background-position: center 44%;
   }
 
