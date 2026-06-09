@@ -1512,7 +1512,7 @@ function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
   return {
     id: baseSection.id,
-    icon: baseSection.id.startsWith("custom-") ? cleanString(section?.icon, baseSection.icon) : baseSection.icon,
+    icon: cleanString(section?.icon, baseSection.icon),
     iconColor: cleanIconColor(section?.iconColor, baseSection.iconColor),
     hidden: Boolean(section?.hidden ?? baseSection.hidden),
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
