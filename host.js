@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260609e";
+} from "./content.js?v=20260609f";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -173,7 +173,7 @@ const dom = {
   optionalLocale: document.querySelector("#field-optional-locale"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
-  heroMeta: document.querySelector("#field-hero-meta"),
+  introLines: document.querySelector("#field-intro-lines"),
   address: document.querySelector("#field-address"),
   license: document.querySelector("#field-license"),
   fontPrimary: document.querySelector("#field-font-primary"),
@@ -784,10 +784,10 @@ async function translateBatch(texts, targetLocale) {
   return translated;
 }
 
-async function translateSingleText(text, targetLocale) {
+async function translateIntroLine(text, targetLocale) {
   if (!text || targetLocale === FIXED_LOCALE) return text;
   const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
-  const key = translationKey(targetLocale, `heroMeta::${text}`);
+  const key = translationKey(targetLocale, `introLines::${text}`);
   if (translationCache.has(key)) return translationCache.get(key);
 
   const params = new URLSearchParams({
@@ -823,10 +823,10 @@ async function translateSingleText(text, targetLocale) {
   }
 }
 
-async function translateHeroMeta(lines = [], targetLocale) {
+async function translateIntroLines(lines = [], targetLocale) {
   const translated = [];
   for (const line of lines) {
-    translated.push(await translateSingleText(line, targetLocale));
+    translated.push(await translateIntroLine(line, targetLocale));
   }
   return translated;
 }
@@ -917,7 +917,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
   if (targetLocale === "sc") {
     return {
-      heroMeta: [...(italianLocale.heroMeta ?? [])],
+      introLines: [...(italianLocale.introLines ?? [])],
       subtitle: italianLocale.subtitle,
       sections: italianLocale.sections.map((section, sectionIndex) => {
         const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
@@ -967,7 +967,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   }
 
   const draftLocale = {
-    heroMeta: [],
+    introLines: [],
     subtitle: "",
     sections: italianLocale.sections.map((section) => ({
       id: section.id,
@@ -983,7 +983,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   const texts = [];
   const appliers = [];
 
-  draftLocale.heroMeta = await translateHeroMeta(italianLocale.heroMeta ?? [], targetLocale);
+  draftLocale.introLines = await translateIntroLines(italianLocale.introLines ?? [], targetLocale);
 
   italianLocale.sections.forEach((section, sectionIndex) => {
     const targetSection = draftLocale.sections[sectionIndex];
@@ -1070,9 +1070,16 @@ async function buildPublishedTemplate(template) {
   const next = JSON.parse(JSON.stringify(template));
   next.locales = next.locales && typeof next.locales === "object" ? next.locales : {};
   next.locales[FIXED_LOCALE] = next.locales[FIXED_LOCALE] || {};
-  if (!Array.isArray(next.locales[FIXED_LOCALE].heroMeta) || !next.locales[FIXED_LOCALE].heroMeta.length) {
-    next.locales[FIXED_LOCALE].heroMeta = Array.isArray(next.heroMeta) ? [...next.heroMeta] : [];
-  }
+  const legacyIntroLines = Array.isArray(next.locales[FIXED_LOCALE].introLines)
+    ? next.locales[FIXED_LOCALE].introLines
+    : Array.isArray(next.locales[FIXED_LOCALE].heroMeta)
+      ? next.locales[FIXED_LOCALE].heroMeta
+      : Array.isArray(next.heroMeta)
+        ? next.heroMeta
+        : [];
+  next.locales[FIXED_LOCALE].introLines = [...legacyIntroLines];
+  delete next.locales[FIXED_LOCALE].heroMeta;
+  delete next.heroMeta;
   const italianLocale = next.locales[FIXED_LOCALE];
   const enabledLocaleCodes = new Set(next.enabledLocales ?? REQUIRED_LOCALES);
   lastTranslationFallbackLocales = [];
@@ -1487,7 +1494,7 @@ function syncFields() {
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
   fillDesignSelects(theme);
   dom.subtitle.value = localeState.subtitle;
-  dom.heroMeta.value = serializeFooterLines(localeState.heroMeta || state.heroMeta || []);
+  dom.introLines.value = serializeFooterLines(localeState.introLines || []);
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
   dom.footerLines.value = serializeFooterLines(state.footer.lines);
@@ -1549,10 +1556,8 @@ function collectTemplate() {
   next.appName = dom.appName.value;
   next.address = dom.address.value;
   next.license = dom.license.value;
-  const heroMeta = parseFooterLines(dom.heroMeta.value);
-  if (selectedEditorLocale === FIXED_LOCALE) {
-    next.heroMeta = heroMeta;
-  }
+  const introLines = parseFooterLines(dom.introLines.value);
+  delete next.heroMeta;
   next.footer = {
     name: dom.footerName.value,
     subtitle: dom.footerSubtitle.value,
@@ -1562,10 +1567,11 @@ function collectTemplate() {
   next.enabledLocales = [...REQUIRED_LOCALES, ...optionalEnabled];
   next.locales[selectedEditorLocale] = {
     ...next.locales[selectedEditorLocale],
-    heroMeta,
+    introLines,
     subtitle: dom.subtitle.value,
     sections,
   };
+  delete next.locales[selectedEditorLocale].heroMeta;
 
   return normalizeTemplate(next);
 }

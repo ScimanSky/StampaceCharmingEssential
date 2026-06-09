@@ -1363,7 +1363,6 @@ export const defaultTemplate = {
   appName: "Stampace Charming",
   address: "Via Domenico Alberto Azuni, 2, 09124 Cagliari, Italia",
   license: "CIN: IT092009C2000R8066",
-  heroMeta: [],
   footer: {
     name: "Stampace Charming",
     subtitle: "Luxury apartment",
@@ -1542,6 +1541,11 @@ function normalizeLocaleSections(rawSections, baseSections, localeCode) {
 
 function normalizeLocaleContent(localeData, baseLocale, localeCode) {
   const rawSections = Array.isArray(localeData?.sections) ? localeData.sections : [];
+  const introLines = Array.isArray(localeData?.introLines)
+    ? localeData.introLines
+    : Array.isArray(localeData?.heroMeta)
+      ? localeData.heroMeta
+      : baseLocale.introLines ?? baseLocale.heroMeta;
   const structureSections =
     localeCode === FIXED_LOCALE && rawSections.length
       ? rawSections.map(
@@ -1552,7 +1556,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       : baseLocale.sections;
 
   return {
-    heroMeta: cleanLines(localeData?.heroMeta ?? baseLocale.heroMeta),
+    introLines: cleanLines(introLines),
     subtitle:
       localeCode === FIXED_LOCALE
         ? cleanString(localeData?.subtitle, baseLocale.subtitle)
@@ -1757,7 +1761,7 @@ function mirrorItalianContent(localeMap) {
         return [
           language.code,
           {
-            heroMeta: localized?.heroMeta?.length ? localized.heroMeta : italian.heroMeta,
+            introLines: localized?.introLines?.length ? localized.introLines : italian.introLines,
             subtitle: italian.subtitle,
             sections: italian.sections.map((section, sectionIndex) => {
               const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
@@ -1808,7 +1812,7 @@ function mirrorItalianContent(localeMap) {
       return [
         language.code,
         {
-          heroMeta: localized?.heroMeta?.length ? localized.heroMeta : italian.heroMeta,
+          introLines: localized?.introLines?.length ? localized.introLines : italian.introLines,
           subtitle: italian.subtitle,
           sections: italian.sections.map((section, index) => {
             const localizedSection = localizedSectionForItalianSection(
@@ -1856,7 +1860,7 @@ function mirrorItalianContent(localeMap) {
 function buildLocaleMap(rawTemplate = {}) {
   const rawLocales = rawTemplate.locales && typeof rawTemplate.locales === "object" ? rawTemplate.locales : {};
   const legacyItLocale = {
-    heroMeta: rawTemplate.heroMeta,
+    introLines: rawTemplate.introLines ?? rawTemplate.heroMeta,
     subtitle: rawTemplate.subtitle,
     sections: rawTemplate.sections,
   };
@@ -1868,8 +1872,8 @@ function buildLocaleMap(rawTemplate = {}) {
         rawLocales[language.code] ??
         (language.code === FIXED_LOCALE ? legacyItLocale : {});
       const rawLocale =
-        language.code === FIXED_LOCALE && !Array.isArray(rawLocaleSource?.heroMeta) && Array.isArray(rawTemplate.heroMeta)
-          ? { ...rawLocaleSource, heroMeta: rawTemplate.heroMeta }
+        language.code === FIXED_LOCALE && !Array.isArray(rawLocaleSource?.introLines) && Array.isArray(rawTemplate.heroMeta)
+          ? { ...rawLocaleSource, introLines: rawTemplate.heroMeta }
           : rawLocaleSource;
       return [language.code, normalizeLocaleContent(rawLocale, baseLocale, language.code)];
     }),
@@ -1884,7 +1888,6 @@ export function normalizeTemplate(rawTemplate = {}) {
   const resolvedAppName = cleanString(rawTemplate.appName, defaultTemplate.appName);
   const resolvedAddress = cleanString(rawTemplate.address, defaultTemplate.address);
   const resolvedLicense = cleanString(rawTemplate.license, defaultTemplate.license);
-  const heroMeta = cleanLines(rawTemplate.heroMeta);
   const footerLines = Array.isArray(footerSource.lines)
     ? footerSource.lines.map((line) => cleanString(line)).filter(Boolean)
     : [cleanString(footerSource.address, resolvedAddress), cleanString(footerSource.license, resolvedLicense)].filter(Boolean);
@@ -1894,7 +1897,6 @@ export function normalizeTemplate(rawTemplate = {}) {
     appName: resolvedAppName,
     address: resolvedAddress,
     license: resolvedLicense,
-    heroMeta,
     footer: {
       name: cleanString(footerSource.name, resolvedAppName || fallbackFooter.name),
       subtitle: cleanString(footerSource.subtitle, fallbackFooter.subtitle),
