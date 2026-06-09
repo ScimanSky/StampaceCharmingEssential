@@ -13,7 +13,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260609d";
+} from "./content.js?v=20260609e";
 import {
   deleteSectionImage,
   fetchRemoteTemplateRow,
@@ -92,6 +92,46 @@ const iconPaths = {
     '<rect x="7" y="5.2" width="10" height="11.6" rx="2"/><path d="M9.5 8.2h5"/><path d="M9.5 11.2h5"/><path d="M9.2 18.2 8 20"/><path d="M14.8 18.2 16 20"/>',
   wave:
     '<path d="M3.8 15.2c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1"/><path d="M4 10.5c1 0 1-.8 2-.8s1 .8 2 .8 1-.8 2-.8 1 .8 2 .8 1-.8 2-.8 1 .8 2 .8"/>',
+  beach:
+    '<path d="M3.5 18.5c1.2 0 1.2-1 2.4-1s1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1 1.2-1 2.4-1 1.2 1 2.4 1"/><path d="M8.2 14.8 12 6l3.8 8.8"/><path d="M5.8 10.6c3.5-2.2 8.8-2.2 12.4 0"/><path d="M12 6v11"/>',
+  boat:
+    '<path d="M4 14.5h16l-2.2 4.2H6.2z"/><path d="M8 14.5V6.2l6 3.2-6 3.2"/><path d="M3.8 20c1.1 0 1.1-.7 2.2-.7s1.1.7 2.2.7 1.1-.7 2.2-.7 1.1.7 2.2.7 1.1-.7 2.2-.7 1.1.7 2.2.7"/>',
+  paddle:
+    '<path d="M5 18.8 18.8 5"/><path d="M3.8 20 6.3 17.5"/><path d="M17.5 6.3 20 3.8"/><path d="M4.2 14.8c1 0 1-.8 2-.8s1 .8 2 .8 1-.8 2-.8 1 .8 2 .8 1-.8 2-.8 1 .8 2 .8"/><path d="M6.2 11.2h11.6"/>',
+  walk:
+    '<circle cx="13" cy="5.5" r="1.7"/><path d="M11.8 8.2 10 12l3 2.2 1.2 5.3"/><path d="M10 12l-2.4 2.4"/><path d="M12.2 9.2l3.2 2.2"/><path d="M11.2 15.2 8.8 20"/>',
+  camera:
+    '<rect x="4.5" y="7.5" width="15" height="10.5" rx="2"/><path d="M8.2 7.5 9.5 5.5h5l1.3 2"/><circle cx="12" cy="12.8" r="3.1"/>',
+  museum:
+    '<path d="M4 9.5 12 5l8 4.5"/><path d="M5.5 10h13"/><path d="M7 10v7M11 10v7M15 10v7M19 18.5H5"/>',
+  coffee:
+    '<path d="M5.5 8h10v5.2a4.3 4.3 0 0 1-4.3 4.3H9.8a4.3 4.3 0 0 1-4.3-4.3z"/><path d="M15.5 9.5h1.2a2.2 2.2 0 0 1 0 4.4h-1.2"/><path d="M7 20h9"/>',
+  wine:
+    '<path d="M8.5 4.5h7l-.7 6.4a3.3 3.3 0 0 1-5.6 2.1 3.3 3.3 0 0 1-1-2.1z"/><path d="M12 14v5"/><path d="M9 20h6"/><path d="M9 8.5h6"/>',
+  shopping:
+    '<path d="M6.5 8.5h11l-1 11h-9z"/><path d="M9 8.5a3 3 0 0 1 6 0"/>',
+  parking:
+    '<rect x="5" y="4.5" width="14" height="15" rx="2"/><path d="M10 16V8h3.2a2.4 2.4 0 0 1 0 4.8H10"/>',
+  taxi:
+    '<path d="M4.2 14.5h15.6"/><path d="m6.2 14.5 1.1-4.2c.2-.8.9-1.3 1.7-1.3h6c.8 0 1.5.5 1.7 1.3l1.1 4.2"/><path d="M10 7h4"/><circle cx="7.8" cy="17" r="1.2"/><circle cx="16.2" cy="17" r="1.2"/>',
+  airplane:
+    '<path d="M3.8 12.7 20 5.2l-4.8 15-3.2-6.2z"/><path d="M20 5.2 12 14"/>',
+  ferry:
+    '<path d="M5 13.5h14l-2 4.5H7z"/><path d="M8 13.5V8h8v5.5"/><path d="M9.5 8V5.5h5V8"/><path d="M4 20c1.2 0 1.2-.8 2.4-.8s1.2.8 2.4.8 1.2-.8 2.4-.8 1.2.8 2.4.8 1.2-.8 2.4-.8 1.2.8 2.4.8"/>',
+  hospital:
+    '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M12 8.2v7.6"/><path d="M8.2 12h7.6"/>',
+  info:
+    '<circle cx="12" cy="12" r="8"/><path d="M12 11v5"/><path d="M12 8h.01"/>',
+  warning:
+    '<path d="M12 4 21 19H3z"/><path d="M12 9v4"/><path d="M12 16h.01"/>',
+  star:
+    '<path d="m12 4 2.3 4.7 5.2.8-3.8 3.7.9 5.2L12 16l-4.6 2.4.9-5.2-3.8-3.7 5.2-.8z"/>',
+  heart:
+    '<path d="M12 19s-7-4.2-7-9a3.8 3.8 0 0 1 6.8-2.3A3.8 3.8 0 0 1 18.6 10c0 4.8-6.6 9-6.6 9z"/>',
+  globe:
+    '<circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4a12 12 0 0 1 0 16"/><path d="M12 4a12 12 0 0 0 0 16"/>',
+  book:
+    '<path d="M5.5 5.5h6A2.5 2.5 0 0 1 14 8v11a2.5 2.5 0 0 0-2.5-2.5h-6z"/><path d="M18.5 5.5h-4A2.5 2.5 0 0 0 12 8v11a2.5 2.5 0 0 1 2.5-2.5h4z"/>',
   route:
     '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
   link:
@@ -331,6 +371,29 @@ const CTA_ICON_OPTIONS = [
   { value: "link", label: "Link" },
   { value: "route", label: "Percorso" },
   { value: "car", label: "Auto" },
+  { value: "bus", label: "Bus" },
+  { value: "taxi", label: "Taxi" },
+  { value: "airplane", label: "Aeroporto" },
+  { value: "ferry", label: "Traghetto" },
+  { value: "boat", label: "Barca" },
+  { value: "beach", label: "Spiaggia" },
+  { value: "paddle", label: "SUP / Kayak" },
+  { value: "walk", label: "Passeggiata" },
+  { value: "trail", label: "Escursione" },
+  { value: "camera", label: "Visita / Foto" },
+  { value: "museum", label: "Museo / Cultura" },
+  { value: "utensils", label: "Ristorante" },
+  { value: "coffee", label: "Bar / Caffe" },
+  { value: "wine", label: "Vino / Aperitivo" },
+  { value: "shopping", label: "Shopping" },
+  { value: "parking", label: "Parcheggio" },
+  { value: "hospital", label: "Pronto soccorso" },
+  { value: "info", label: "Informazioni" },
+  { value: "warning", label: "Avviso" },
+  { value: "star", label: "Consigliato" },
+  { value: "heart", label: "Preferito" },
+  { value: "globe", label: "Sito / Lingue" },
+  { value: "book", label: "Guida" },
   { value: "ticket", label: "Ticket" },
   { value: "home", label: "Casa" },
   { value: "key", label: "Chiave" },
@@ -356,10 +419,30 @@ const SECTION_ICON_OPTIONS = [
   { value: "cart", label: "Spesa" },
   { value: "cross", label: "Farmacia / Emergenze" },
   { value: "wave", label: "Mare" },
+  { value: "beach", label: "Spiaggia" },
+  { value: "boat", label: "Barca" },
+  { value: "paddle", label: "SUP / Kayak" },
+  { value: "walk", label: "Passeggiata" },
   { value: "trail", label: "Escursioni" },
+  { value: "camera", label: "Visite guidate / Foto" },
+  { value: "museum", label: "Musei / Cultura" },
   { value: "binoculars", label: "Dintorni" },
+  { value: "coffee", label: "Bar / Caffe" },
+  { value: "wine", label: "Vino / Aperitivo" },
+  { value: "shopping", label: "Shopping" },
+  { value: "parking", label: "Parcheggio" },
+  { value: "taxi", label: "Taxi" },
+  { value: "airplane", label: "Aeroporto" },
+  { value: "ferry", label: "Traghetto" },
   { value: "receipt", label: "Pagamenti" },
   { value: "id", label: "Documenti" },
+  { value: "hospital", label: "Pronto soccorso" },
+  { value: "info", label: "Informazioni" },
+  { value: "warning", label: "Avvisi" },
+  { value: "star", label: "Consigliati" },
+  { value: "heart", label: "Preferiti" },
+  { value: "globe", label: "Sito / Lingue" },
+  { value: "book", label: "Guida" },
   { value: "phone", label: "Telefono" },
   { value: "mail", label: "Email" },
   { value: "home", label: "Casa" },
@@ -413,6 +496,12 @@ function inferSectionIcon(section) {
   if (/cassafort|safe|valori/.test(text)) return "vault";
   if (/chiav|serratur|porta|access/.test(text)) return "key";
   if (/escursion|tour|gita|trek|experience|esperienz|sentier/.test(text)) return "trail";
+  if (/spiagg|beach|poetto|mare/.test(text)) return "beach";
+  if (/barca|boat|sail|vela|gommon|yacht/.test(text)) return "boat";
+  if (/sup|kayak|canoa|paddle/.test(text)) return "paddle";
+  if (/walk|walking|passeggiat|cammin/.test(text)) return "walk";
+  if (/visita guid|guided tour|foto|photo|camera/.test(text)) return "camera";
+  if (/muse|cultur|arte|storia/.test(text)) return "museum";
   if (/ristorant|locali|bar|aperitiv|food|drink|cibo|spesa|market|supermercat/.test(text)) return "utensils";
   if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "skyline";
   if (/noleggio|rent|auto|car rental|vehicle|parchegg/.test(text)) return "car";
@@ -716,17 +805,23 @@ async function translateTexts(texts, targetLocale) {
 
   if (missingTexts.length) {
     let translated;
+    let shouldCache = true;
     try {
       translated = await translateBatch(missingTexts, targetLocale);
     } catch {
       lastTranslationFallbackLocales.push(targetLocale);
       translated = missingTexts;
+      shouldCache = false;
     }
     translated.forEach((value, idx) => {
       const source = missingTexts[idx];
       const index = missingIndexes[idx];
       const key = translationKey(targetLocale, source);
-      translationCache.set(key, value);
+      if (shouldCache) {
+        translationCache.set(key, value);
+      } else {
+        translationCache.delete(key);
+      }
       results[index] = value;
     });
   }
