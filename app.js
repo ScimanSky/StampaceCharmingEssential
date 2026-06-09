@@ -375,17 +375,6 @@ function hostActionFromCtaItem(item) {
   };
 }
 
-function hostActionFromPrivateItem(item) {
-  const href = sanitizeHref(item.href);
-  if (!href) return null;
-  return {
-    kind: "host",
-    label: item.label || item.title || "Area Host",
-    href,
-    icon: "shield",
-  };
-}
-
 function renderHostActionIcon(action) {
   if (action.kind === "whatsapp") return renderWhatsAppBrandIcon();
   if (action.kind === "gmail") return renderGmailBrandIcon();
@@ -665,11 +654,17 @@ function renderHostShortcut() {
   dom.hostAvatarLabel.textContent = "Host";
 }
 
-function renderHostAvatarMedia(className = "sheet-host-avatar-media") {
-  return `
+function renderHostAvatarMedia(className = "sheet-host-avatar-media", { linked = false } = {}) {
+  const media = `
     <span class="${escapeAttribute(className)}">
       <img src="${escapeAttribute(sanitizeImageSrc(HOST_AVATAR_SRC))}" alt="" loading="lazy" decoding="async" />
     </span>
+  `;
+  if (!linked) return media;
+  return `
+    <a class="sheet-host-avatar-link" href="./host.html" target="_blank" rel="noopener noreferrer" aria-label="Apri area host">
+      ${media}
+    </a>
   `;
 }
 
@@ -687,9 +682,9 @@ function renderSectionItems(items, sectionId) {
           ? hostActionFromStringItem(item)
           : isCtaItem(item)
             ? hostActionFromCtaItem(item)
-            : isHostPrivateItem(item)
-              ? hostActionFromPrivateItem(item)
-              : null;
+            : null;
+
+      if (isHostPrivateItem(item)) return;
 
       if (action) {
         actions.push(action);
@@ -818,13 +813,15 @@ function renderOpenSection(sectionId) {
 
   activeSectionId = section.id;
   if (section.id === "host") {
-    dom.sheetIcon.innerHTML = renderHostAvatarMedia();
+    dom.sheetIcon.innerHTML = renderHostAvatarMedia("sheet-host-avatar-media", { linked: true });
     dom.sheetIcon.className = "sheet-icon sheet-icon--host sheet-icon--host-avatar";
+    dom.sheetIcon.removeAttribute("aria-hidden");
     dom.sheetIcon.style.removeProperty("--icon-custom-color");
   } else {
     const sectionIcon = iconForSection(section);
     dom.sheetIcon.innerHTML = renderIcon(sectionIcon);
     dom.sheetIcon.className = `sheet-icon sheet-icon--${sectionClassToken(section.id)} sheet-icon--icon-${sectionClassToken(sectionIcon)}`;
+    dom.sheetIcon.setAttribute("aria-hidden", "true");
   }
   const iconColor = section.id === "host" ? "" : sectionIconColor(section);
   if (iconColor) {
@@ -1157,7 +1154,7 @@ function render() {
   dom.topbarSubtitle.textContent = localeTemplate.subtitle;
   renderHostShortcut();
   renderLocaleBar();
-  dom.subtitle.textContent = localeTemplate.subtitle;
+  dom.subtitle.textContent = "";
   dom.heroMeta.innerHTML = (localeTemplate.introLines || [])
     .map((line) => `<span>${escapeHtml(line)}</span>`)
     .join("");
