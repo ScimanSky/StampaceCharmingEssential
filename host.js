@@ -210,6 +210,98 @@ const FONT_WEIGHT_OPTIONS = [
   { value: "500", label: "Medio" },
   { value: "600", label: "Grassetto" },
 ];
+const TEXT_SIZE_OPTIONS = [
+  { value: "0.9rem", label: "Piccolo" },
+  { value: "0.98rem", label: "Normale" },
+  { value: "1.08rem", label: "Grande" },
+  { value: "1.18rem", label: "Molto grande" },
+];
+const TITLE_SIZE_OPTIONS = [
+  { value: "1.08rem", label: "Compatto" },
+  { value: "1.18rem", label: "Normale" },
+  { value: "1.32rem", label: "Grande" },
+  { value: "1.48rem", label: "Importante" },
+];
+const SECTION_TITLE_SIZE_OPTIONS = [
+  { value: "1.18rem", label: "Compatto" },
+  { value: "1.32rem", label: "Normale" },
+  { value: "1.48rem", label: "Grande" },
+  { value: "1.64rem", label: "Molto grande" },
+];
+const APP_WIDTH_OPTIONS = [
+  { value: "30rem", label: "Stretta" },
+  { value: "34rem", label: "Normale" },
+  { value: "40rem", label: "Ampia" },
+  { value: "48rem", label: "Molto ampia" },
+];
+const SPACING_OPTIONS = [
+  { value: "0.55rem", label: "Compatta" },
+  { value: "0.8rem", label: "Normale" },
+  { value: "1rem", label: "Aria media" },
+  { value: "1.25rem", label: "Ampia" },
+];
+const HERO_HEIGHT_OPTIONS = [
+  { value: "12.5rem", label: "Bassa" },
+  { value: "15.5rem", label: "Normale" },
+  { value: "18.75rem", label: "Alta" },
+  { value: "22rem", label: "Molto alta" },
+];
+const BUTTON_HEIGHT_OPTIONS = [
+  { value: "3.35rem", label: "Compatta" },
+  { value: "3.7rem", label: "Normale" },
+  { value: "4.1rem", label: "Grande" },
+  { value: "4.55rem", label: "Molto grande" },
+];
+const RADIUS_OPTIONS = [
+  { value: "0.45rem", label: "Squadrato" },
+  { value: "0.72rem", label: "Morbido" },
+  { value: "1rem", label: "Arrotondato" },
+  { value: "1.45rem", label: "Molto arrotondato" },
+];
+const SHEET_RADIUS_OPTIONS = [
+  { value: "1rem", label: "Morbido" },
+  { value: "1.8rem", label: "Arrotondato" },
+  { value: "2.4rem", label: "Molto arrotondato" },
+];
+const ICON_SIZE_OPTIONS = [
+  { value: "1.75rem", label: "Piccole" },
+  { value: "2.06rem", label: "Normali" },
+  { value: "2.35rem", label: "Grandi" },
+];
+const SOLID_COLOR_OPTIONS = [
+  { value: "#070605", label: "Nero caldo" },
+  { value: "#0e0c0a", label: "Bruno scuro" },
+  { value: "#17120e", label: "Legno scuro" },
+  { value: "#f3eadc", label: "Avorio" },
+  { value: "#e7d8c1", label: "Oro chiaro" },
+  { value: "#dfc39c", label: "Oro caldo" },
+  { value: "#5fa8ff", label: "Blu elegante" },
+  { value: "#e45f53", label: "Rosso terracotta" },
+  { value: "#44c77a", label: "Verde WhatsApp" },
+];
+const SOFT_COLOR_OPTIONS = [
+  { value: "rgba(231, 216, 193, 0.58)", label: "Molto discreto" },
+  { value: "rgba(231, 216, 193, 0.72)", label: "Discreto" },
+  { value: "rgba(231, 216, 193, 0.88)", label: "Chiaro" },
+  { value: "#e7d8c1", label: "Pieno" },
+];
+const SURFACE_COLOR_OPTIONS = [
+  { value: "rgba(17, 14, 11, 0.28)", label: "Molto leggero" },
+  { value: "rgba(17, 14, 11, 0.34)", label: "Normale" },
+  { value: "rgba(27, 22, 17, 0.48)", label: "Più visibile" },
+  { value: "rgba(40, 31, 23, 0.62)", label: "Intenso" },
+];
+const LINE_COLOR_OPTIONS = [
+  { value: "rgba(224, 205, 177, 0.08)", label: "Sottile" },
+  { value: "rgba(224, 205, 177, 0.12)", label: "Normale" },
+  { value: "rgba(224, 205, 177, 0.2)", label: "Visibile" },
+  { value: "rgba(224, 205, 177, 0.32)", label: "Marcato" },
+];
+const SHEET_COLOR_OPTIONS = [
+  { value: "rgba(10, 8, 6, 0.88)", label: "Scuro leggero" },
+  { value: "rgba(10, 8, 6, 0.92)", label: "Scuro elegante" },
+  { value: "rgba(17, 14, 11, 0.96)", label: "Legno scuro" },
+];
 let draggingSectionId = null;
 const CTA_KIND_OPTIONS = [
   { value: "web", label: "Web" },
@@ -411,13 +503,58 @@ function ctaDefaultHref(kind = "web") {
 }
 
 function optionsHtml(options, selectedValue) {
-  return options.map(
+  const selected = typeof selectedValue === "string" ? selectedValue : "";
+  const mergedOptions = selected && !options.some((option) => option.value === selected)
+    ? [...options, { value: selected, label: "Valore personalizzato salvato" }]
+    : options;
+  return mergedOptions.map(
     (option) => `<option value="${escapeAttribute(option.value)}" ${option.value === selectedValue ? "selected" : ""}>${escapeHtml(option.label)}</option>`,
   ).join("");
 }
 
 function setFieldValue(field, value) {
   if (field) field.value = value ?? "";
+}
+
+function fillSelect(field, options, selectedValue) {
+  if (!field) return;
+  field.innerHTML = optionsHtml(options, selectedValue);
+}
+
+function fillDesignSelects(theme) {
+  const colors = theme?.colors || {};
+  const typography = theme?.typography || {};
+  const layout = theme?.layout || {};
+  const buttons = theme?.buttons || {};
+  const motion = theme?.motion || {};
+
+  fillSelect(dom.titleSize, TITLE_SIZE_OPTIONS, typography.titleSize);
+  fillSelect(dom.subtitleSize, TEXT_SIZE_OPTIONS, typography.subtitleSize);
+  fillSelect(dom.menuSize, TEXT_SIZE_OPTIONS, typography.menuSize);
+  fillSelect(dom.menuWeight, FONT_WEIGHT_OPTIONS, typography.menuWeight);
+  fillSelect(dom.sectionTitleSize, SECTION_TITLE_SIZE_OPTIONS, typography.sectionTitleSize);
+  fillSelect(dom.bodySize, TEXT_SIZE_OPTIONS, typography.bodySize);
+  fillSelect(dom.bodyWeight, FONT_WEIGHT_OPTIONS, typography.bodyWeight);
+  fillSelect(dom.colorBackground, SOLID_COLOR_OPTIONS, colors.background);
+  fillSelect(dom.colorText, SOLID_COLOR_OPTIONS, colors.text);
+  fillSelect(dom.colorMuted, SOFT_COLOR_OPTIONS, colors.muted);
+  fillSelect(dom.colorIcon, SOLID_COLOR_OPTIONS, colors.icon);
+  fillSelect(dom.colorLine, LINE_COLOR_OPTIONS, colors.line);
+  fillSelect(dom.colorRow, SURFACE_COLOR_OPTIONS, colors.row);
+  fillSelect(dom.colorRowHover, SURFACE_COLOR_OPTIONS, colors.rowHover);
+  fillSelect(dom.colorSheet, SHEET_COLOR_OPTIONS, colors.sheet);
+  fillSelect(dom.appWidth, APP_WIDTH_OPTIONS, layout.appWidth);
+  fillSelect(dom.pagePadding, SPACING_OPTIONS, layout.pagePadding);
+  fillSelect(dom.heroHeight, HERO_HEIGHT_OPTIONS, layout.heroHeight);
+  fillSelect(dom.buttonHeight, BUTTON_HEIGHT_OPTIONS, layout.buttonHeight);
+  fillSelect(dom.buttonRadius, RADIUS_OPTIONS, layout.buttonRadius);
+  fillSelect(dom.buttonGap, SPACING_OPTIONS, layout.buttonGap);
+  fillSelect(dom.iconSize, ICON_SIZE_OPTIONS, buttons.iconSize);
+  fillSelect(dom.sheetWidth, APP_WIDTH_OPTIONS, layout.sheetWidth);
+  fillSelect(dom.sheetRadius, SHEET_RADIUS_OPTIONS, layout.sheetRadius);
+  fillSelect(dom.contentGap, SPACING_OPTIONS, layout.contentGap);
+  setFieldValue(dom.showChevron, buttons.showChevron);
+  setFieldValue(dom.sheetAnimation, motion.sheetAnimation);
 }
 
 function themeDraftFromFields() {
@@ -1145,52 +1282,18 @@ function renderSectionEditors() {
 function syncFields() {
   if (dom.fontPrimary && dom.fontPrimary.options.length === 0) {
     const fontOptions = optionsHtml(AVAILABLE_FONTS);
-    const weightOptions = optionsHtml(FONT_WEIGHT_OPTIONS);
     dom.fontPrimary.innerHTML = fontOptions;
     dom.fontSecondary.innerHTML = fontOptions;
-    dom.menuWeight.innerHTML = weightOptions;
-    dom.bodyWeight.innerHTML = weightOptions;
   }
   applyTheme(state.theme);
   const localeState = currentLocaleState();
   const theme = state.theme || {};
-  const colors = theme.colors || {};
-  const typography = theme.typography || {};
-  const layout = theme.layout || {};
-  const buttons = theme.buttons || {};
-  const motion = theme.motion || {};
   dom.appName.value = state.appName;
   dom.address.value = state.address;
   dom.license.value = state.license;
   dom.fontPrimary.value = state.theme?.fontPrimary || "Roboto";
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
-  setFieldValue(dom.titleSize, typography.titleSize);
-  setFieldValue(dom.subtitleSize, typography.subtitleSize);
-  setFieldValue(dom.menuSize, typography.menuSize);
-  setFieldValue(dom.menuWeight, typography.menuWeight);
-  setFieldValue(dom.sectionTitleSize, typography.sectionTitleSize);
-  setFieldValue(dom.bodySize, typography.bodySize);
-  setFieldValue(dom.bodyWeight, typography.bodyWeight);
-  setFieldValue(dom.colorBackground, colors.background);
-  setFieldValue(dom.colorText, colors.text);
-  setFieldValue(dom.colorMuted, colors.muted);
-  setFieldValue(dom.colorIcon, colors.icon);
-  setFieldValue(dom.colorLine, colors.line);
-  setFieldValue(dom.colorRow, colors.row);
-  setFieldValue(dom.colorRowHover, colors.rowHover);
-  setFieldValue(dom.colorSheet, colors.sheet);
-  setFieldValue(dom.appWidth, layout.appWidth);
-  setFieldValue(dom.pagePadding, layout.pagePadding);
-  setFieldValue(dom.heroHeight, layout.heroHeight);
-  setFieldValue(dom.buttonHeight, layout.buttonHeight);
-  setFieldValue(dom.buttonRadius, layout.buttonRadius);
-  setFieldValue(dom.buttonGap, layout.buttonGap);
-  setFieldValue(dom.iconSize, buttons.iconSize);
-  setFieldValue(dom.showChevron, buttons.showChevron);
-  setFieldValue(dom.sheetWidth, layout.sheetWidth);
-  setFieldValue(dom.sheetRadius, layout.sheetRadius);
-  setFieldValue(dom.contentGap, layout.contentGap);
-  setFieldValue(dom.sheetAnimation, motion.sheetAnimation);
+  fillDesignSelects(theme);
   dom.subtitle.value = localeState.subtitle;
   dom.heroMeta.value = serializeFooterLines(state.heroMeta || []);
   dom.footerName.value = state.footer.name;
