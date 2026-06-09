@@ -48,6 +48,17 @@ select {
   padding: 0.85rem 0.9rem;
   outline: none;
   min-height: 2.75rem;
+  color-scheme: dark;
+}
+
+select option {
+  background: #1b1712;
+  color: #f0dfc7;
+}
+
+select option:checked {
+  background: #6d5a40;
+  color: #fff7e8;
 }
 
 .hidden {
