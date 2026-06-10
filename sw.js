@@ -1,17 +1,14 @@
-const CACHE_NAME = "stampace-essential-v20260610f";
+const CACHE_NAME = "stampace-essential-v20260610g";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
   "./guest/",
   "./guest/index.html",
-  "./host.html",
-  "./styles.css?v=20260610f",
-  "./host.css?v=20260610f",
-  "./app.js?v=20260610f",
-  "./host.js?v=20260610f",
-  "./content.js?v=20260610f",
+  "./styles.css?v=20260610g",
+  "./app.js?v=20260610g",
+  "./content.js?v=20260610g",
   "./supabase.js",
-  "./security.js?v=20260610f",
+  "./security.js?v=20260610g",
   "./template.json",
   "./manifest.json",
   "./img/app-icon.svg",
@@ -81,8 +78,17 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Bypass service worker caching for host panel files to prevent any caching issues
+  if (
+    url.pathname.endsWith("/host.html") ||
+    url.pathname.includes("/host.js") ||
+    url.pathname.includes("/host.css")
+  ) {
+    return;
+  }
+
   if (request.mode === "navigate") {
-    event.respondWith(networkFirst(request, url.pathname.endsWith("/host.html") ? "./host.html" : "./index.html"));
+    event.respondWith(networkFirst(request, "./index.html"));
     return;
   }
 
