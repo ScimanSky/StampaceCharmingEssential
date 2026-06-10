@@ -9,7 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260610e";
+} from "./content.js?v=20260610f";
 import {
   escapeAttribute,
   escapeHtml,
@@ -18,7 +18,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610e";
+} from "./security.js?v=20260610f";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {

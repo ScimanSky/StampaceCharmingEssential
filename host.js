@@ -15,7 +15,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260610e";
+} from "./content.js?v=20260610f";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -37,7 +37,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610e";
+} from "./security.js?v=20260610f";
 
 const iconPaths = {
   shield:
@@ -904,6 +904,7 @@ async function translateBatch(texts, targetLocale) {
 
 async function translateIntroLine(text, targetLocale) {
   if (!text || targetLocale === FIXED_LOCALE) return text;
+  if (text.toLowerCase().trim() === "keybox") return text;
   const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
   const key = translationKey(targetLocale, `introLines::${text}`);
   if (translationCache.has(key)) return translationCache.get(key);
@@ -958,6 +959,10 @@ async function translateTexts(texts, targetLocale) {
 
   texts.forEach((text, index) => {
     if (!text || targetLocale === FIXED_LOCALE) {
+      results[index] = text;
+      return;
+    }
+    if (text.toLowerCase().trim() === "keybox") {
       results[index] = text;
       return;
     }
