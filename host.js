@@ -15,7 +15,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260609g";
+} from "./content.js?v=20260610a";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -37,7 +37,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260609d";
+} from "./security.js?v=20260610a";
 
 const iconPaths = {
   shield:
@@ -2432,6 +2432,8 @@ function bindEditorEvents() {
 
   dom.app.addEventListener("change", (event) => {
     if (!event.target.matches("[data-theme-field]")) return;
+    state = saveTemplate(collectTemplate());
+    syncFields();
     queueAutoPublish();
   });
 

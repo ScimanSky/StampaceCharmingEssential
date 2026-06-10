@@ -9,7 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260609g";
+} from "./content.js?v=20260610a";
 import {
   escapeAttribute,
   escapeHtml,
@@ -18,7 +18,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260609d";
+} from "./security.js?v=20260610a";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -1128,6 +1128,30 @@ function preventCopy() {
   });
 }
 
+function makeColorTransparent(colorStr, alpha = 0.45) {
+  if (!colorStr) return `rgba(10, 8, 6, ${alpha})`;
+  colorStr = colorStr.trim();
+  if (colorStr.startsWith("rgb")) {
+    const matches = colorStr.match(/\d+(\.\d+)?/g);
+    if (matches && matches.length >= 3) {
+      return `rgba(${matches[0]}, ${matches[1]}, ${matches[2]}, ${alpha})`;
+    }
+  }
+  if (colorStr.startsWith("#")) {
+    let hex = colorStr.slice(1);
+    if (hex.length === 3) {
+      hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16);
+      const g = parseInt(hex.slice(2, 4), 16);
+      const b = parseInt(hex.slice(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+  }
+  return colorStr;
+}
+
 function applyTheme(theme) {
   const primaryFont = theme?.fontPrimary || "Roboto";
   const secondaryFont = theme?.fontSecondary || "Roboto";
@@ -1153,7 +1177,7 @@ function applyTheme(theme) {
   document.documentElement.style.setProperty("--line", themeValue(colors, "line", "rgba(224, 205, 177, 0.12)"));
   document.documentElement.style.setProperty("--row", themeValue(colors, "row", "rgba(17, 14, 11, 0.34)"));
   document.documentElement.style.setProperty("--row-hover", themeValue(colors, "rowHover", "rgba(27, 22, 17, 0.48)"));
-  document.documentElement.style.setProperty("--sheet-bg", themeValue(colors, "sheet", "rgba(10, 8, 6, 0.92)"));
+  document.documentElement.style.setProperty("--sheet-bg", makeColorTransparent(themeValue(colors, "sheet", "rgba(10, 8, 6, 0.45)"), 0.45));
   document.documentElement.style.setProperty("--title-size", themeValue(typography, "titleSize", "1.18rem"));
   document.documentElement.style.setProperty("--subtitle-size", themeValue(typography, "subtitleSize", "0.98rem"));
   document.documentElement.style.setProperty("--menu-size", themeValue(typography, "menuSize", "1.04rem"));
