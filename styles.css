@@ -32,7 +32,7 @@
   --section-title-size: 1.32rem;
   --body-size: 0.96rem;
   --body-weight: 400;
-  --sheet-bg: rgba(10, 8, 6, 0.45);
+  --sheet-bg: rgba(10, 8, 6, 0.3);
   --sheet-max-width: 34rem;
   --sheet-radius: 1.8rem;
   --content-gap: 0.8rem;
@@ -642,7 +642,7 @@ svg,
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: var(--bg);
+  background: transparent;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -660,41 +660,11 @@ svg,
 }
 
 .section-sheet::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("./img/patternlegn.webp") center top / 42rem auto repeat;
-  opacity: 0.42;
-  filter: brightness(1.02) contrast(1.18) saturate(0.62);
-  pointer-events: none;
-  transform: scale(1.02);
-  transition:
-    opacity 260ms ease,
-    transform 420ms ease;
+  display: none !important;
 }
 
 .section-sheet::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at top center, rgba(255, 222, 170, 0.05), transparent 28%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.42));
-  pointer-events: none;
-  transition: opacity 260ms ease;
-}
-
-.section-sheet.is-visible::before {
-  transform: scale(1);
-}
-
-.section-sheet.is-closing::before {
-  opacity: 0.18;
-  transform: scale(1.04);
-}
-
-.section-sheet.is-closing::after {
-  opacity: 0;
+  display: none !important;
 }
 
 .sheet-backdrop {
@@ -714,8 +684,8 @@ svg,
   -ms-overflow-style: none;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   background: var(--sheet-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   opacity: 0;
   transform: translateY(var(--sheet-enter-y)) scale(var(--sheet-enter-scale));
   transition:

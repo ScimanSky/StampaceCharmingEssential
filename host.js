@@ -15,7 +15,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260610a";
+} from "./content.js?v=20260610c";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -37,7 +37,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610a";
+} from "./security.js?v=20260610c";
 
 const iconPaths = {
   shield:
@@ -258,7 +258,24 @@ const TRANSLATE_TIMEOUT_MS = 8000;
 const TRANSLATE_LOCALE_MAP = {
   sc: "ca",
 };
-const translationCache = new Map();
+const STORAGE_TRANSLATION_CACHE_KEY = "stampace-translation-cache-v1";
+let translationCache = new Map();
+try {
+  const storedTranslationCache = window.localStorage.getItem(STORAGE_TRANSLATION_CACHE_KEY);
+  if (storedTranslationCache) {
+    translationCache = new Map(JSON.parse(storedTranslationCache));
+  }
+} catch (e) {
+  console.warn("Could not load translation cache", e);
+}
+
+function saveTranslationCache() {
+  try {
+    window.localStorage.setItem(STORAGE_TRANSLATION_CACHE_KEY, JSON.stringify([...translationCache]));
+  } catch (e) {
+    console.warn("Could not save translation cache", e);
+  }
+}
 let lastTranslationFallbackLocales = [];
 const expandedSectionIds = new Set();
 let shouldSeedExpandedSection = true;
@@ -914,9 +931,11 @@ async function translateIntroLine(text, targetLocale) {
       throw new Error("Traduzione vuota o invariata.");
     }
     translationCache.set(key, translated);
+    saveTranslationCache();
     return translated;
   } catch {
     translationCache.delete(key);
+    saveTranslationCache();
     lastTranslationFallbackLocales.push(targetLocale);
     return text;
   } finally {
@@ -972,6 +991,7 @@ async function translateTexts(texts, targetLocale) {
       }
       results[index] = value;
     });
+    saveTranslationCache();
   }
 
   return results;
@@ -1086,6 +1106,11 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   const appliers = [];
 
   draftLocale.introLines = await translateIntroLines(italianLocale.introLines ?? [], targetLocale);
+
+  texts.push(italianLocale.subtitle ?? "");
+  appliers.push((value) => {
+    draftLocale.subtitle = value;
+  });
 
   italianLocale.sections.forEach((section, sectionIndex) => {
     const targetSection = draftLocale.sections[sectionIndex];

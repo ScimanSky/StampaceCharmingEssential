@@ -9,7 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260610a";
+} from "./content.js?v=20260610c";
 import {
   escapeAttribute,
   escapeHtml,
@@ -18,7 +18,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610a";
+} from "./security.js?v=20260610c";
 import { subscribeToRemoteTemplate } from "./supabase.js";
 
 const iconPaths = {
@@ -1177,7 +1177,7 @@ function applyTheme(theme) {
   document.documentElement.style.setProperty("--line", themeValue(colors, "line", "rgba(224, 205, 177, 0.12)"));
   document.documentElement.style.setProperty("--row", themeValue(colors, "row", "rgba(17, 14, 11, 0.34)"));
   document.documentElement.style.setProperty("--row-hover", themeValue(colors, "rowHover", "rgba(27, 22, 17, 0.48)"));
-  document.documentElement.style.setProperty("--sheet-bg", makeColorTransparent(themeValue(colors, "sheet", "rgba(10, 8, 6, 0.45)"), 0.45));
+  document.documentElement.style.setProperty("--sheet-bg", makeColorTransparent(themeValue(colors, "sheet", "rgba(10, 8, 6, 0.3)"), 0.3));
   document.documentElement.style.setProperty("--title-size", themeValue(typography, "titleSize", "1.18rem"));
   document.documentElement.style.setProperty("--subtitle-size", themeValue(typography, "subtitleSize", "0.98rem"));
   document.documentElement.style.setProperty("--menu-size", themeValue(typography, "menuSize", "1.04rem"));
