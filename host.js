@@ -15,7 +15,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260610c";
+} from "./content.js?v=20260610d";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -37,7 +37,7 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610c";
+} from "./security.js?v=20260610d";
 
 const iconPaths = {
   shield:
