@@ -15,7 +15,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
-} from "./content.js?v=20260610g";
+} from "./content.js?v=20260610h";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -37,7 +37,20 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610g";
+} from "./security.js?v=20260610h";
+
+// Unregister any active service worker on the host panel to avoid caching stale code
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister().then((unregistered) => {
+        if (unregistered) {
+          console.log("Service Worker unregistered successfully for Host Panel.");
+        }
+      });
+    }
+  });
+}
 
 const iconPaths = {
   shield:
