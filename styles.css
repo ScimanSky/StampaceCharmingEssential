@@ -1196,6 +1196,10 @@ svg,
   box-shadow: none;
 }
 
+.sheet-card-media--host-qr {
+  margin-top: 1.8rem;
+}
+
 .sheet-card-cta {
   grid-template-columns: minmax(0, 1fr);
   gap: 0;

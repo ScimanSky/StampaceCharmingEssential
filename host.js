@@ -1029,6 +1029,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
               const items = section.items.map((item, itemIndex) => {
                 if (isImageItem(item)) return { ...item };
+                if (isMediaItem(item)) return { ...item };
                 if (isHostPrivateItem(item)) return { ...getHostPrivateItem(targetLocale) };
                 if (isCtaItem(item)) {
                   const itBaseItem = itBaseSection.items?.[itemIndex];
@@ -1106,7 +1107,30 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
     section.items.forEach((item) => {
       if (isImageItem(item)) {
-        targetSection.items.push({ ...item });
+        const translatedItem = { ...item, alt: "", caption: "" };
+        const nextIndex = targetSection.items.push(translatedItem) - 1;
+        texts.push(item.alt ?? "");
+        appliers.push((value) => {
+          targetSection.items[nextIndex].alt = value;
+        });
+        texts.push(item.caption ?? "");
+        appliers.push((value) => {
+          targetSection.items[nextIndex].caption = value;
+        });
+        return;
+      }
+
+      if (isMediaItem(item)) {
+        const translatedItem = { ...item, title: "", caption: "" };
+        const nextIndex = targetSection.items.push(translatedItem) - 1;
+        texts.push(item.title ?? "");
+        appliers.push((value) => {
+          targetSection.items[nextIndex].title = value;
+        });
+        texts.push(item.caption ?? "");
+        appliers.push((value) => {
+          targetSection.items[nextIndex].caption = value;
+        });
         return;
       }
 

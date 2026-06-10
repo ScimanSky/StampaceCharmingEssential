@@ -477,11 +477,12 @@ function renderCtaItem(item) {
   `;
 }
 
-function renderImageItem(item, { plain = false } = {}) {
+function renderImageItem(item, { plain = false, hostQr = false } = {}) {
   const src = sanitizeImageSrc(item.src);
   if (!src) return "";
+  const hostQrClass = hostQr ? " sheet-card-media--host-qr" : "";
   return `
-    <article class="sheet-card sheet-card-media${plain ? " sheet-card-media--plain" : ""}">
+    <article class="sheet-card sheet-card-media${plain ? " sheet-card-media--plain" : ""}${hostQrClass}">
       <div class="sheet-card-media-body">
         <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}${plain ? " sheet-image--plain" : ""}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
         ${
@@ -739,7 +740,7 @@ function renderSectionItems(items, sectionId) {
       }
 
       if (isImageItem(item)) {
-        mediaCards.push(renderImageItem(item, { plain: true }));
+        mediaCards.push(renderImageItem(item, { plain: true, hostQr: true }));
         return;
       }
 
