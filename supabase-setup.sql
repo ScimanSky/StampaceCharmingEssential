@@ -13,6 +13,19 @@ set public = true,
     file_size_limit = 5242880,
     allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'media',
+  'media',
+  true,
+  52428800,
+  null
+)
+on conflict (id) do update
+set public = true,
+    file_size_limit = 52428800,
+    allowed_mime_types = null;
+
 create table if not exists public.app_templates (
   id text primary key,
   content jsonb not null,
@@ -106,6 +119,47 @@ for delete
 to authenticated
 using (
   bucket_id = 'images'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+drop policy if exists "public can view media" on storage.objects;
+create policy "public can view media"
+on storage.objects
+for select
+to anon, authenticated
+using (bucket_id = 'media');
+
+drop policy if exists "host can upload media" on storage.objects;
+create policy "host can upload media"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'media'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+drop policy if exists "host can update media" on storage.objects;
+create policy "host can update media"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'media'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+)
+with check (
+  bucket_id = 'media'
+  and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
+);
+
+drop policy if exists "host can delete media" on storage.objects;
+create policy "host can delete media"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'media'
   and lower(auth.jwt() ->> 'email') = 'stampacecharming@gmail.com'
 );
 

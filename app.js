@@ -6,6 +6,7 @@ import {
   isCtaItem,
   isHostPrivateItem,
   isImageItem,
+  isMediaItem,
   loadTemplate,
   normalizeTemplate,
 } from "./content.js?v=20260609g";
@@ -125,6 +126,10 @@ const iconPaths = {
     '<path d="M5.5 5.5h6A2.5 2.5 0 0 1 14 8v11a2.5 2.5 0 0 0-2.5-2.5h-6z"/><path d="M18.5 5.5h-4A2.5 2.5 0 0 0 12 8v11a2.5 2.5 0 0 1 2.5-2.5h4z"/>',
   route:
     '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
+  bicycle:
+    '<circle cx="6.5" cy="17" r="3.2"/><circle cx="17.5" cy="17" r="3.2"/><path d="M8.4 17h3.2l2.3-5.4h-3.4"/><path d="M11.6 17 8.9 11.6"/><path d="M13.9 11.6 17.5 17"/><path d="M10.2 8.2h2.5"/><path d="M14.5 8.2h2.2"/>',
+  pedestrian:
+    '<circle cx="12.8" cy="4.8" r="1.7"/><path d="M11.8 7.5 9.8 12l3 2.1 1.2 5.8"/><path d="M10 12 7.2 14.6"/><path d="M12.2 8.4 15.8 11"/><path d="M11.5 15.2 8.8 20.5"/><path d="M13.8 14.2 17 20"/>',
   compass:
     '<circle cx="12" cy="12" r="8"/><path d="M14.8 9.2 13 13l-3.8 1.8L11 11z"/><circle cx="12" cy="12" r="1"/>',
   chat:
@@ -361,6 +366,7 @@ function hostActionFromStringItem(item) {
 }
 
 function hostActionFromCtaItem(item) {
+  if (item.hidden) return null;
   const kind = normalizeCtaKind(item.kind);
   const href = normalizeCtaHref(kind, item.href);
   if (!href) return null;
@@ -456,6 +462,7 @@ function ctaIcon(item) {
 }
 
 function renderCtaItem(item) {
+  if (item.hidden) return "";
   const kind = normalizeCtaKind(item.kind);
   const href = normalizeCtaHref(kind, item.href);
   if (!href) return "";
@@ -482,6 +489,36 @@ function renderImageItem(item, { plain = false } = {}) {
             ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
             : ""
         }
+      </div>
+    </article>
+  `;
+}
+
+function renderMediaItem(item) {
+  const src = sanitizeImageSrc(item.src);
+  if (!src) return "";
+  const title = item.title || item.fileName || (item.mediaKind === "video" ? "Video" : "Documento");
+  const caption = item.caption ? `<p class="sheet-media-caption">${escapeHtml(item.caption)}</p>` : "";
+
+  if (item.mediaKind === "video") {
+    return `
+      <article class="sheet-card sheet-card-media sheet-card-file">
+        <video class="sheet-video" controls preload="metadata" src="${escapeAttribute(src)}"></video>
+        <div class="sheet-card-copy">
+          <strong>${escapeHtml(title)}</strong>
+          ${caption}
+        </div>
+      </article>
+    `;
+  }
+
+  return `
+    <article class="sheet-card sheet-card-file">
+      <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${renderIcon("book")}</span>
+      <div class="sheet-card-copy">
+        <strong>${escapeHtml(title)}</strong>
+        ${caption}
+        <a class="sheet-link" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer" download>Apri documento</a>
       </div>
     </article>
   `;
@@ -541,6 +578,7 @@ function getItemText(item) {
 
 function iconForItem(item, sectionId) {
   if (isImageItem(item)) return "image";
+  if (isMediaItem(item)) return item.mediaKind === "video" ? "camera" : "book";
   const text = getItemText(item);
 
   if (sectionId === "rules") {
@@ -576,6 +614,8 @@ function iconForItem(item, sectionId) {
   if (/aeroport|airport|volo|flight/.test(text)) return "airplane";
   if (/traghett|ferry|porto/.test(text)) return "ferry";
   if (/auto|noleggio/.test(text)) return "car";
+  if (/bici|biciclett|bike|cycling|ciclab/.test(text)) return "bicycle";
+  if (/a piedi|pedon|pedestrian/.test(text)) return "pedestrian";
   if (/bus|navetta/.test(text)) return "bus";
   if (/ristorant|trattoria|food|cibo/.test(text)) return "utensils";
   if (/bar|caffe|colazione/.test(text)) return "coffee";
@@ -686,6 +726,13 @@ function renderSectionItems(items, sectionId) {
 
       if (isHostPrivateItem(item)) return;
 
+      if (isCtaItem(item)) {
+        if (action) {
+          actions.push(action);
+        }
+        return;
+      }
+
       if (action) {
         actions.push(action);
         return;
@@ -693,6 +740,11 @@ function renderSectionItems(items, sectionId) {
 
       if (isImageItem(item)) {
         mediaCards.push(renderImageItem(item, { plain: true }));
+        return;
+      }
+
+      if (isMediaItem(item)) {
+        mediaCards.push(renderMediaItem(item));
         return;
       }
 
@@ -748,6 +800,10 @@ function renderSectionItems(items, sectionId) {
 
       if (isImageItem(item)) {
         return renderImageItem(item);
+      }
+
+      if (isMediaItem(item)) {
+        return renderMediaItem(item);
       }
 
       if (typeof item === "string") {
@@ -1076,6 +1132,7 @@ function applyTheme(theme) {
   const secondaryFont = theme?.fontSecondary || "Roboto";
   const colors = theme?.colors || {};
   const typography = theme?.typography || {};
+  const textStyles = theme?.textStyles || {};
   const layout = theme?.layout || {};
   const buttons = theme?.buttons || {};
   const motion = theme?.motion || {};
@@ -1103,6 +1160,19 @@ function applyTheme(theme) {
   document.documentElement.style.setProperty("--body-size", themeValue(typography, "bodySize", "0.96rem"));
   document.documentElement.style.setProperty("--menu-weight", themeValue(typography, "menuWeight", "400"));
   document.documentElement.style.setProperty("--body-weight", themeValue(typography, "bodyWeight", "400"));
+  document.documentElement.style.setProperty("--intro-size", themeValue(typography, "introSize", "0.9rem"));
+  document.documentElement.style.setProperty("--intro-weight", themeValue(typography, "introWeight", "400"));
+  document.documentElement.style.setProperty("--intro-align", themeValue(typography, "introAlign", "center"));
+  document.documentElement.style.setProperty("--section-lead-size", themeValue(typography, "sectionLeadSize", "0.96rem"));
+  document.documentElement.style.setProperty("--section-lead-weight", themeValue(typography, "sectionLeadWeight", "400"));
+  document.documentElement.style.setProperty("--section-body-size", themeValue(typography, "sectionBodySize", "0.96rem"));
+  document.documentElement.style.setProperty("--section-body-weight", themeValue(typography, "sectionBodyWeight", "400"));
+  document.documentElement.style.setProperty("--intro-color", themeValue(textStyles, "introColor", "var(--muted)"));
+  document.documentElement.style.setProperty("--section-lead-color", themeValue(textStyles, "sectionLeadColor", "var(--muted)"));
+  document.documentElement.style.setProperty("--section-body-color", themeValue(textStyles, "sectionBodyColor", "var(--muted-strong)"));
+  document.documentElement.style.setProperty("--intro-font", themeValue(textStyles, "introFont", "secondary") === "primary" ? "var(--font-primary)" : "var(--font-secondary)");
+  document.documentElement.style.setProperty("--section-lead-font", themeValue(textStyles, "sectionLeadFont", "secondary") === "primary" ? "var(--font-primary)" : "var(--font-secondary)");
+  document.documentElement.style.setProperty("--section-body-font", themeValue(textStyles, "sectionBodyFont", "secondary") === "primary" ? "var(--font-primary)" : "var(--font-secondary)");
   document.documentElement.style.setProperty("--app-max-width", themeValue(layout, "appWidth", "34rem"));
   document.documentElement.style.setProperty("--page-padding-x", themeValue(layout, "pagePadding", "1rem"));
   document.documentElement.style.setProperty("--hero-height", themeValue(layout, "heroHeight", "15.5rem"));

@@ -6,9 +6,11 @@ import {
   FIXED_LOCALE,
   getHostPrivateItem,
   HOST_PRIVATE_ITEM,
+  MEDIA_ITEM_TYPE,
   REQUIRED_LOCALES,
   isCtaItem,
   isImageItem,
+  isMediaItem,
   isHostPrivateItem,
   loadTemplate,
   normalizeTemplate,
@@ -16,12 +18,16 @@ import {
 } from "./content.js?v=20260609g";
 import {
   deleteSectionImage,
+  deleteSectionMedia,
   fetchRemoteTemplateRow,
   getHostSupabase,
   HOST_EMAIL,
+  DOCUMENT_MAX_BYTES,
   IMAGE_MAX_BYTES,
+  VIDEO_MAX_BYTES,
   publishRemoteTemplate,
   uploadSectionImage,
+  uploadSectionMedia,
 } from "./supabase.js";
 import {
   escapeAttribute,
@@ -142,6 +148,10 @@ const iconPaths = {
     '<path d="M5.5 5.5h6A2.5 2.5 0 0 1 14 8v11a2.5 2.5 0 0 0-2.5-2.5h-6z"/><path d="M18.5 5.5h-4A2.5 2.5 0 0 0 12 8v11a2.5 2.5 0 0 1 2.5-2.5h4z"/>',
   route:
     '<circle cx="6.4" cy="6.4" r="2.2"/><circle cx="17.6" cy="17.6" r="2.2"/><path d="M8.4 7.8c2.2 1 3.9 2.2 5.1 3.8 1 1.3 1.8 2.6 2 4.2"/><path d="M10.2 5.6h5.2"/><path d="M14.2 5.6 16 7.4"/><path d="M14.2 5.6 16 3.8"/>',
+  bicycle:
+    '<circle cx="6.5" cy="17" r="3.2"/><circle cx="17.5" cy="17" r="3.2"/><path d="M8.4 17h3.2l2.3-5.4h-3.4"/><path d="M11.6 17 8.9 11.6"/><path d="M13.9 11.6 17.5 17"/><path d="M10.2 8.2h2.5"/><path d="M14.5 8.2h2.2"/>',
+  pedestrian:
+    '<circle cx="12.8" cy="4.8" r="1.7"/><path d="M11.8 7.5 9.8 12l3 2.1 1.2 5.8"/><path d="M10 12 7.2 14.6"/><path d="M12.2 8.4 15.8 11"/><path d="M11.5 15.2 8.8 20.5"/><path d="M13.8 14.2 17 20"/>',
   link:
     '<path d="M10.7 13.3 13.3 10.7"/><path d="M8.1 15.9 6.6 17.4a3 3 0 0 1-4.2-4.2l3-3a3 3 0 0 1 4.2 0"/><path d="M15.9 8.1l1.5-1.5a3 3 0 1 1 4.2 4.2l-3 3a3 3 0 0 1-4.2 0"/>',
   chat:
@@ -182,8 +192,6 @@ const dom = {
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
   introLines: document.querySelector("#field-intro-lines"),
-  address: document.querySelector("#field-address"),
-  license: document.querySelector("#field-license"),
   fontPrimary: document.querySelector("#field-font-primary"),
   fontSecondary: document.querySelector("#field-font-secondary"),
   titleSize: document.querySelector("#field-title-size"),
@@ -193,6 +201,19 @@ const dom = {
   sectionTitleSize: document.querySelector("#field-section-title-size"),
   bodySize: document.querySelector("#field-body-size"),
   bodyWeight: document.querySelector("#field-body-weight"),
+  introSize: document.querySelector("#field-intro-size"),
+  introWeight: document.querySelector("#field-intro-weight"),
+  introAlign: document.querySelector("#field-intro-align"),
+  introFont: document.querySelector("#field-intro-font"),
+  introColor: document.querySelector("#field-intro-color"),
+  sectionLeadSize: document.querySelector("#field-section-lead-size"),
+  sectionLeadWeight: document.querySelector("#field-section-lead-weight"),
+  sectionLeadFont: document.querySelector("#field-section-lead-font"),
+  sectionLeadColor: document.querySelector("#field-section-lead-color"),
+  sectionBodySize: document.querySelector("#field-section-body-size"),
+  sectionBodyWeight: document.querySelector("#field-section-body-weight"),
+  sectionBodyFont: document.querySelector("#field-section-body-font"),
+  sectionBodyColor: document.querySelector("#field-section-body-color"),
   colorBackground: document.querySelector("#field-color-background"),
   colorText: document.querySelector("#field-color-text"),
   colorMuted: document.querySelector("#field-color-muted"),
@@ -259,6 +280,15 @@ const FONT_WEIGHT_OPTIONS = [
   { value: "400", label: "Normale" },
   { value: "500", label: "Medio" },
   { value: "600", label: "Grassetto" },
+];
+const TEXT_FONT_TARGET_OPTIONS = [
+  { value: "secondary", label: "Font testi" },
+  { value: "primary", label: "Font titoli" },
+];
+const TEXT_ALIGN_OPTIONS = [
+  { value: "left", label: "Sinistra" },
+  { value: "center", label: "Centro" },
+  { value: "right", label: "Destra" },
 ];
 const TEXT_SIZE_OPTIONS = [
   { value: "0.9rem", label: "Piccolo" },
@@ -328,6 +358,9 @@ const SOLID_COLOR_OPTIONS = [
   { value: "#5fa8ff", label: "Blu elegante" },
   { value: "#e45f53", label: "Rosso terracotta" },
   { value: "#44c77a", label: "Verde WhatsApp" },
+  { value: "#3fc7b0", label: "Teal mediterraneo" },
+  { value: "#c98252", label: "Rame caldo" },
+  { value: "#ffffff", label: "Bianco" },
 ];
 const ICON_COLOR_OPTIONS = [
   { value: "", label: "Automatico" },
@@ -382,6 +415,8 @@ const CTA_ICON_OPTIONS = [
   { value: "chat", label: "Chat" },
   { value: "link", label: "Link" },
   { value: "route", label: "Percorso" },
+  { value: "bicycle", label: "Bicicletta" },
+  { value: "pedestrian", label: "Persona a piedi" },
   { value: "car", label: "Auto" },
   { value: "bus", label: "Bus" },
   { value: "taxi", label: "Taxi" },
@@ -426,6 +461,8 @@ const SECTION_ICON_OPTIONS = [
   { value: "pin", label: "Posizione" },
   { value: "map", label: "Mappa" },
   { value: "route", label: "Percorso" },
+  { value: "bicycle", label: "Bicicletta" },
+  { value: "pedestrian", label: "Persona a piedi" },
   { value: "car", label: "Auto / Parcheggio" },
   { value: "bus", label: "Bus / Transfer" },
   { value: "train", label: "Treno" },
@@ -519,6 +556,8 @@ function inferSectionIcon(section) {
   if (/visita guid|guided tour|foto|photo|camera/.test(text)) return "camera";
   if (/muse|cultur|arte|storia/.test(text)) return "museum";
   if (/ristorant|locali|bar|aperitiv|food|drink|cibo|spesa|market|supermercat/.test(text)) return "utensils";
+  if (/bici|biciclett|bike|cycling|ciclab/.test(text)) return "bicycle";
+  if (/a piedi|pedon|pedestrian/.test(text)) return "pedestrian";
   if (/mobilit|transfer|navetta|aeroport|bus|taxi|trasport/.test(text)) return "skyline";
   if (/noleggio|rent|auto|car rental|vehicle|parchegg/.test(text)) return "car";
   if (/farmacia|emergenz|medic|ospedal/.test(text)) return "cross";
@@ -636,11 +675,23 @@ function optionsHtml(options, selectedValue) {
   ).join("");
 }
 
-function iconColorOptionsHtml(selectedValue = "") {
-  const selected = sanitizeCssColor(selectedValue);
-  return ICON_COLOR_OPTIONS.map(
-    (option) => `<option value="${escapeAttribute(option.value)}" ${option.value === selected ? "selected" : ""}>${escapeHtml(option.label)}</option>`,
-  ).join("");
+function colorToInputValue(value, fallback = "#dfc39c") {
+  const color = sanitizeCssColor(value);
+  if (/^#[0-9a-f]{6}$/i.test(color)) return color;
+  if (/^#[0-9a-f]{3}$/i.test(color)) {
+    return `#${color.slice(1).split("").map((char) => `${char}${char}`).join("")}`;
+  }
+  return fallback;
+}
+
+function setColorInputValue(field, value, fallback) {
+  if (!field) return;
+  field.value = colorToInputValue(value, fallback);
+}
+
+function colorInputHtml(fieldName, selectedValue = "", { cta = false, fallback = "#dfc39c" } = {}) {
+  const attr = cta ? "data-cta-field" : "data-field";
+  return `<input ${attr}="${escapeAttribute(fieldName)}" class="host-color-picker" type="color" value="${escapeAttribute(colorToInputValue(selectedValue, fallback))}" />`;
 }
 
 function iconColorStyle(value) {
@@ -671,14 +722,27 @@ function fillDesignSelects(theme) {
   fillSelect(dom.sectionTitleSize, SECTION_TITLE_SIZE_OPTIONS, typography.sectionTitleSize);
   fillSelect(dom.bodySize, TEXT_SIZE_OPTIONS, typography.bodySize);
   fillSelect(dom.bodyWeight, FONT_WEIGHT_OPTIONS, typography.bodyWeight);
-  fillSelect(dom.colorBackground, SOLID_COLOR_OPTIONS, colors.background);
-  fillSelect(dom.colorText, SOLID_COLOR_OPTIONS, colors.text);
-  fillSelect(dom.colorMuted, SOFT_COLOR_OPTIONS, colors.muted);
-  fillSelect(dom.colorIcon, SOLID_COLOR_OPTIONS, colors.icon);
-  fillSelect(dom.colorLine, LINE_COLOR_OPTIONS, colors.line);
-  fillSelect(dom.colorRow, SURFACE_COLOR_OPTIONS, colors.row);
-  fillSelect(dom.colorRowHover, SURFACE_COLOR_OPTIONS, colors.rowHover);
-  fillSelect(dom.colorSheet, SHEET_COLOR_OPTIONS, colors.sheet);
+  fillSelect(dom.introSize, TEXT_SIZE_OPTIONS, typography.introSize);
+  fillSelect(dom.introWeight, FONT_WEIGHT_OPTIONS, typography.introWeight);
+  fillSelect(dom.introAlign, TEXT_ALIGN_OPTIONS, typography.introAlign);
+  fillSelect(dom.introFont, TEXT_FONT_TARGET_OPTIONS, theme?.textStyles?.introFont);
+  fillSelect(dom.sectionLeadSize, TEXT_SIZE_OPTIONS, typography.sectionLeadSize);
+  fillSelect(dom.sectionLeadWeight, FONT_WEIGHT_OPTIONS, typography.sectionLeadWeight);
+  fillSelect(dom.sectionLeadFont, TEXT_FONT_TARGET_OPTIONS, theme?.textStyles?.sectionLeadFont);
+  fillSelect(dom.sectionBodySize, TEXT_SIZE_OPTIONS, typography.sectionBodySize);
+  fillSelect(dom.sectionBodyWeight, FONT_WEIGHT_OPTIONS, typography.sectionBodyWeight);
+  fillSelect(dom.sectionBodyFont, TEXT_FONT_TARGET_OPTIONS, theme?.textStyles?.sectionBodyFont);
+  setColorInputValue(dom.colorBackground, colors.background, "#070605");
+  setColorInputValue(dom.colorText, colors.text, "#e7d8c1");
+  setColorInputValue(dom.colorMuted, colors.muted, "#cbb99d");
+  setColorInputValue(dom.colorIcon, colors.icon, "#dfc39c");
+  setColorInputValue(dom.colorLine, colors.line, "#504536");
+  setColorInputValue(dom.colorRow, colors.row, "#17120e");
+  setColorInputValue(dom.colorRowHover, colors.rowHover, "#241d17");
+  setColorInputValue(dom.colorSheet, colors.sheet, "#0f0c09");
+  setColorInputValue(dom.introColor, theme?.textStyles?.introColor, "#e7d8c1");
+  setColorInputValue(dom.sectionLeadColor, theme?.textStyles?.sectionLeadColor, "#cbb99d");
+  setColorInputValue(dom.sectionBodyColor, theme?.textStyles?.sectionBodyColor, "#e7d8c1");
   fillSelect(dom.appWidth, APP_WIDTH_OPTIONS, layout.appWidth);
   fillSelect(dom.pagePadding, SPACING_OPTIONS, layout.pagePadding);
   fillSelect(dom.heroHeight, HERO_HEIGHT_OPTIONS, layout.heroHeight);
@@ -715,6 +779,21 @@ function themeDraftFromFields() {
       bodySize: dom.bodySize.value,
       menuWeight: dom.menuWeight.value,
       bodyWeight: dom.bodyWeight.value,
+      introSize: dom.introSize.value,
+      introWeight: dom.introWeight.value,
+      introAlign: dom.introAlign.value,
+      sectionLeadSize: dom.sectionLeadSize.value,
+      sectionLeadWeight: dom.sectionLeadWeight.value,
+      sectionBodySize: dom.sectionBodySize.value,
+      sectionBodyWeight: dom.sectionBodyWeight.value,
+    },
+    textStyles: {
+      introFont: dom.introFont.value,
+      introColor: dom.introColor.value,
+      sectionLeadFont: dom.sectionLeadFont.value,
+      sectionLeadColor: dom.sectionLeadColor.value,
+      sectionBodyFont: dom.sectionBodyFont.value,
+      sectionBodyColor: dom.sectionBodyColor.value,
     },
     layout: {
       appWidth: dom.appWidth.value,
@@ -1289,11 +1368,11 @@ function renderSectionCtas(section) {
         const icon = item.icon || ctaDefaultIcon(kind);
         const iconColor = sanitizeCssColor(item.iconColor);
         return `
-        <article class="host-cta-item host-cta-item--${escapeAttribute(kind)}" data-cta-item data-cta-index="${escapeAttribute(index)}">
+        <article class="host-cta-item host-cta-item--${escapeAttribute(kind)}${item.hidden ? " is-hidden-cta" : ""}" data-cta-item data-cta-index="${escapeAttribute(index)}">
           <div class="host-cta-meta">
             <span class="host-cta-icon-preview host-cta-icon-preview--${escapeAttribute(kind)}" aria-hidden="true"${iconColorStyle(iconColor)}>${renderIcon(icon)}</span>
             <span class="host-cta-heading">
-              <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}</strong>
+              <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}${item.hidden ? " (Nascosto)" : ""}</strong>
               <span>${escapeHtml(CTA_KIND_OPTIONS.find((option) => option.value === kind)?.label ?? "Web")}</span>
             </span>
             <div class="host-cta-actions">
@@ -1317,9 +1396,7 @@ function renderSectionCtas(section) {
             </label>
             <label>
               <span>Colore icona</span>
-              <select data-cta-field="iconColor" ${!editable ? "disabled" : ""}>
-                ${iconColorOptionsHtml(iconColor)}
-              </select>
+              ${colorInputHtml("iconColor", iconColor, { cta: true })}
             </label>
             <label>
               <span>Etichetta bottone</span>
@@ -1328,6 +1405,13 @@ function renderSectionCtas(section) {
             <label>
               <span>Destinazione</span>
               <input data-cta-field="href" type="text" value="${escapeAttribute(href || item.href || "")}" ${!editable ? "disabled" : ""} />
+            </label>
+            <label>
+              <span>Visibilità</span>
+              <select data-cta-field="hidden" ${!editable ? "disabled" : ""}>
+                <option value="false" ${!item.hidden ? "selected" : ""}>Visibile</option>
+                <option value="true" ${item.hidden ? "selected" : ""}>Nascosta</option>
+              </select>
             </label>
           </div>
         </article>
@@ -1339,6 +1423,7 @@ function renderSectionCtas(section) {
 
 function renderSectionImages(section) {
   const images = section.items.filter(isImageItem);
+  const editable = selectedEditorLocale === FIXED_LOCALE;
   if (!images.length) {
     return `<p class="host-image-empty">Nessuna immagine caricata.</p>`;
   }
@@ -1363,14 +1448,14 @@ function renderSectionImages(section) {
             </label>
             <label>
               <span>Dimensione</span>
-              <select data-image-field="size">
+              <select data-image-field="size" ${!editable ? "disabled" : ""}>
                 <option value="grande" ${size === "grande" ? "selected" : ""}>Grande (100%)</option>
                 <option value="media" ${size === "media" ? "selected" : ""}>Media (65%)</option>
                 <option value="piccola" ${size === "piccola" ? "selected" : ""}>Piccola (40%)</option>
               </select>
             </label>
           </div>
-          <button class="ghost-button host-image-remove" type="button" data-action="remove-image">Rimuovi</button>
+          <button class="ghost-button host-image-remove" type="button" data-action="remove-image" ${!editable ? "disabled" : ""}>Rimuovi</button>
         </article>
       `;
       },
@@ -1436,9 +1521,7 @@ function renderSectionEditors() {
               </label>
               <label>
                 <span>Colore icona</span>
-                <select data-field="iconColor" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
-                  ${iconColorOptionsHtml(section.iconColor)}
-                </select>
+                ${colorInputHtml("iconColor", section.iconColor)}
               </label>
               <label>
                 <span>Testo introduttivo</span>
@@ -1479,13 +1562,28 @@ function renderSectionEditors() {
                   <p class="host-kicker">Immagini sezione</p>
                   <p class="host-media-note">JPEG, PNG o WEBP. Max ${Math.round(IMAGE_MAX_BYTES / (1024 * 1024))} MB.</p>
                 </div>
-                <label class="ghost-button file-button host-upload-button">
+                <label class="ghost-button file-button host-upload-button" style="${selectedEditorLocale !== FIXED_LOCALE ? "display: none;" : ""}">
                   <span>Aggiungi immagine</span>
                   <input data-image-upload type="file" accept="image/jpeg,image/png,image/webp" />
                 </label>
               </div>
               <div class="host-image-list">
                 ${renderSectionImages(section)}
+              </div>
+            </div>
+            <div class="host-section-media">
+              <div class="host-section-media-head">
+                <div>
+                  <p class="host-kicker">Documenti e video</p>
+                  <p class="host-media-note">PDF, Word, Excel, PPT, TXT (max ${Math.round(DOCUMENT_MAX_BYTES / (1024 * 1024))} MB) oppure MP4, WebM, MOV (max ${Math.round(VIDEO_MAX_BYTES / (1024 * 1024))} MB).</p>
+                </div>
+                <label class="ghost-button file-button host-upload-button" style="${selectedEditorLocale !== FIXED_LOCALE ? "display: none;" : ""}">
+                  <span>Aggiungi file</span>
+                  <input data-media-upload type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.mp4,.webm,.mov" />
+                </label>
+              </div>
+              <div class="host-media-list">
+                ${renderSectionMedia(section)}
               </div>
             </div>
             ${
@@ -1510,8 +1608,6 @@ function syncFields() {
   const localeState = currentLocaleState();
   const theme = state.theme || {};
   dom.appName.value = state.appName;
-  dom.address.value = state.address;
-  dom.license.value = state.license;
   dom.fontPrimary.value = state.theme?.fontPrimary || "Roboto";
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
   fillDesignSelects(theme);
@@ -1539,7 +1635,8 @@ function collectTemplate() {
       const label = item.querySelector('[data-cta-field="label"]').value.trim();
       const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
       const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
-      const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value);
+      const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
+      const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
       return {
         type: CTA_ITEM_TYPE,
         kind,
@@ -1547,6 +1644,7 @@ function collectTemplate() {
         href,
         icon,
         iconColor,
+        hidden,
       };
     }).filter((item) => item.label && item.href);
     const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
@@ -1557,8 +1655,19 @@ function collectTemplate() {
       caption: item.querySelector('[data-image-field="caption"]').value,
       size: item.querySelector('[data-image-field="size"]')?.value || "grande",
     })).filter((item) => item.src);
+    const mediaItems = [...card.querySelectorAll("[data-media-item]")].map((item) => ({
+      type: MEDIA_ITEM_TYPE,
+      mediaKind: item.dataset.mediaKind || "document",
+      path: item.dataset.mediaPath || "",
+      src: sanitizeImageSrc(item.dataset.mediaSrc || ""),
+      title: item.querySelector('[data-media-field="title"]')?.value || "",
+      caption: item.querySelector('[data-media-field="caption"]')?.value || "",
+      fileName: item.dataset.mediaFileName || "",
+      mimeType: item.dataset.mediaMimeType || "",
+      sizeBytes: Number(item.dataset.mediaSizeBytes) || 0,
+    })).filter((item) => item.src);
     const selectedIcon = card.querySelector('[data-field="icon"]')?.value || base.icon || "spark";
-    const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value);
+    const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);
     return {
       id,
       icon: selectedIcon.trim() || "spark",
@@ -1567,7 +1676,7 @@ function collectTemplate() {
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
-      items: [...parseItems(card.querySelector('[data-field="items"]').value), ...ctaItems, ...imageItems],
+      items: [...parseItems(card.querySelector('[data-field="items"]').value), ...ctaItems, ...imageItems, ...mediaItems],
     };
   });
 
@@ -1576,8 +1685,6 @@ function collectTemplate() {
     : [];
 
   next.appName = dom.appName.value;
-  next.address = dom.address.value;
-  next.license = dom.license.value;
   const introLines = parseFooterLines(dom.introLines.value);
   delete next.heroMeta;
   next.footer = {
@@ -2095,6 +2202,111 @@ async function removeImage(sectionId, imageIndex) {
   }
 }
 
+function renderSectionMedia(section) {
+  const mediaItems = section.items.filter(isMediaItem);
+  const editable = selectedEditorLocale === FIXED_LOCALE;
+  if (!mediaItems.length) {
+    return `<p class="host-media-empty">Nessun documento o video caricato.</p>`;
+  }
+
+  return mediaItems
+    .map(
+      (item, index) => {
+        const src = sanitizeImageSrc(item.src);
+        if (!src) return "";
+        const kindLabel = item.mediaKind === "video" ? "🎬 Video" : "📄 Documento";
+        const title = item.title || item.fileName || (item.mediaKind === "video" ? "Video" : "Documento");
+        return `
+        <article class="host-media-item" data-media-item data-media-index="${escapeAttribute(index)}" data-media-path="${escapeAttribute(item.path ?? "")}" data-media-src="${escapeAttribute(src)}" data-media-kind="${escapeAttribute(item.mediaKind || "document")}" data-media-file-name="${escapeAttribute(item.fileName || "")}" data-media-mime-type="${escapeAttribute(item.mimeType || "")}" data-media-size-bytes="${escapeAttribute(item.sizeBytes || 0)}">
+          <div class="host-media-item-header">
+            <span class="host-media-kind-badge">${escapeHtml(kindLabel)}</span>
+            <button class="ghost-button host-media-remove" type="button" data-action="remove-media" ${!editable ? "disabled" : ""}>Rimuovi</button>
+          </div>
+          <div class="host-media-fields">
+            <label>
+              <span>Titolo</span>
+              <input data-media-field="title" type="text" value="${escapeAttribute(item.title ?? "")}" />
+            </label>
+            <label>
+              <span>Didascalia</span>
+              <input data-media-field="caption" type="text" value="${escapeAttribute(item.caption ?? "")}" />
+            </label>
+          </div>
+        </article>
+      `;
+      },
+    )
+    .join("");
+}
+
+async function handleMediaUpload(sectionId, file) {
+  if (!file) return;
+  if (!isAuthorizedSession(session)) {
+    setStatus("Accedi come host per caricare file.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  setStatus("Upload file in corso...", "");
+
+  try {
+    const uploaded = await uploadSectionMedia(file, sectionId, supabase);
+    const section = currentLocaleState().sections.find((item) => item.id === sectionId);
+    if (!section) return;
+
+    section.items.push({
+      type: MEDIA_ITEM_TYPE,
+      mediaKind: uploaded.mediaKind,
+      path: uploaded.path,
+      src: uploaded.src,
+      title: file.name.replace(/\.[^.]+$/, ""),
+      caption: "",
+      fileName: file.name,
+      mimeType: file.type,
+      sizeBytes: file.size,
+    });
+
+    state = saveTemplate(state);
+    syncFields();
+    setStatus("File caricato. La sincronizzazione live parte ora.", "success");
+    queueAutoPublish();
+  } catch (error) {
+    setStatus(error.message || "Upload file fallito.", "error");
+  }
+}
+
+function countMediaPathUsage(templateState, mediaPath) {
+  if (!mediaPath || !templateState?.locales?.[FIXED_LOCALE]) return 0;
+  return templateState.locales[FIXED_LOCALE].sections.reduce((count, section) => {
+    const items = Array.isArray(section?.items) ? section.items : [];
+    return count + items.filter((item) => isMediaItem(item) && item.path === mediaPath).length;
+  }, 0);
+}
+
+async function removeMedia(sectionId, mediaIndex) {
+  state = collectTemplate();
+  const section = currentLocaleState().sections.find((item) => item.id === sectionId);
+  if (!section) return;
+  const mediaItems = section.items.filter(isMediaItem);
+  const target = mediaItems[mediaIndex];
+  if (!target) return;
+
+  try {
+    const pathUsageCount = countMediaPathUsage(state, target.path);
+    if (target.path && pathUsageCount <= 1 && isAuthorizedSession(session)) {
+      await deleteSectionMedia(target.path, supabase);
+    }
+
+    section.items = section.items.filter((item) => item !== target);
+    state = saveTemplate(state);
+    syncFields();
+    setStatus("File rimosso dalla sezione.", "success");
+    queueAutoPublish();
+  } catch (error) {
+    setStatus(error.message || "Rimozione file fallita.", "error");
+  }
+}
+
 async function login() {
   const password = dom.password.value.trim();
   if (!password) {
@@ -2200,11 +2412,20 @@ function bindEditorEvents() {
   });
 
   dom.sections.addEventListener("change", (event) => {
-    const uploader = event.target.closest("[data-image-upload]");
-    if (!uploader) return;
-    const sectionCard = event.target.closest("[data-section-id]");
-    handleImageUpload(sectionCard?.dataset.sectionId, event.target.files?.[0]);
-    event.target.value = "";
+    const imageUploader = event.target.closest("[data-image-upload]");
+    if (imageUploader) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      handleImageUpload(sectionCard?.dataset.sectionId, event.target.files?.[0]);
+      event.target.value = "";
+      return;
+    }
+    const mediaUploader = event.target.closest("[data-media-upload]");
+    if (mediaUploader) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      handleMediaUpload(sectionCard?.dataset.sectionId, event.target.files?.[0]);
+      event.target.value = "";
+      return;
+    }
   });
 
   dom.sections.addEventListener("change", (event) => {
@@ -2297,10 +2518,18 @@ function bindEditorEvents() {
     }
 
     const removeTrigger = event.target.closest('[data-action="remove-image"]');
-    if (!removeTrigger) return;
-    const imageItem = event.target.closest("[data-image-item]");
-    const sectionCard = event.target.closest("[data-section-id]");
-    removeImage(sectionCard?.dataset.sectionId, Number.parseInt(imageItem?.dataset.imageIndex ?? "-1", 10));
+    if (removeTrigger) {
+      const imageItem = event.target.closest("[data-image-item]");
+      const sectionCard = event.target.closest("[data-section-id]");
+      removeImage(sectionCard?.dataset.sectionId, Number.parseInt(imageItem?.dataset.imageIndex ?? "-1", 10));
+      return;
+    }
+
+    const removeMediaTrigger = event.target.closest('[data-action="remove-media"]');
+    if (!removeMediaTrigger) return;
+    const mediaItem = event.target.closest("[data-media-item]");
+    const mediaSectionCard = event.target.closest("[data-section-id]");
+    removeMedia(mediaSectionCard?.dataset.sectionId, Number.parseInt(mediaItem?.dataset.mediaIndex ?? "-1", 10));
   });
 
   dom.sections.addEventListener("dragstart", (event) => {

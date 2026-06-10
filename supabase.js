@@ -7,8 +7,22 @@ export const HOST_EMAIL = "stampacecharming@gmail.com";
 export const TEMPLATE_TABLE = "app_templates";
 export const TEMPLATE_ROW_ID = "live";
 export const IMAGE_BUCKET = "images";
+export const MEDIA_BUCKET = "media";
 export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+export const DOCUMENT_MAX_BYTES = 10 * 1024 * 1024;
+export const VIDEO_MAX_BYTES = 50 * 1024 * 1024;
 export const IMAGE_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const DOCUMENT_ALLOWED_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+];
+export const VIDEO_ALLOWED_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
 let guestClient = null;
 let hostClient = null;
@@ -134,6 +148,55 @@ export async function deleteSectionImage(path, client = getHostSupabase()) {
   if (!path) return;
 
   const { error } = await client.storage.from(IMAGE_BUCKET).remove([path]);
+
+  if (error) {
+    throw error;
+  }
+}
+
+export function mediaKindForFile(file) {
+  if (VIDEO_ALLOWED_TYPES.includes(file.type)) return "video";
+  if (DOCUMENT_ALLOWED_TYPES.includes(file.type)) return "document";
+  return "";
+}
+
+export async function uploadSectionMedia(file, sectionId, client = getHostSupabase()) {
+  const mediaKind = mediaKindForFile(file);
+  if (!mediaKind) {
+    throw new Error("Formato file non consentito. Usa PDF, Word, Excel, PowerPoint, TXT, MP4, WebM o MOV.");
+  }
+
+  const maxBytes = mediaKind === "video" ? VIDEO_MAX_BYTES : DOCUMENT_MAX_BYTES;
+  const maxLabel = mediaKind === "video" ? "50 MB" : "10 MB";
+  if (file.size > maxBytes) {
+    throw new Error(`File oltre il limite di ${maxLabel}.`);
+  }
+
+  const safeName = slugifyFileName(file.name || mediaKind);
+  const path = `${sectionId}/${mediaKind}/${Date.now()}-${safeName}`;
+  const { error } = await client.storage.from(MEDIA_BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+    contentType: file.type,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const { data } = client.storage.from(MEDIA_BUCKET).getPublicUrl(path);
+
+  return {
+    path,
+    src: data.publicUrl,
+    mediaKind,
+  };
+}
+
+export async function deleteSectionMedia(path, client = getHostSupabase()) {
+  if (!path) return;
+
+  const { error } = await client.storage.from(MEDIA_BUCKET).remove([path]);
 
   if (error) {
     throw error;

@@ -2,6 +2,7 @@ import { fetchRemoteTemplateRow } from "./supabase.js";
 
 export const STORAGE_KEY = "stampace_essential_template_v1";
 export const IMAGE_ITEM_TYPE = "image";
+export const MEDIA_ITEM_TYPE = "media";
 export const CTA_ITEM_TYPE = "cta";
 export const FIXED_LOCALE = "it";
 export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
@@ -1338,6 +1339,21 @@ const DEFAULT_THEME = Object.freeze({
     bodySize: "0.96rem",
     menuWeight: "400",
     bodyWeight: "400",
+    introSize: "0.9rem",
+    introWeight: "400",
+    introAlign: "center",
+    sectionLeadSize: "0.96rem",
+    sectionLeadWeight: "400",
+    sectionBodySize: "0.96rem",
+    sectionBodyWeight: "400",
+  },
+  textStyles: {
+    introFont: "secondary",
+    introColor: "#e7d8c1",
+    sectionLeadFont: "secondary",
+    sectionLeadColor: "#e7d8c1",
+    sectionBodyFont: "secondary",
+    sectionBodyColor: "#e7d8c1",
   },
   layout: {
     appWidth: "34rem",
@@ -1393,6 +1409,10 @@ function cleanIconColor(value, fallback = "") {
   return "";
 }
 
+function cleanMediaKind(value) {
+  return value === "video" ? "video" : "document";
+}
+
 function cleanThemeGroup(source = {}, fallback = {}) {
   const next = {};
   Object.entries(fallback).forEach(([key, fallbackValue]) => {
@@ -1443,6 +1463,19 @@ function normalizeItems(items, fallbackItems) {
             size: cleanString(item.size, "grande"),
           };
         }
+        if (item.type === MEDIA_ITEM_TYPE) {
+          return {
+            type: MEDIA_ITEM_TYPE,
+            mediaKind: cleanMediaKind(item.mediaKind),
+            src: cleanString(item.src),
+            path: cleanString(item.path),
+            title: cleanString(item.title),
+            caption: cleanString(item.caption),
+            fileName: cleanString(item.fileName),
+            mimeType: cleanString(item.mimeType),
+            sizeBytes: Number.isFinite(Number(item.sizeBytes)) ? Number(item.sizeBytes) : 0,
+          };
+        }
         if (item.type === CTA_ITEM_TYPE) {
           return {
             type: CTA_ITEM_TYPE,
@@ -1451,6 +1484,7 @@ function normalizeItems(items, fallbackItems) {
             href: cleanString(item.href),
             icon: cleanString(item.icon),
             iconColor: cleanIconColor(item.iconColor),
+            hidden: Boolean(item.hidden),
           };
         }
         return {
@@ -1465,6 +1499,7 @@ function normalizeItems(items, fallbackItems) {
     .filter((item) => {
       if (typeof item === "string") return Boolean(item);
       if (item.type === IMAGE_ITEM_TYPE) return Boolean(item.src);
+      if (item.type === MEDIA_ITEM_TYPE) return Boolean(item.src);
       if (item.type === CTA_ITEM_TYPE) return Boolean(item.label && item.href);
       return Boolean(item.title || item.body || item.href || item.label);
     });
@@ -1485,8 +1520,23 @@ export function isImageItem(item) {
   return Boolean(item && typeof item === "object" && item.type === IMAGE_ITEM_TYPE && item.src);
 }
 
+export function isMediaItem(item) {
+  return Boolean(item && typeof item === "object" && item.type === MEDIA_ITEM_TYPE && item.src);
+}
+
 export function isCtaItem(item) {
   return Boolean(item && typeof item === "object" && item.type === CTA_ITEM_TYPE && item.label && item.href);
+}
+
+function migrateSectionIcon(section) {
+  const text = `${section?.menuTitle ?? ""} ${section?.sectionTitle ?? ""}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  if (/ristorant|locali|restaurant|trattoria/.test(text) && ["binoculars", "pin", "map", "spark"].includes(section.icon)) {
+    return "utensils";
+  }
+  return section.icon;
 }
 
 function ensureHostPrivateItem(items, localeCode) {
@@ -1512,7 +1562,7 @@ function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
   return {
     id: baseSection.id,
-    icon: cleanString(section?.icon, baseSection.icon),
+    icon: migrateSectionIcon({ ...section, icon: cleanString(section?.icon, baseSection.icon) }),
     iconColor: cleanIconColor(section?.iconColor, baseSection.iconColor),
     hidden: Boolean(section?.hidden ?? baseSection.hidden),
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
@@ -1599,12 +1649,12 @@ function localizedCtaFor(italianItem, ctaIndex, localizedCtas, fallbackCtas) {
 
 function localizedGenericItemFor(items, itemIndex, fallbackItems) {
   const localizedItem = items[itemIndex];
-  if (localizedItem && typeof localizedItem === "object" && !isImageItem(localizedItem) && !isCtaItem(localizedItem)) {
+  if (localizedItem && typeof localizedItem === "object" && !isImageItem(localizedItem) && !isMediaItem(localizedItem) && !isCtaItem(localizedItem)) {
     return localizedItem;
   }
 
   const fallbackItem = fallbackItems[itemIndex];
-  if (fallbackItem && typeof fallbackItem === "object" && !isImageItem(fallbackItem) && !isCtaItem(fallbackItem)) {
+  if (fallbackItem && typeof fallbackItem === "object" && !isImageItem(fallbackItem) && !isMediaItem(fallbackItem) && !isCtaItem(fallbackItem)) {
     return fallbackItem;
   }
 
@@ -1614,6 +1664,7 @@ function localizedGenericItemFor(items, itemIndex, fallbackItems) {
 function itemKind(item) {
   if (isCtaItem(item)) return "cta";
   if (isImageItem(item)) return "image";
+  if (isMediaItem(item)) return "media";
   if (typeof item === "string") return "text";
   if (item && typeof item === "object") return "link";
   return "empty";
@@ -1630,7 +1681,7 @@ function itemKindCounts(items = []) {
 function sectionShapeCompatible(left, right) {
   const leftCounts = itemKindCounts(left?.items ?? []);
   const rightCounts = itemKindCounts(right?.items ?? []);
-  return ["cta", "image", "text", "link"].every((kind) => (leftCounts[kind] ?? 0) === (rightCounts[kind] ?? 0));
+  return ["cta", "image", "media", "text", "link"].every((kind) => (leftCounts[kind] ?? 0) === (rightCounts[kind] ?? 0));
 }
 
 function sectionCtaScore(italianSection, localizedSection) {
@@ -1690,12 +1741,15 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
   const fallbackCtas = fallbackItems.filter(isCtaItem);
   const localizedImages = localizedItems.filter(isImageItem);
   const fallbackImages = fallbackItems.filter(isImageItem);
+  const localizedMedia = localizedItems.filter(isMediaItem);
+  const fallbackMedia = fallbackItems.filter(isMediaItem);
   const localizedTexts = localizedItems.filter((item) => typeof item === "string");
   const fallbackTexts = fallbackItems.filter((item) => typeof item === "string");
-  const localizedGenericItems = localizedItems.filter((item) => item && typeof item === "object" && !isImageItem(item) && !isCtaItem(item));
-  const fallbackGenericItems = fallbackItems.filter((item) => item && typeof item === "object" && !isImageItem(item) && !isCtaItem(item));
+  const localizedGenericItems = localizedItems.filter((item) => item && typeof item === "object" && !isImageItem(item) && !isMediaItem(item) && !isCtaItem(item));
+  const fallbackGenericItems = fallbackItems.filter((item) => item && typeof item === "object" && !isImageItem(item) && !isMediaItem(item) && !isCtaItem(item));
   let ctaIndex = 0;
   let imageIndex = 0;
+  let mediaIndex = 0;
   let textIndex = 0;
   let genericIndex = 0;
 
@@ -1711,6 +1765,7 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
         ...cloneItem(italianItem),
         label: cleanString(localizedItem?.label, italianItem.label),
         iconColor: cleanIconColor(localizedItem?.iconColor, italianItem.iconColor),
+        hidden: Boolean(italianItem.hidden),
       };
     }
 
@@ -1720,6 +1775,16 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
       return {
         ...cloneItem(italianItem),
         alt: cleanString(localizedItem.alt, italianItem.alt),
+        caption: cleanString(localizedItem.caption, italianItem.caption),
+      };
+    }
+
+    if (isMediaItem(italianItem)) {
+      const localizedItem = localizedMedia[mediaIndex] ?? fallbackMedia[mediaIndex] ?? {};
+      mediaIndex += 1;
+      return {
+        ...cloneItem(italianItem),
+        title: cleanString(localizedItem.title, italianItem.title),
         caption: cleanString(localizedItem.caption, italianItem.caption),
       };
     }
@@ -1907,6 +1972,7 @@ export function normalizeTemplate(rawTemplate = {}) {
       fontSecondary: cleanString(themeSource.fontSecondary, fallbackTheme.fontSecondary),
       colors: cleanThemeGroup(themeSource.colors, fallbackTheme.colors),
       typography: cleanThemeGroup(themeSource.typography, fallbackTheme.typography),
+      textStyles: cleanThemeGroup(themeSource.textStyles, fallbackTheme.textStyles),
       layout: cleanThemeGroup(themeSource.layout, fallbackTheme.layout),
       buttons: cleanThemeGroup(themeSource.buttons, fallbackTheme.buttons),
       motion: cleanThemeGroup(themeSource.motion, fallbackTheme.motion),

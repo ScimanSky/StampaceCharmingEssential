@@ -32,7 +32,7 @@
   --section-title-size: 1.32rem;
   --body-size: 0.96rem;
   --body-weight: 400;
-  --sheet-bg: rgba(10, 8, 6, 0.92);
+  --sheet-bg: rgba(10, 8, 6, 0.78);
   --sheet-max-width: 34rem;
   --sheet-radius: 1.8rem;
   --content-gap: 0.8rem;
@@ -410,14 +410,16 @@ svg,
 
 .hero-meta {
   display: grid;
-  justify-items: center;
+  justify-items: var(--intro-align, center);
   gap: 0.2rem;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 240, 220, 0.12);
-  color: var(--muted);
-  font-size: 0.72rem;
-  text-align: center;
+  color: var(--intro-color, var(--muted));
+  font-size: var(--intro-size, 0.9rem);
+  font-weight: var(--intro-weight, 400);
+  font-family: var(--intro-font, var(--font-secondary)), sans-serif;
+  text-align: var(--intro-align, center);
   white-space: normal;
 }
 
@@ -712,6 +714,8 @@ svg,
   -ms-overflow-style: none;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
   background: var(--sheet-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   opacity: 0;
   transform: translateY(var(--sheet-enter-y)) scale(var(--sheet-enter-scale));
   transition:
@@ -829,10 +833,11 @@ svg,
 
 .sheet-lead {
   margin: 0.45rem 0 0;
-  color: var(--muted);
+  color: var(--section-lead-color, var(--muted));
   line-height: 1.45;
-  font-size: var(--body-size);
-  font-weight: var(--body-weight);
+  font-size: var(--section-lead-size, var(--body-size));
+  font-weight: var(--section-lead-weight, var(--body-weight));
+  font-family: var(--section-lead-font, var(--font-secondary)), sans-serif;
   overflow-wrap: anywhere;
   text-wrap: pretty;
 }
@@ -929,13 +934,34 @@ svg,
 .sheet-card p {
   margin: 0;
   line-height: 1.5;
-  color: var(--muted-strong);
-  font-size: var(--body-size);
-  font-weight: var(--body-weight);
+  color: var(--section-body-color, var(--muted-strong));
+  font-size: var(--section-body-size, var(--body-size));
+  font-weight: var(--section-body-weight, var(--body-weight));
+  font-family: var(--section-body-font, var(--font-secondary)), sans-serif;
   white-space: pre-line;
   overflow-wrap: anywhere;
   word-break: break-word;
   text-wrap: pretty;
+}
+
+.sheet-card-media {
+  grid-template-columns: 1fr;
+}
+
+.sheet-video {
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: block;
+  height: auto;
+  max-height: min(60vh, 24rem);
+  background: #000;
+}
+
+.sheet-media-caption {
+  margin: 0.3rem 0 0;
+  font-size: 0.86rem;
+  color: var(--muted);
 }
 
 .sheet-card-copy {

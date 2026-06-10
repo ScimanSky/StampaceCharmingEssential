@@ -92,14 +92,6 @@
                 <span>Testo sotto il sottotitolo della lingua selezionata, una riga per voce</span>
                 <textarea id="field-intro-lines"></textarea>
               </label>
-              <label class="host-grid-wide">
-                <span>Indirizzo</span>
-                <input id="field-address" type="text" />
-              </label>
-              <label class="host-grid-wide">
-                <span>CIN</span>
-                <input id="field-license" type="text" />
-              </label>
               <label>
                 <span>Footer: nome struttura</span>
                 <input id="field-footer-name" type="text" />
@@ -171,39 +163,109 @@
               </section>
 
               <section class="host-design-group">
+                <p class="host-kicker">Testo sotto il sottotitolo</p>
+                <div class="host-grid">
+                  <label>
+                    <span>Font</span>
+                    <select id="field-intro-font" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Dimensione</span>
+                    <select id="field-intro-size" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Peso</span>
+                    <select id="field-intro-weight" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Allineamento</span>
+                    <select id="field-intro-align" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Colore</span>
+                    <input id="field-intro-color" type="color" class="host-color-picker" data-theme-field />
+                  </label>
+                </div>
+              </section>
+
+              <section class="host-design-group">
+                <p class="host-kicker">Testo introduttivo sezioni (lead)</p>
+                <div class="host-grid">
+                  <label>
+                    <span>Font</span>
+                    <select id="field-section-lead-font" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Dimensione</span>
+                    <select id="field-section-lead-size" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Peso</span>
+                    <select id="field-section-lead-weight" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Colore</span>
+                    <input id="field-section-lead-color" type="color" class="host-color-picker" data-theme-field />
+                  </label>
+                </div>
+              </section>
+
+              <section class="host-design-group">
+                <p class="host-kicker">Contenuti sezioni (body)</p>
+                <div class="host-grid">
+                  <label>
+                    <span>Font</span>
+                    <select id="field-section-body-font" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Dimensione</span>
+                    <select id="field-section-body-size" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Peso</span>
+                    <select id="field-section-body-weight" data-theme-field></select>
+                  </label>
+                  <label>
+                    <span>Colore</span>
+                    <input id="field-section-body-color" type="color" class="host-color-picker" data-theme-field />
+                  </label>
+                </div>
+              </section>
+
+              <section class="host-design-group">
                 <p class="host-kicker">Colori</p>
                 <div class="host-grid">
                   <label>
                     <span>Sfondo app</span>
-                    <select id="field-color-background" data-theme-field></select>
+                    <input id="field-color-background" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Testo principale</span>
-                    <select id="field-color-text" data-theme-field></select>
+                    <input id="field-color-text" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Testi descrittivi</span>
-                    <select id="field-color-muted" data-theme-field></select>
+                    <input id="field-color-muted" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Icone</span>
-                    <select id="field-color-icon" data-theme-field></select>
+                    <input id="field-color-icon" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Bordi</span>
-                    <select id="field-color-line" data-theme-field></select>
+                    <input id="field-color-line" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Pulsanti</span>
-                    <select id="field-color-row" data-theme-field></select>
+                    <input id="field-color-row" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Pulsanti hover/tap</span>
-                    <select id="field-color-row-hover" data-theme-field></select>
+                    <input id="field-color-row-hover" type="color" class="host-color-picker" data-theme-field />
                   </label>
                   <label>
                     <span>Sfondo finestre</span>
-                    <select id="field-color-sheet" data-theme-field></select>
+                    <input id="field-color-sheet" type="color" class="host-color-picker" data-theme-field />
                   </label>
                 </div>
               </section>
