@@ -2407,6 +2407,20 @@ function bindEditorEvents() {
     if (event.target.matches('[data-field="menuTitle"], [data-field="sectionTitle"], [data-field="lead"]')) {
       updateSectionIconPreview(event.target.closest("[data-section-id]"));
     }
+    if (event.target.matches('[data-cta-field="label"]')) {
+      const ctaCard = event.target.closest("[data-cta-item]");
+      if (ctaCard) {
+        const isHidden = ctaCard.querySelector('[data-cta-field="hidden"]')?.value === "true";
+        const labelText = event.target.value.trim();
+        const strong = ctaCard.querySelector(".host-cta-heading strong");
+        if (strong) {
+          strong.textContent = isHidden
+            ? `${labelText || "Nuovo pulsante grafico"} (Nascosto)`
+            : (labelText || "Nuovo pulsante grafico");
+        }
+      }
+    }
+    state = saveTemplate(collectTemplate());
     queueAutoPublish();
   });
 
@@ -2452,21 +2466,33 @@ function bindEditorEvents() {
       event.target.value = "";
       return;
     }
-  });
 
-  dom.sections.addEventListener("change", (event) => {
+    if (event.target.matches('[data-cta-field="hidden"]')) {
+      const ctaCard = event.target.closest("[data-cta-item]");
+      if (ctaCard) {
+        const isHidden = event.target.value === "true";
+        ctaCard.classList.toggle("is-hidden-cta", isHidden);
+        const labelInput = ctaCard.querySelector('[data-cta-field="label"]');
+        const labelText = labelInput ? labelInput.value.trim() : "";
+        const strong = ctaCard.querySelector(".host-cta-heading strong");
+        if (strong) {
+          strong.textContent = isHidden
+            ? `${labelText || "Nuovo pulsante grafico"} (Nascosto)`
+            : (labelText || "Nuovo pulsante grafico");
+        }
+      }
+    }
+
     if (event.target.matches('[data-field="icon"], [data-field="iconColor"]')) {
       updateSectionIconPreview(event.target.closest("[data-section-id]"));
-      queueAutoPublish();
-      return;
-    }
-    if (event.target.matches('[data-cta-field="icon"], [data-cta-field="iconColor"]')) {
+    } else if (event.target.matches('[data-cta-field="icon"], [data-cta-field="iconColor"]')) {
       updateCtaIconPreview(event.target.closest("[data-cta-item]"));
-      queueAutoPublish();
-      return;
     }
-    if (!event.target.matches('[data-cta-field], [data-image-field="size"]')) return;
-    queueAutoPublish();
+
+    if (event.target.matches('[data-cta-field], [data-image-field="size"], [data-field]')) {
+      state = saveTemplate(collectTemplate());
+      queueAutoPublish();
+    }
   });
 
   dom.sections.addEventListener("click", (event) => {
