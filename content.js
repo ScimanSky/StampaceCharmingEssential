@@ -1558,12 +1558,14 @@ function buildFallbackSection(section = {}, index = 0) {
   };
 }
 
-export function defaultCategoryForSection(sectionId) {
+export function defaultCategoryForSection(sectionId, menuTitle = "") {
   if (sectionId === "host") return "top";
   const houseIds = ["wifi", "access", "key", "safe", "rules", "checkin", "custom-mpnjxoue"];
+  const titleText = String(menuTitle).toLowerCase();
   if (
     houseIds.includes(sectionId) ||
-    /keybox|contatore|luce|safe|cassafort|mappa|posizion/.test(sectionId)
+    /keybox|contatore|luce|safe|cassafort|mappa|posizion|casa/.test(sectionId) ||
+    /keybox|contatore|luce|cassaforte|regole|chiav|check|wifi|posizione|mappa/.test(titleText)
   ) {
     return "casa";
   }
@@ -1572,13 +1574,14 @@ export function defaultCategoryForSection(sectionId) {
 
 function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
+  const resolvedMenuTitle = cleanString(section?.menuTitle, baseSection.menuTitle);
   return {
     id: baseSection.id,
     icon: migrateSectionIcon({ ...section, icon: cleanString(section?.icon, baseSection.icon) }),
     iconColor: cleanIconColor(section?.iconColor, baseSection.iconColor),
     hidden: Boolean(section?.hidden ?? baseSection.hidden),
-    category: cleanString(section?.category, defaultCategoryForSection(baseSection.id)),
-    menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
+    category: cleanString(section?.category, defaultCategoryForSection(baseSection.id, resolvedMenuTitle)),
+    menuTitle: resolvedMenuTitle,
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
     items: baseSection.id === "host" ? ensureHostPrivateItem(normalizedItems, localeCode) : normalizedItems,

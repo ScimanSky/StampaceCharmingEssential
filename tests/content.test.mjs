@@ -15,7 +15,8 @@ const {
   isCtaItem,
   isHostPrivateItem,
   getLocaleContent,
-  defaultTemplate
+  defaultTemplate,
+  defaultCategoryForSection
 } = await import('../content.js');
 
 describe('Content module', () => {
@@ -101,6 +102,35 @@ describe('Content module', () => {
       };
       const content = getLocaleContent(template, 'en');
       assert.deepStrictEqual(content.introLines, ['Hello']);
+    });
+  });
+
+  describe('defaultCategoryForSection', () => {
+    it('should assign host to top', () => {
+      assert.strictEqual(defaultCategoryForSection('host'), 'top');
+    });
+
+    it('should assign standard house sections to casa', () => {
+      assert.strictEqual(defaultCategoryForSection('wifi'), 'casa');
+      assert.strictEqual(defaultCategoryForSection('rules'), 'casa');
+      assert.strictEqual(defaultCategoryForSection('checkin'), 'casa');
+    });
+
+    it('should assign keybox and contatore luce to casa based on ID or menuTitle', () => {
+      // By ID (lowercase, substring match)
+      assert.strictEqual(defaultCategoryForSection('custom-keybox'), 'casa');
+      assert.strictEqual(defaultCategoryForSection('custom-contatore'), 'casa');
+      
+      // By menuTitle
+      assert.strictEqual(defaultCategoryForSection('custom-123', 'Keybox'), 'casa');
+      assert.strictEqual(defaultCategoryForSection('custom-123', 'Contatore Luce'), 'casa');
+      assert.strictEqual(defaultCategoryForSection('custom-123', 'contatore luce'), 'casa');
+    });
+
+    it('should assign other sections to citta', () => {
+      assert.strictEqual(defaultCategoryForSection('around'), 'citta');
+      assert.strictEqual(defaultCategoryForSection('custom-123', 'Dintorni'), 'citta');
+      assert.strictEqual(defaultCategoryForSection('custom-456', 'My Custom Section'), 'citta');
     });
   });
 });
