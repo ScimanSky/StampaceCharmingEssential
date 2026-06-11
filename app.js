@@ -934,6 +934,13 @@ function toggleMenuGroup(groupId) {
   if (header) {
     header.setAttribute("aria-expanded", isExpanded ? "true" : "false");
   }
+
+  if (isExpanded) {
+    window.setTimeout(() => {
+      const y = container.getBoundingClientRect().top + window.scrollY - 12;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 100);
+  }
 }
 
 function expandSectionInline(sectionId) {
@@ -965,6 +972,11 @@ function expandSectionInline(sectionId) {
   container.classList.add("is-expanded");
   const button = container.querySelector('[data-action="toggle-section"]');
   if (button) button.setAttribute("aria-expanded", "true");
+
+  window.setTimeout(() => {
+    const y = container.getBoundingClientRect().top + window.scrollY - 16;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }, 100);
 }
 
 function collapseAllSectionsInline() {
