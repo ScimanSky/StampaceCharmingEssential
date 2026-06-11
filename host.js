@@ -80,6 +80,9 @@ const dom = {
   introLines: document.querySelector("#field-intro-lines"),
   fontPrimary: document.querySelector("#field-font-primary"),
   fontSecondary: document.querySelector("#field-font-secondary"),
+  menuFont: document.querySelector("#field-menu-font"),
+  ctaFont: document.querySelector("#field-cta-font"),
+  sectionTitleFont: document.querySelector("#field-section-title-font"),
   titleSize: document.querySelector("#field-title-size"),
   subtitleSize: document.querySelector("#field-subtitle-size"),
   menuSize: document.querySelector("#field-menu-size"),
@@ -184,9 +187,10 @@ const FONT_WEIGHT_OPTIONS = [
   { value: "500", label: "Medio" },
   { value: "600", label: "Grassetto" },
 ];
-const TEXT_FONT_TARGET_OPTIONS = [
-  { value: "secondary", label: "Font testi" },
-  { value: "primary", label: "Font titoli" },
+const EXTENDED_FONT_OPTIONS = [
+  { value: "secondary", label: "Usa font testi (default)" },
+  { value: "primary", label: "Usa font titoli" },
+  ...AVAILABLE_FONTS
 ];
 const TEXT_ALIGN_OPTIONS = [
   { value: "left", label: "Sinistra" },
@@ -475,24 +479,55 @@ function sectionIconOptions(selectedIcon = "spark") {
     { value: selectedIcon, label: `Icona salvata (${selectedIcon})` },
   ];
 }
-
 function applyTheme(theme) {
   const primaryFont = theme?.fontPrimary || "Roboto";
   const secondaryFont = theme?.fontSecondary || "Roboto";
   const colors = theme?.colors || {};
+  const textStyles = theme?.textStyles || {};
 
   const serifFonts = ["Playfair Display", "Lora", "Cormorant Garamond"];
   const primaryFallback = serifFonts.includes(primaryFont) ? "serif" : "sans-serif";
   const secondaryFallback = serifFonts.includes(secondaryFont) ? "serif" : "sans-serif";
 
+  const resolveFont = (val) => {
+    if (val === "primary") return primaryFont;
+    if (val === "secondary" || !val) return secondaryFont;
+    return val;
+  };
+
+  const introFont = resolveFont(textStyles.introFont);
+  const sectionLeadFont = resolveFont(textStyles.sectionLeadFont);
+  const sectionBodyFont = resolveFont(textStyles.sectionBodyFont);
+  const menuFont = resolveFont(textStyles.menuFont || "primary");
+  const ctaFont = resolveFont(textStyles.ctaFont || "primary");
+  const sectionTitleFont = resolveFont(textStyles.sectionTitleFont || "primary");
+
+  const getFallback = (f) => serifFonts.includes(f) ? "serif" : "sans-serif";
+
   document.documentElement.style.setProperty("--font-primary", `"${primaryFont}", ${primaryFallback}`);
   document.documentElement.style.setProperty("--font-secondary", `"${secondaryFont}", ${secondaryFallback}`);
+  document.documentElement.style.setProperty("--intro-font", `"${introFont}", ${getFallback(introFont)}`);
+  document.documentElement.style.setProperty("--section-lead-font", `"${sectionLeadFont}", ${getFallback(sectionLeadFont)}`);
+  document.documentElement.style.setProperty("--section-body-font", `"${sectionBodyFont}", ${getFallback(sectionBodyFont)}`);
+  document.documentElement.style.setProperty("--menu-font", `"${menuFont}", ${getFallback(menuFont)}`);
+  document.documentElement.style.setProperty("--cta-font", `"${ctaFont}", ${getFallback(ctaFont)}`);
+  document.documentElement.style.setProperty("--section-title-font", `"${sectionTitleFont}", ${getFallback(sectionTitleFont)}`);
+
   document.documentElement.style.setProperty("--copy", themeValue(colors, "text", "#e7d8c1"));
   document.documentElement.style.setProperty("--text", "var(--copy)");
   document.documentElement.style.setProperty("--muted", themeValue(colors, "muted", "rgba(231, 216, 193, 0.72)"));
   document.documentElement.style.setProperty("--line", themeValue(colors, "line", "rgba(224, 205, 177, 0.12)"));
 
-  const fontsToLoad = new Set([primaryFont, secondaryFont]);
+  const fontsToLoad = new Set([
+    primaryFont,
+    secondaryFont,
+    introFont,
+    sectionLeadFont,
+    sectionBodyFont,
+    menuFont,
+    ctaFont,
+    sectionTitleFont,
+  ]);
   const linkId = "google-fonts-dynamic";
   let linkEl = document.getElementById(linkId);
   if (!linkEl) {
@@ -614,13 +649,16 @@ function fillDesignSelects(theme) {
   fillSelect(dom.introSize, TEXT_SIZE_OPTIONS, typography.introSize);
   fillSelect(dom.introWeight, FONT_WEIGHT_OPTIONS, typography.introWeight);
   fillSelect(dom.introAlign, TEXT_ALIGN_OPTIONS, typography.introAlign);
-  fillSelect(dom.introFont, TEXT_FONT_TARGET_OPTIONS, theme?.textStyles?.introFont);
+  fillSelect(dom.introFont, EXTENDED_FONT_OPTIONS, theme?.textStyles?.introFont);
   fillSelect(dom.sectionLeadSize, TEXT_SIZE_OPTIONS, typography.sectionLeadSize);
   fillSelect(dom.sectionLeadWeight, FONT_WEIGHT_OPTIONS, typography.sectionLeadWeight);
-  fillSelect(dom.sectionLeadFont, TEXT_FONT_TARGET_OPTIONS, theme?.textStyles?.sectionLeadFont);
+  fillSelect(dom.sectionLeadFont, EXTENDED_FONT_OPTIONS, theme?.textStyles?.sectionLeadFont);
   fillSelect(dom.sectionBodySize, TEXT_SIZE_OPTIONS, typography.sectionBodySize);
   fillSelect(dom.sectionBodyWeight, FONT_WEIGHT_OPTIONS, typography.sectionBodyWeight);
-  fillSelect(dom.sectionBodyFont, TEXT_FONT_TARGET_OPTIONS, theme?.textStyles?.sectionBodyFont);
+  fillSelect(dom.sectionBodyFont, EXTENDED_FONT_OPTIONS, theme?.textStyles?.sectionBodyFont);
+  fillSelect(dom.menuFont, EXTENDED_FONT_OPTIONS, theme?.textStyles?.menuFont);
+  fillSelect(dom.ctaFont, EXTENDED_FONT_OPTIONS, theme?.textStyles?.ctaFont);
+  fillSelect(dom.sectionTitleFont, EXTENDED_FONT_OPTIONS, theme?.textStyles?.sectionTitleFont);
   setColorInputValue(dom.colorBackground, colors.background, "#070605");
   setColorInputValue(dom.colorText, colors.text, "#e7d8c1");
   setColorInputValue(dom.colorMuted, colors.muted, "#cbb99d");
@@ -683,6 +721,9 @@ function themeDraftFromFields() {
       sectionLeadColor: dom.sectionLeadColor.value,
       sectionBodyFont: dom.sectionBodyFont.value,
       sectionBodyColor: dom.sectionBodyColor.value,
+      menuFont: dom.menuFont.value,
+      ctaFont: dom.ctaFont.value,
+      sectionTitleFont: dom.sectionTitleFont.value,
     },
     layout: {
       appWidth: dom.appWidth.value,

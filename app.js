@@ -1033,9 +1033,28 @@ function applyTheme(theme) {
   document.documentElement.style.setProperty("--intro-color", themeValue(textStyles, "introColor", "var(--muted)"));
   document.documentElement.style.setProperty("--section-lead-color", themeValue(textStyles, "sectionLeadColor", "var(--muted)"));
   document.documentElement.style.setProperty("--section-body-color", themeValue(textStyles, "sectionBodyColor", "var(--muted-strong)"));
-  document.documentElement.style.setProperty("--intro-font", themeValue(textStyles, "introFont", "secondary") === "primary" ? "var(--font-primary)" : "var(--font-secondary)");
-  document.documentElement.style.setProperty("--section-lead-font", themeValue(textStyles, "sectionLeadFont", "secondary") === "primary" ? "var(--font-primary)" : "var(--font-secondary)");
-  document.documentElement.style.setProperty("--section-body-font", themeValue(textStyles, "sectionBodyFont", "secondary") === "primary" ? "var(--font-primary)" : "var(--font-secondary)");
+  const resolveFont = (val) => {
+    if (val === "primary") return primaryFont;
+    if (val === "secondary" || !val) return secondaryFont;
+    return val;
+  };
+
+  const introFont = resolveFont(textStyles.introFont);
+  const sectionLeadFont = resolveFont(textStyles.sectionLeadFont);
+  const sectionBodyFont = resolveFont(textStyles.sectionBodyFont);
+  const menuFont = resolveFont(textStyles.menuFont || "primary");
+  const ctaFont = resolveFont(textStyles.ctaFont || "primary");
+  const sectionTitleFont = resolveFont(textStyles.sectionTitleFont || "primary");
+
+  const getFallback = (f) => serifFonts.includes(f) ? "serif" : "sans-serif";
+
+  document.documentElement.style.setProperty("--intro-font", `"${introFont}", ${getFallback(introFont)}`);
+  document.documentElement.style.setProperty("--section-lead-font", `"${sectionLeadFont}", ${getFallback(sectionLeadFont)}`);
+  document.documentElement.style.setProperty("--section-body-font", `"${sectionBodyFont}", ${getFallback(sectionBodyFont)}`);
+  document.documentElement.style.setProperty("--menu-font", `"${menuFont}", ${getFallback(menuFont)}`);
+  document.documentElement.style.setProperty("--cta-font", `"${ctaFont}", ${getFallback(ctaFont)}`);
+  document.documentElement.style.setProperty("--section-title-font", `"${sectionTitleFont}", ${getFallback(sectionTitleFont)}`);
+
   document.documentElement.style.setProperty("--app-max-width", themeValue(layout, "appWidth", "34rem"));
   document.documentElement.style.setProperty("--page-padding-x", themeValue(layout, "pagePadding", "1rem"));
   document.documentElement.style.setProperty("--hero-height", themeValue(layout, "heroHeight", "15.5rem"));
@@ -1052,7 +1071,16 @@ function applyTheme(theme) {
   document.documentElement.style.setProperty("--sheet-enter-scale", animation === "scale" ? "0.96" : "1");
   document.documentElement.style.setProperty("--sheet-motion-duration", animation === "none" ? "1ms" : "300ms");
 
-  const fontsToLoad = new Set([primaryFont, secondaryFont]);
+  const fontsToLoad = new Set([
+    primaryFont,
+    secondaryFont,
+    introFont,
+    sectionLeadFont,
+    sectionBodyFont,
+    menuFont,
+    ctaFont,
+    sectionTitleFont,
+  ]);
   const linkId = "google-fonts-dynamic";
   let linkEl = document.getElementById(linkId);
   if (!linkEl) {

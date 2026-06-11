@@ -619,7 +619,7 @@ svg,
   overflow-wrap: anywhere;
   word-break: break-word;
   text-wrap: balance;
-  font-family: var(--font-primary), sans-serif;
+  font-family: var(--menu-font, var(--font-primary)), sans-serif;
 }
 
 .menu-copy span {
@@ -826,7 +826,7 @@ svg,
   overflow-wrap: anywhere;
   word-break: break-word;
   text-wrap: balance;
-  font-family: var(--font-primary), sans-serif;
+  font-family: var(--section-title-font, var(--font-primary)), sans-serif;
 }
 
 .sheet-lead {
@@ -1288,7 +1288,7 @@ svg,
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: center;
-  font-family: var(--font-primary), sans-serif;
+  font-family: var(--cta-font, var(--font-primary)), sans-serif;
 }
 
 .sheet-cta:focus-visible {
