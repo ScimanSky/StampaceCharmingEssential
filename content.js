@@ -1453,16 +1453,6 @@ function normalizeItems(items, fallbackItems) {
     .map((item) => {
       if (typeof item === "string") return item.trim();
       if (item && typeof item === "object") {
-        if (item.type === IMAGE_ITEM_TYPE || item.src) {
-          return {
-            type: IMAGE_ITEM_TYPE,
-            src: cleanString(item.src),
-            path: cleanString(item.path),
-            alt: cleanString(item.alt),
-            caption: cleanString(item.caption),
-            size: cleanString(item.size, "grande"),
-          };
-        }
         if (item.type === MEDIA_ITEM_TYPE) {
           return {
             type: MEDIA_ITEM_TYPE,
@@ -1474,6 +1464,16 @@ function normalizeItems(items, fallbackItems) {
             fileName: cleanString(item.fileName),
             mimeType: cleanString(item.mimeType),
             sizeBytes: Number.isFinite(Number(item.sizeBytes)) ? Number(item.sizeBytes) : 0,
+          };
+        }
+        if (item.type === IMAGE_ITEM_TYPE || item.src) {
+          return {
+            type: IMAGE_ITEM_TYPE,
+            src: cleanString(item.src),
+            path: cleanString(item.path),
+            alt: cleanString(item.alt),
+            caption: cleanString(item.caption),
+            size: cleanString(item.size, "grande"),
           };
         }
         if (item.type === CTA_ITEM_TYPE) {
