@@ -442,6 +442,30 @@ svg,
   perspective: 900px;
 }
 
+@keyframes menu-item-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(22px) rotateX(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+}
+
+.main-menu > * {
+  opacity: 0;
+  animation: menu-item-entrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger the page-load/locale-switch animation for the main elements */
+.main-menu > *:nth-child(1) { animation-delay: 0.05s; }
+.main-menu > *:nth-child(2) { animation-delay: 0.12s; }
+.main-menu > *:nth-child(3) { animation-delay: 0.19s; }
+.main-menu > *:nth-child(4) { animation-delay: 0.26s; }
+.main-menu > *:nth-child(5) { animation-delay: 0.33s; }
+.main-menu > *:nth-child(6) { animation-delay: 0.40s; }
+
 .app-footer {
   display: grid;
   justify-items: center;
@@ -885,6 +909,32 @@ svg,
   width: min(100%, var(--sheet-max-width));
   min-width: 0;
 }
+
+/* Animated sheet items inside sheet content */
+.sheet-content > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.2, 0.8, 0.22, 1);
+}
+
+.section-sheet.is-visible .sheet-content > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered transition delays for sheet items when sheet is opened */
+.section-sheet.is-visible .sheet-content > *:nth-child(1) { transition-delay: 0.04s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(2) { transition-delay: 0.08s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(3) { transition-delay: 0.12s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(4) { transition-delay: 0.16s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(5) { transition-delay: 0.20s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(6) { transition-delay: 0.24s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(7) { transition-delay: 0.28s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(8) { transition-delay: 0.32s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(9) { transition-delay: 0.36s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(10) { transition-delay: 0.40s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(11) { transition-delay: 0.44s; }
+.section-sheet.is-visible .sheet-content > *:nth-child(12) { transition-delay: 0.48s; }
 
 .sheet-card {
   display: grid;
@@ -1640,17 +1690,37 @@ svg,
   flex-direction: column;
   gap: var(--menu-list-gap, 0.8rem);
   padding: 0 0.5rem;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
 
 .menu-group-container.is-expanded .menu-group-content {
-  opacity: 1;
-  transform: translateY(0);
   padding: 0.5rem 0.60rem 0.85rem 0.60rem;
 }
+
+/* Submenu items animation inside expanded category groups */
+.menu-group-content .menu-row {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.menu-group-container.is-expanded .menu-group-content .menu-row {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.menu-group-container.is-expanded .menu-row:nth-child(1) { transition-delay: 0.04s; }
+.menu-group-container.is-expanded .menu-row:nth-child(2) { transition-delay: 0.08s; }
+.menu-group-container.is-expanded .menu-row:nth-child(3) { transition-delay: 0.12s; }
+.menu-group-container.is-expanded .menu-row:nth-child(4) { transition-delay: 0.16s; }
+.menu-group-container.is-expanded .menu-row:nth-child(5) { transition-delay: 0.20s; }
+.menu-group-container.is-expanded .menu-row:nth-child(6) { transition-delay: 0.24s; }
+.menu-group-container.is-expanded .menu-row:nth-child(7) { transition-delay: 0.28s; }
+.menu-group-container.is-expanded .menu-row:nth-child(8) { transition-delay: 0.32s; }
+.menu-group-container.is-expanded .menu-row:nth-child(9) { transition-delay: 0.36s; }
+.menu-group-container.is-expanded .menu-row:nth-child(10) { transition-delay: 0.40s; }
+.menu-group-container.is-expanded .menu-row:nth-child(11) { transition-delay: 0.44s; }
+.menu-group-container.is-expanded .menu-row:nth-child(12) { transition-delay: 0.48s; }
 
 @media (prefers-reduced-motion: reduce) {
   html {
