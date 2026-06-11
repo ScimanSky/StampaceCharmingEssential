@@ -339,23 +339,48 @@ function renderImageItem(item, { plain = false, hostQr = false } = {}) {
   `;
 }
 
+const MEDIA_TRANSLATIONS = {
+  it: { docFallback: "Documento", openDoc: "Apri documento" },
+  en: { docFallback: "Document", openDoc: "Open document" },
+  fr: { docFallback: "Document", openDoc: "Ouvrir le document" },
+  es: { docFallback: "Documento", openDoc: "Abrir documento" },
+  de: { docFallback: "Dokument", openDoc: "Dokument öffnen" },
+  nl: { docFallback: "Document", openDoc: "Document openen" },
+  pt: { docFallback: "Documento", openDoc: "Abrir documento" },
+  pl: { docFallback: "Dokument", openDoc: "Otwórz dokument" },
+  cs: { docFallback: "Dokument", openDoc: "Otevřít dokument" },
+  ru: { docFallback: "Документ", openDoc: "Открыть документ" },
+  zh: { docFallback: "文档", openDoc: "打开文档" },
+  hi: { docFallback: "दस्तावेज़", openDoc: "दस्तावेज़ खोलें" },
+  ja: { docFallback: "ドキュメント", openDoc: "ドキュメントを開く" }
+};
+
 function renderMediaItem(item) {
   const src = sanitizeImageSrc(item.src);
   if (!src) return "";
-  const title = item.title || item.fileName || (item.mediaKind === "video" ? "Video" : "Documento");
+  const lang = currentLocale || "en";
+  const translations = MEDIA_TRANSLATIONS[lang] ?? MEDIA_TRANSLATIONS.en;
   const caption = item.caption ? `<p class="sheet-media-caption">${escapeHtml(item.caption)}</p>` : "";
 
   if (item.mediaKind === "video") {
+    const showCopy = Boolean(item.title || item.caption);
+    const copyHtml = showCopy
+      ? `
+        <div class="sheet-card-copy">
+          ${item.title ? `<strong>${escapeHtml(item.title)}</strong>` : ""}
+          ${caption}
+        </div>
+      `
+      : "";
     return `
       <article class="sheet-card sheet-card-media sheet-card-file">
         <video class="sheet-video" controls preload="metadata" src="${escapeAttribute(src)}"></video>
-        <div class="sheet-card-copy">
-          <strong>${escapeHtml(title)}</strong>
-          ${caption}
-        </div>
+        ${copyHtml}
       </article>
     `;
   }
+
+  const title = item.title || translations.docFallback;
 
   return `
     <article class="sheet-card sheet-card-file">
@@ -363,7 +388,7 @@ function renderMediaItem(item) {
       <div class="sheet-card-copy">
         <strong>${escapeHtml(title)}</strong>
         ${caption}
-        <a class="sheet-link" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer" download>Apri documento</a>
+        <a class="sheet-link" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer" download>${escapeHtml(translations.openDoc)}</a>
       </div>
     </article>
   `;
