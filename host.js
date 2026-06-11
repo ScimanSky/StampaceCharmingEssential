@@ -312,6 +312,7 @@ const CTA_KIND_OPTIONS = [
   { value: "tel", label: "Telefono" },
   { value: "airbnb", label: "Airbnb" },
   { value: "booking", label: "Booking" },
+  { value: "vrbo", label: "Vrbo" },
 ];
 const CTA_ICON_OPTIONS = [
   { value: "map", label: "Mappa" },
@@ -353,6 +354,7 @@ const CTA_ICON_OPTIONS = [
   { value: "key", label: "Chiave" },
   { value: "airbnb", label: "Airbnb" },
   { value: "booking", label: "Booking" },
+  { value: "vrbo", label: "Vrbo" },
 ];
 const SECTION_ICON_OPTIONS = [
   { value: "spark", label: "Automatica" },
@@ -414,6 +416,7 @@ const CTA_PRESET_OPTIONS = [
   { kind: "tel", label: "CTA Telefono" },
   { kind: "airbnb", label: "Icona Airbnb" },
   { kind: "booking", label: "Icona Booking" },
+  { kind: "vrbo", label: "Icona Vrbo" },
 ];
 
 function serializeFooterLines(lines = []) {
@@ -564,6 +567,7 @@ function ctaDefaultIcon(kind = "web") {
     tel: "phone",
     airbnb: "airbnb",
     booking: "booking",
+    vrbo: "vrbo",
   };
   return fallbackMap[kind] ?? "link";
 }
@@ -577,6 +581,7 @@ function ctaDefaultLabel(kind = "web") {
     tel: "Chiama",
     airbnb: "Airbnb",
     booking: "Booking",
+    vrbo: "Vrbo",
   };
   return fallbackMap[kind] ?? "Apri link";
 }
@@ -590,6 +595,7 @@ function ctaDefaultHref(kind = "web") {
     tel: "+39",
     airbnb: "https://www.airbnb.it/",
     booking: "https://www.booking.com/",
+    vrbo: "https://www.vrbo.com/",
   };
   return fallbackMap[kind] ?? "https://example.com";
 }

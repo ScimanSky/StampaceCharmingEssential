@@ -116,6 +116,10 @@ function renderBookingBrandIcon() {
   return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.booking}</svg>`;
 }
 
+function renderVrboBrandIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.vrbo}</svg>`;
+}
+
 function gmailComposeHref(email) {
   return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
 }
@@ -224,6 +228,7 @@ function renderHostActionIcon(action) {
   if (action.kind === "gmail") return renderGmailBrandIcon();
   if (action.kind === "airbnb") return renderAirbnbBrandIcon();
   if (action.kind === "booking") return renderBookingBrandIcon();
+  if (action.kind === "vrbo") return renderVrboBrandIcon();
   return renderIcon(action.icon || "link");
 }
 
@@ -295,6 +300,7 @@ function ctaIcon(item) {
     tel: "phone",
     airbnb: "airbnb",
     booking: "booking",
+    vrbo: "vrbo",
   };
   return item.icon || kindFallback[item.kind] || "link";
 }

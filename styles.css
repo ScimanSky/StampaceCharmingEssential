@@ -1169,6 +1169,17 @@ svg,
   height: 3.25rem;
 }
 
+.sheet-host-action--vrbo {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.sheet-host-action--vrbo svg {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
 .sheet-host-action:hover,
 .sheet-host-action:focus-visible {
   transform: translateY(-1px);

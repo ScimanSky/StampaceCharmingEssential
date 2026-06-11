@@ -745,6 +745,16 @@ select:focus-visible {
   height: 2.65rem;
 }
 
+.host-cta-icon-preview--vrbo {
+  border-color: transparent;
+  background: transparent;
+}
+
+.host-cta-icon-preview--vrbo svg {
+  width: 2.65rem;
+  height: 2.65rem;
+}
+
 .host-cta-heading {
   min-width: 0;
   flex: 1 1 auto;
