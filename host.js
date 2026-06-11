@@ -1995,6 +1995,47 @@ function updateAccessState() {
   dom.app.classList.toggle("hidden", !showEditor);
 }
 
+function cleanupCorruptedMediaItems(tempState) {
+  const FIXED_LOCALE = "it";
+  if (!tempState?.locales?.[FIXED_LOCALE]) return tempState;
+
+  let cleanedAny = false;
+  const sections = tempState.locales[FIXED_LOCALE].sections;
+
+  for (const section of sections) {
+    if (Array.isArray(section.items)) {
+      section.items = section.items.filter((item) => {
+        if (
+          item &&
+          typeof item === "object" &&
+          item.type === "image" &&
+          item.src &&
+          item.src.toLowerCase().endsWith(".mp4")
+        ) {
+          console.warn("[host] Removing corrupted video item treated as image:", item.src);
+          cleanedAny = true;
+          if (item.path && isAuthorizedSession(session)) {
+            deleteSectionMedia(item.path, supabase).catch((err) => {
+              console.error("[host] Failed to delete storage file:", item.path, err);
+            });
+          }
+          return false;
+        }
+        return true;
+      });
+    }
+  }
+
+  if (cleanedAny) {
+    console.log("[host] Corrupted items cleaned up from local state, saving and publishing...");
+    const nextState = saveTemplate(normalizeTemplate(tempState));
+    queueAutoPublish();
+    return nextState;
+  }
+
+  return tempState;
+}
+
 async function hydrateEditorState() {
   shouldSeedExpandedSection = true;
   state = await loadTemplate({ preferLocal: true });
@@ -2009,6 +2050,7 @@ async function hydrateEditorState() {
     latestRemoteUpdatedAt = null;
   }
 
+  state = cleanupCorruptedMediaItems(state);
   syncFields();
 }
 
