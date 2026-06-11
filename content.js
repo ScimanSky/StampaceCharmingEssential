@@ -2013,7 +2013,8 @@ export function loadLocalTemplate() {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return normalizeTemplate(JSON.parse(raw));
-  } catch {
+  } catch (error) {
+    console.warn("[content] Failed to load local template:", error);
     return null;
   }
 }
@@ -2026,10 +2027,12 @@ export async function loadTemplate({ preferLocal = false } = {}) {
   try {
     const remote = await fetchRemoteTemplateEnvelope();
     return remote.template;
-  } catch {
+  } catch (error) {
+    console.warn("[content] Remote template fetch failed:", error);
     try {
       return await fetchTemplateFile();
-    } catch {
+    } catch (fileError) {
+      console.warn("[content] Template file fallback failed:", fileError);
       return loadLocalTemplate() ?? normalizeTemplate(defaultTemplate);
     }
   }

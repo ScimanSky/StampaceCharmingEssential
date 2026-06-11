@@ -6,6 +6,8 @@ const STATIC_ASSETS = [
   "./guest/index.html",
   "./styles.css?v=20260610h",
   "./app.js?v=20260610h",
+  "./icons.js?v=20260610h",
+  "./theme-utils.js?v=20260610h",
   "./content.js?v=20260610h",
   "./supabase.js",
   "./security.js?v=20260610h",
@@ -55,7 +57,8 @@ async function networkFirst(request, fallbackUrl = "./index.html") {
       cache.put(request, response.clone());
     }
     return response;
-  } catch {
+  } catch (error) {
+    console.warn("[sw] Fetch failed, serving from cache:", error);
     return (await cache.match(request)) || cache.match(fallbackUrl);
   }
 }
