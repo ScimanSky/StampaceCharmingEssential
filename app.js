@@ -538,17 +538,31 @@ function renderMenu(sections) {
   const casaSections = visible.filter((s) => s.category === "casa");
   const cittaSections = visible.filter((s) => s.category === "citta");
 
-  const renderSectionButton = (section) => `
-    <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(iconForSection(section)))}" type="button" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
-      <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
-      <span class="menu-copy">
-        <strong>${escapeHtml(section.menuTitle)}</strong>
-      </span>
-      <span class="menu-chevron" aria-hidden="true">›</span>
-    </button>
-  `;
+  const renderSectionItem = (section) => {
+    const sectionIcon = iconForSection(section);
+    return `
+      <div class="menu-section-container" data-section-id="${escapeAttribute(section.id)}">
+        <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(sectionIcon))}" type="button" data-action="toggle-section" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
+          <span class="menu-icon">${renderIcon(sectionIcon)}</span>
+          <span class="menu-copy">
+            <strong>${escapeHtml(section.menuTitle)}</strong>
+          </span>
+          <span class="menu-row-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
+        </button>
+        <div class="menu-section-content-wrapper">
+          <div class="menu-section-content">
+            ${renderSectionItems(section.items, section.id)}
+          </div>
+        </div>
+      </div>
+    `;
+  };
 
-  const topHtml = topSections.map(renderSectionButton).join("");
+  const topHtml = topSections.map(renderSectionItem).join("");
 
   const lang = currentLocale || "en";
   const groupNames = SUBMENU_TRANSLATIONS[lang] ?? SUBMENU_TRANSLATIONS.en;
@@ -572,7 +586,7 @@ function renderMenu(sections) {
         </button>
         <div class="menu-group-content-wrapper">
           <div class="menu-group-content">
-            ${groupSections.map(renderSectionButton).join("")}
+            ${groupSections.map(renderSectionItem).join("")}
           </div>
         </div>
       </div>
@@ -922,6 +936,71 @@ function toggleMenuGroup(groupId) {
   }
 }
 
+function expandSectionInline(sectionId) {
+  activeSectionId = sectionId;
+  const sections = localeState().sections;
+  const section = sections.find((s) => s.id === sectionId);
+  if (section && section.category && section.category !== "top") {
+    if (!expandedMenuGroups[section.category]) {
+      Object.keys(expandedMenuGroups).forEach((key) => {
+        expandedMenuGroups[key] = false;
+      });
+      expandedMenuGroups[section.category] = true;
+      dom.mainMenu.innerHTML = renderMenu(sections);
+    }
+  }
+
+  const container = dom.mainMenu.querySelector(`.menu-section-container[data-section-id="${sectionId}"]`);
+  if (!container) return;
+
+  const otherContainers = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+  otherContainers.forEach((other) => {
+    if (other !== container) {
+      other.classList.remove("is-expanded");
+      const otherButton = other.querySelector('[data-action="toggle-section"]');
+      if (otherButton) otherButton.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  container.classList.add("is-expanded");
+  const button = container.querySelector('[data-action="toggle-section"]');
+  if (button) button.setAttribute("aria-expanded", "true");
+}
+
+function collapseAllSectionsInline() {
+  const containers = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+  containers.forEach((container) => {
+    container.classList.remove("is-expanded");
+    const button = container.querySelector('[data-action="toggle-section"]');
+    if (button) button.setAttribute("aria-expanded", "false");
+  });
+}
+
+function toggleSectionInline(sectionId) {
+  const container = dom.mainMenu.querySelector(`.menu-section-container[data-section-id="${sectionId}"]`);
+  if (!container) return;
+
+  const isExpanded = !container.classList.contains("is-expanded");
+
+  if (isExpanded) {
+    window.history.pushState(
+      {
+        ...(window.history.state ?? {}),
+        [SHEET_HISTORY_KEY]: sectionId,
+      },
+      "",
+    );
+    expandSectionInline(sectionId);
+  } else {
+    if (window.history.state?.[SHEET_HISTORY_KEY] === sectionId) {
+      window.history.back();
+    } else {
+      collapseAllSectionsInline();
+      activeSectionId = null;
+    }
+  }
+}
+
 function bindMenu() {
   dom.mainMenu.addEventListener("click", (event) => {
     const groupToggle = event.target.closest('[data-action="toggle-menu-group"]');
@@ -931,9 +1010,12 @@ function bindMenu() {
       return;
     }
 
-    const trigger = event.target.closest("[data-section-id]");
-    if (!trigger) return;
-    openSection(trigger.dataset.sectionId);
+    const sectionToggle = event.target.closest('[data-action="toggle-section"]');
+    if (sectionToggle) {
+      const sectionId = sectionToggle.dataset.sectionId;
+      toggleSectionInline(sectionId);
+      return;
+    }
   });
 }
 
@@ -1034,20 +1116,41 @@ function bindSheet() {
     }
 
     if (event.key === "Escape" && activeSectionId) {
-      closeSection();
+      if (activeSectionId === "host") {
+        closeSection();
+      } else {
+        if (window.history.state?.[SHEET_HISTORY_KEY] === activeSectionId) {
+          window.history.back();
+        } else {
+          collapseAllSectionsInline();
+          activeSectionId = null;
+        }
+      }
     }
   });
 
   window.addEventListener("popstate", (event) => {
     const nextSectionId = event.state?.[SHEET_HISTORY_KEY];
     if (nextSectionId) {
-      renderOpenSection(nextSectionId);
-      focusSheet();
+      if (nextSectionId === "host") {
+        renderOpenSection(nextSectionId);
+        focusSheet();
+      } else {
+        if (activeSectionId === "host") {
+          closeSection({ fromHistory: true });
+        }
+        expandSectionInline(nextSectionId);
+      }
       return;
     }
 
     if (activeSectionId) {
-      closeSection({ fromHistory: true });
+      if (activeSectionId === "host") {
+        closeSection({ fromHistory: true });
+      } else {
+        collapseAllSectionsInline();
+        activeSectionId = null;
+      }
     }
   });
 }
@@ -1245,18 +1348,37 @@ function render() {
   dom.footerMeta.innerHTML = template.footer.lines
     .map((line) => `<span>${escapeHtml(line)}</span>`)
     .join("");
+
+  if (activeSectionId && activeSectionId !== "host") {
+    const activeSection = localeTemplate.sections.find((s) => s.id === activeSectionId);
+    if (activeSection && !activeSection.hidden) {
+      if (activeSection.category && activeSection.category !== "top") {
+        expandedMenuGroups[activeSection.category] = true;
+      }
+    }
+  }
+
   dom.mainMenu.innerHTML = renderMenu(localeTemplate.sections);
 
   if (activeSectionId) {
-    const activeSection = localeTemplate.sections.find((section) => section.id === activeSectionId);
-    if (!activeSection || activeSection.hidden) {
-      activeSectionId = null;
-      dom.sheet.classList.add("hidden");
-      dom.sheet.classList.remove("is-visible", "is-closing");
-      dom.sheet.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("sheet-open");
+    if (activeSectionId === "host") {
+      const activeSection = localeTemplate.sections.find((section) => section.id === activeSectionId);
+      if (!activeSection || activeSection.hidden) {
+        activeSectionId = null;
+        dom.sheet.classList.add("hidden");
+        dom.sheet.classList.remove("is-visible", "is-closing");
+        dom.sheet.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("sheet-open");
+      } else {
+        renderOpenSection(activeSectionId);
+      }
     } else {
-      renderOpenSection(activeSectionId);
+      const container = dom.mainMenu.querySelector(`.menu-section-container[data-section-id="${activeSectionId}"]`);
+      if (container) {
+        container.classList.add("is-expanded");
+        const button = container.querySelector('[data-action="toggle-section"]');
+        if (button) button.setAttribute("aria-expanded", "true");
+      }
     }
   }
 }
