@@ -1558,6 +1558,18 @@ function buildFallbackSection(section = {}, index = 0) {
   };
 }
 
+export function defaultCategoryForSection(sectionId) {
+  if (sectionId === "host") return "top";
+  const houseIds = ["wifi", "access", "key", "safe", "rules", "checkin", "custom-mpnjxoue"];
+  if (
+    houseIds.includes(sectionId) ||
+    /keybox|contatore|luce|safe|cassafort|mappa|posizion/.test(sectionId)
+  ) {
+    return "casa";
+  }
+  return "citta";
+}
+
 function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
   return {
@@ -1565,6 +1577,7 @@ function normalizeSection(section, baseSection, localeCode) {
     icon: migrateSectionIcon({ ...section, icon: cleanString(section?.icon, baseSection.icon) }),
     iconColor: cleanIconColor(section?.iconColor, baseSection.iconColor),
     hidden: Boolean(section?.hidden ?? baseSection.hidden),
+    category: cleanString(section?.category, defaultCategoryForSection(baseSection.id)),
     menuTitle: cleanString(section?.menuTitle, baseSection.menuTitle),
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
@@ -1858,6 +1871,7 @@ function mirrorItalianContent(localeMap) {
                 icon: section.icon,
                 iconColor: section.iconColor,
                 hidden: Boolean(section.hidden),
+                category: section.category,
                 menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
                 sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
                 lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
@@ -1907,6 +1921,7 @@ function mirrorItalianContent(localeMap) {
               icon: section.icon,
               iconColor: section.iconColor,
               hidden: Boolean(section.hidden),
+              category: section.category,
               menuTitle: pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle),
               sectionTitle: pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle),
               lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),

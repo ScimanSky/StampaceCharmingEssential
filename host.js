@@ -1502,6 +1502,14 @@ function renderSectionEditors() {
                 ${colorInputHtml("iconColor", section.iconColor)}
               </label>
               <label>
+                <span>Categoria menu</span>
+                <select data-field="category" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>
+                  <option value="top" ${section.category === "top" ? "selected" : ""}>Sempre visibile (in alto)</option>
+                  <option value="casa" ${section.category === "casa" ? "selected" : ""}>La Casa</option>
+                  <option value="citta" ${section.category === "citta" ? "selected" : ""}>Vivi la Città</option>
+                </select>
+              </label>
+              <label>
                 <span>Testo introduttivo</span>
                 <textarea data-field="lead">${escapeHtml(section.lead)}</textarea>
               </label>
@@ -1651,6 +1659,7 @@ function collectTemplate() {
       icon: selectedIcon.trim() || "spark",
       iconColor,
       hidden: card.dataset.sectionHidden === "true",
+      category: card.querySelector('[data-field="category"]')?.value || "citta",
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,

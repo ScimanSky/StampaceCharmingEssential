@@ -513,21 +513,76 @@ function iconForItem(item, sectionId) {
   return sectionFallbacks[sectionId] ?? "spark";
 }
 
+const SUBMENU_TRANSLATIONS = {
+  it: { casa: "La Casa", citta: "Vivi la Città" },
+  en: { casa: "The House", citta: "Live the City" },
+  fr: { casa: "La Maison", citta: "Vivre la Ville" },
+  es: { casa: "La Casa", citta: "Vive la Ciudad" },
+  de: { casa: "Das Haus", citta: "Erlebe die Stadt" },
+  nl: { casa: "Het Huis", citta: "Beleef de Stad" },
+  pt: { casa: "A Casa", citta: "Viva a Cidade" },
+  pl: { casa: "Dom", citta: "Życie w Mieście" },
+  cs: { casa: "Dům", citta: "Poznejte Město" },
+  ru: { casa: "Дом", citta: "Познакомьтесь с Городом" },
+  zh: { casa: "房子", citta: "城市生活" },
+  hi: { casa: "घर", citta: "शहर का अनुभव" },
+  ja: { casa: "家", citta: "街を楽しむ" }
+};
+
+const expandedMenuGroups = { casa: false, citta: false };
+
 function renderMenu(sections) {
-  return sections
-    .filter((section) => section.id !== "host" && !section.hidden)
-    .map(
-      (section) => `
-        <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(iconForSection(section)))}" type="button" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
-          <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
+  const visible = sections.filter((section) => section.id !== "host" && !section.hidden);
+
+  const topSections = visible.filter((s) => s.category === "top");
+  const casaSections = visible.filter((s) => s.category === "casa");
+  const cittaSections = visible.filter((s) => s.category === "citta");
+
+  const renderSectionButton = (section) => `
+    <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(iconForSection(section)))}" type="button" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
+      <span class="menu-icon">${renderIcon(iconForSection(section))}</span>
+      <span class="menu-copy">
+        <strong>${escapeHtml(section.menuTitle)}</strong>
+      </span>
+      <span class="menu-chevron" aria-hidden="true">›</span>
+    </button>
+  `;
+
+  const topHtml = topSections.map(renderSectionButton).join("");
+
+  const lang = currentLocale || "en";
+  const groupNames = SUBMENU_TRANSLATIONS[lang] ?? SUBMENU_TRANSLATIONS.en;
+
+  const renderGroup = (groupId, groupSections, groupLabel, groupIcon) => {
+    if (!groupSections.length) return "";
+    const isExpanded = expandedMenuGroups[groupId] === true;
+
+    return `
+      <div class="menu-group-container${isExpanded ? " is-expanded" : ""}" data-group-id="${escapeAttribute(groupId)}">
+        <button class="menu-group-header" type="button" data-action="toggle-menu-group" data-group-id="${escapeAttribute(groupId)}" aria-expanded="${isExpanded ? "true" : "false"}">
+          <span class="menu-icon">${renderIcon(groupIcon)}</span>
           <span class="menu-copy">
-            <strong>${escapeHtml(section.menuTitle)}</strong>
+            <strong>${escapeHtml(groupLabel)}</strong>
           </span>
-          <span class="menu-chevron" aria-hidden="true">›</span>
+          <span class="menu-group-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
         </button>
-      `,
-    )
-    .join("");
+        <div class="menu-group-content-wrapper">
+          <div class="menu-group-content">
+            ${groupSections.map(renderSectionButton).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const casaHtml = renderGroup("casa", casaSections, groupNames.casa, "home");
+  const cittaHtml = renderGroup("citta", cittaSections, groupNames.citta, "globe");
+
+  return `${topHtml}${casaHtml}${cittaHtml}`;
 }
 
 function renderLocaleBar() {
@@ -839,8 +894,43 @@ function closeSection({ fromHistory = false } = {}) {
   }
 }
 
+function toggleMenuGroup(groupId) {
+  const container = dom.mainMenu.querySelector(`.menu-group-container[data-group-id="${groupId}"]`);
+  if (!container) return;
+
+  const isExpanded = !container.classList.contains("is-expanded");
+  expandedMenuGroups[groupId] = isExpanded;
+
+  if (isExpanded) {
+    Object.keys(expandedMenuGroups).forEach((id) => {
+      if (id !== groupId) {
+        expandedMenuGroups[id] = false;
+        const otherContainer = dom.mainMenu.querySelector(`.menu-group-container[data-group-id="${id}"]`);
+        if (otherContainer) {
+          otherContainer.classList.remove("is-expanded");
+          const otherHeader = otherContainer.querySelector(".menu-group-header");
+          if (otherHeader) otherHeader.setAttribute("aria-expanded", "false");
+        }
+      }
+    });
+  }
+
+  container.classList.toggle("is-expanded", isExpanded);
+  const header = container.querySelector(".menu-group-header");
+  if (header) {
+    header.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+  }
+}
+
 function bindMenu() {
   dom.mainMenu.addEventListener("click", (event) => {
+    const groupToggle = event.target.closest('[data-action="toggle-menu-group"]');
+    if (groupToggle) {
+      const groupId = groupToggle.dataset.groupId;
+      toggleMenuGroup(groupId);
+      return;
+    }
+
     const trigger = event.target.closest("[data-section-id]");
     if (!trigger) return;
     openSection(trigger.dataset.sectionId);
