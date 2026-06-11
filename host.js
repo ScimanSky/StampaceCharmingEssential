@@ -1245,7 +1245,7 @@ function setStatus(message, variant = "") {
 
 function serializeItems(items) {
   return items
-    .filter((item) => !isHostPrivateItem(item) && !isImageItem(item) && !isCtaItem(item))
+    .filter((item) => !isHostPrivateItem(item) && !isImageItem(item) && !isCtaItem(item) && !isMediaItem(item))
     .map((item) => {
       if (typeof item === "string") return item;
       if (item?.href) {
@@ -2437,7 +2437,7 @@ function bindEditorEvents() {
       updateCtaIconPreview(event.target.closest("[data-cta-item]"));
     }
 
-    if (event.target.matches('[data-cta-field], [data-image-field="size"], [data-field]')) {
+    if (event.target.matches('[data-cta-field], [data-image-field], [data-media-field], [data-field]')) {
       state = saveTemplate(collectTemplate());
       queueAutoPublish();
     }

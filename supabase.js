@@ -157,6 +157,12 @@ export async function deleteSectionImage(path, client = getHostSupabase()) {
 export function mediaKindForFile(file) {
   if (VIDEO_ALLOWED_TYPES.includes(file.type)) return "video";
   if (DOCUMENT_ALLOWED_TYPES.includes(file.type)) return "document";
+
+  // Fallback to checking the file extension if the browser didn't supply a MIME type or it is generic
+  const ext = file.name ? file.name.split(".").pop().toLowerCase() : "";
+  if (["mp4", "webm", "mov"].includes(ext)) return "video";
+  if (["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt"].includes(ext)) return "document";
+
   return "";
 }
 
