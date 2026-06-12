@@ -688,9 +688,9 @@ svg,
   content: "";
   position: absolute;
   inset: 0;
-  background: url("./img/patternlegn.webp") center top / 42rem auto repeat;
-  opacity: 0.85;
-  filter: brightness(1.02) contrast(1.18) saturate(0.62);
+  background:
+    linear-gradient(180deg, rgba(9, 7, 5, 0.88), rgba(9, 7, 5, 0.96)),
+    url("./img/patternlegn.webp") center top / 42rem auto repeat;
   pointer-events: none;
   transform: scale(1.02);
   transition:
