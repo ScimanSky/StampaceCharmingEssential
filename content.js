@@ -1642,8 +1642,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
     rawCategories = localeData.categories;
   } else if (localeData?.categories && typeof localeData.categories === "object") {
     rawCategories = [
-      { id: "casa", menuTitle: localeData.categories.casa || "La Casa" },
-      { id: "citta", menuTitle: localeData.categories.citta || "Vivi la Città" }
+      { id: "casa", icon: "home", iconColor: "#dfc39c", menuTitle: localeData.categories.casa || "La Casa" },
+      { id: "citta", icon: "globe", iconColor: "#5fa8ff", menuTitle: localeData.categories.citta || "Vivi la Città" }
     ];
   }
   const defaultBaseCategories = [
@@ -1675,8 +1675,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
     localeCode === FIXED_LOCALE
       ? (rawCategories.length ? rawCategories.map((cat, idx) => ({
           id: cleanString(cat?.id) || `cat-${Date.now()}-${idx}`,
-          icon: cleanString(cat?.icon) || "spark",
-          iconColor: cleanIconColor(cat?.iconColor),
+          icon: cleanString(cat?.icon) || (cat?.id === "casa" ? "home" : cat?.id === "citta" ? "globe" : "spark"),
+          iconColor: cleanIconColor(cat?.iconColor) || (cat?.id === "casa" ? "#dfc39c" : cat?.id === "citta" ? "#5fa8ff" : ""),
           bgColor: cleanIconColor(cat?.bgColor),
           textColor: cleanIconColor(cat?.textColor),
           fontSize: cleanString(cat?.fontSize),
