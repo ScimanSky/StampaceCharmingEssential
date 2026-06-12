@@ -947,6 +947,32 @@ function toggleMenuGroup(groupId) {
       otherContainer.classList.remove("is-expanded");
       const otherHeader = otherContainer.querySelector(".menu-group-header");
       if (otherHeader) otherHeader.setAttribute("aria-expanded", "false");
+      
+      // Collapse all sections inside other collapsing groups
+      const sections = otherContainer.querySelectorAll(".menu-section-container.is-expanded");
+      sections.forEach((sec) => {
+        sec.classList.remove("is-expanded");
+        const btn = sec.querySelector('[data-action="toggle-section"]');
+        if (btn) btn.setAttribute("aria-expanded", "false");
+      });
+    });
+  } else {
+    // If the group is collapsed directly, collapse all internal sections
+    if (activeSectionId) {
+      const activeSecInGroup = container.querySelector(`.menu-section-container[data-section-id="${activeSectionId}"]`);
+      if (activeSecInGroup) {
+        if (window.history.state?.[SHEET_HISTORY_KEY] === activeSectionId) {
+          window.history.back();
+          return; // The popstate handler will handle collapsing everything and resetting activeSectionId
+        }
+      }
+    }
+
+    const sections = container.querySelectorAll(".menu-section-container.is-expanded");
+    sections.forEach((sec) => {
+      sec.classList.remove("is-expanded");
+      const btn = sec.querySelector('[data-action="toggle-section"]');
+      if (btn) btn.setAttribute("aria-expanded", "false");
     });
   }
 
