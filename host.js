@@ -2347,6 +2347,56 @@ function cleanupCorruptedMediaItems(tempState) {
   return tempState;
 }
 
+function cleanupOrphanedCategoriesAndDuplicates(tempState) {
+  if (!tempState?.locales) return tempState;
+
+  let cleanedAny = false;
+  const locales = tempState.locales;
+
+  Object.keys(locales).forEach((locale) => {
+    const localeData = locales[locale];
+    if (!localeData || !localeData.sections) return;
+
+    // wifi
+    const wifiSec = localeData.sections.find((s) => s.id === "wifi");
+    if (wifiSec && wifiSec.category === "top") {
+      wifiSec.category = "casa";
+      cleanedAny = true;
+    }
+
+    // custom-mpnjxoue
+    const mapSec = localeData.sections.find((s) => s.id === "custom-mpnjxoue");
+    if (mapSec && mapSec.category === "top") {
+      mapSec.category = "casa";
+      cleanedAny = true;
+    }
+
+    // custom-mq6bdpmrcoj0 (Keybox 1 original)
+    const kb1 = localeData.sections.find((s) => s.id === "custom-mq6bdpmrcoj0");
+    if (kb1 && (kb1.hidden || kb1.category !== "casa")) {
+      kb1.category = "casa";
+      kb1.hidden = false;
+      cleanedAny = true;
+    }
+
+    // custom-mq8ee5bfaaz6 (Keybox 2 duplicate)
+    const initialCount = localeData.sections.length;
+    localeData.sections = localeData.sections.filter((s) => s.id !== "custom-mq8ee5bfaaz6");
+    if (localeData.sections.length !== initialCount) {
+      cleanedAny = true;
+    }
+  });
+
+  if (cleanedAny) {
+    console.log("[host] Cleaned up orphaned categories and duplicate keybox from template.");
+    const nextState = saveTemplate(normalizeTemplate(tempState));
+    queueAutoPublish();
+    return nextState;
+  }
+
+  return tempState;
+}
+
 async function hydrateEditorState() {
   shouldSeedExpandedSection = true;
   state = await loadTemplate({ preferLocal: true });
@@ -2362,6 +2412,7 @@ async function hydrateEditorState() {
   }
 
   state = cleanupCorruptedMediaItems(state);
+  state = cleanupOrphanedCategoriesAndDuplicates(state);
   syncFields();
 }
 
