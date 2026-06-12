@@ -730,7 +730,7 @@ function renderSectionItems(items, sectionId) {
   }
 
   return items
-    .map((item) => {
+    .map((item, idx) => {
       const itemIcon = renderIcon(iconForItem(item, sectionId));
       const useSafeNumbers = sectionId === "safe" && !isImageItem(item);
       const marker = useSafeNumbers
@@ -745,17 +745,29 @@ function renderSectionItems(items, sectionId) {
         return renderMediaItem(item);
       }
 
-      if (typeof item === "string") {
-        if (sectionId === "wifi" && wifiColonStrings.includes(item)) {
-          const index = wifiColonStrings.indexOf(item);
-          const parts = item.split(/[:：]/);
+      // Check if Italian label is "stampace" to prevent translation display
+      let finalItem = item;
+      if (item && typeof item === "object" && !isImageItem(item) && !isMediaItem(item)) {
+        const itSection = template?.locales?.["it"]?.sections?.find((s) => s.id === sectionId);
+        const itItem = itSection?.items?.[idx];
+        if (itItem && typeof itItem === "object" && itItem.label) {
+          if (itItem.label.toLowerCase().trim() === "stampace") {
+            finalItem = { ...item, label: itItem.label };
+          }
+        }
+      }
+
+      if (typeof finalItem === "string") {
+        if (sectionId === "wifi" && wifiColonStrings.includes(finalItem)) {
+          const index = wifiColonStrings.indexOf(finalItem);
+          const parts = finalItem.split(/[:：]/);
           
           const type = index === 0 ? "rete" : "password";
           const label = index === 0 ? "Rete" : "Password";
           
           // Use the Italian value if available to prevent translation of network name/password!
           const value = (type === "rete" ? italianWifiValues.rete : italianWifiValues.password) || 
-                        (parts.length > 1 ? parts.slice(1).join(":").trim() : item.trim());
+                        (parts.length > 1 ? parts.slice(1).join(":").trim() : finalItem.trim());
 
           return `
             <article class="sheet-card">
@@ -777,22 +789,22 @@ function renderSectionItems(items, sectionId) {
         }
 
         if (sectionId === "host") {
-          return renderHostStringItem(item, marker);
+          return renderHostStringItem(finalItem, marker);
         }
 
         return `
           <article class="sheet-card">
             ${marker}
-            <p>${escapeHtml(item)}</p>
+            <p>${escapeHtml(finalItem)}</p>
           </article>
         `;
       }
 
-      if (isCtaItem(item)) {
-        return renderCtaItem(item);
+      if (isCtaItem(finalItem)) {
+        return renderCtaItem(finalItem);
       }
 
-      return renderGenericLinkItem(item, marker, sectionId);
+      return renderGenericLinkItem(finalItem, marker, sectionId);
     })
     .join("");
 }
@@ -963,7 +975,6 @@ function toggleMenuGroup(groupId) {
       if (activeSecInGroup) {
         if (window.history.state?.[SHEET_HISTORY_KEY] === activeSectionId) {
           window.history.back();
-          return; // The popstate handler will handle collapsing everything and resetting activeSectionId
         }
       }
     }
