@@ -2808,6 +2808,37 @@ function bindEditorEvents() {
 
     if (event.target.matches('[data-cta-field], [data-image-field], [data-media-field], [data-field]')) {
       state = saveTemplate(collectTemplate());
+
+      const activeFocusedElement = document.activeElement;
+      const sectionCard = activeFocusedElement?.closest('[data-section-id]');
+      const activeFocusedSectionId = sectionCard?.dataset.sectionId;
+      const activeFocusedField = activeFocusedElement?.dataset.field;
+      const activeFocusedCtaId = activeFocusedElement?.closest('[data-cta-item]')?.dataset.ctaId;
+      const activeFocusedCtaField = activeFocusedElement?.dataset.ctaField;
+      const hasSelection = activeFocusedElement && ('selectionStart' in activeFocusedElement);
+      const selectionStart = hasSelection ? activeFocusedElement.selectionStart : null;
+      const selectionEnd = hasSelection ? activeFocusedElement.selectionEnd : null;
+
+      syncFields();
+
+      // Restore focus for sections
+      if (activeFocusedSectionId) {
+        const card = dom.sections.querySelector(`[data-section-id="${activeFocusedSectionId}"]`);
+        let input = null;
+        if (activeFocusedCtaId && activeFocusedCtaField) {
+          const ctaCard = card?.querySelector(`[data-cta-item="${activeFocusedCtaId}"]`);
+          input = ctaCard?.querySelector(`[data-cta-field="${activeFocusedCtaField}"]`);
+        } else if (activeFocusedField) {
+          input = card?.querySelector(`[data-field="${activeFocusedField}"]`);
+        }
+        if (input) {
+          input.focus();
+          if (hasSelection && typeof selectionStart === "number" && selectionStart !== null && selectionEnd !== null) {
+            input.setSelectionRange(selectionStart, selectionEnd);
+          }
+        }
+      }
+
       queueAutoPublish();
     }
   });
