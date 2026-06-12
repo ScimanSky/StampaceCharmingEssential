@@ -863,7 +863,21 @@ function renderOpenSection(sectionId) {
   dom.sheetBrand.textContent = template.appName;
   dom.sheetTitle.textContent = section.sectionTitle;
   dom.sheetLead.textContent = section.lead;
-  dom.sheetContent.innerHTML = renderSectionItems(section.items, section.id);
+
+  let contentHtml = renderSectionItems(section.items, section.id);
+  if (section.id === "host") {
+    contentHtml += `
+      <footer class="app-footer" style="margin-top: 3rem; margin-bottom: 1.5rem;" aria-label="Footer">
+        <div class="app-footer-rule" aria-hidden="true"></div>
+        <p class="app-footer-name">${escapeHtml(template.footer.name)}</p>
+        <p class="app-footer-subtitle">${escapeHtml(template.footer.subtitle)}</p>
+        <div class="app-footer-meta">
+          ${template.footer.lines.map((line) => `<span>${escapeHtml(line)}</span>`).join("")}
+        </div>
+      </footer>
+    `;
+  }
+  dom.sheetContent.innerHTML = contentHtml;
 
   dom.sheet.classList.remove("hidden");
   dom.sheet.classList.remove("is-closing");
