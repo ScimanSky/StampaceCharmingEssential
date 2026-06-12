@@ -616,6 +616,7 @@ svg,
 }
 
 .menu-row[style*="--icon-custom-color"] .menu-icon,
+.menu-group-header[style*="--icon-custom-color"] .menu-icon,
 .sheet-icon[style*="--icon-custom-color"],
 .sheet-card-index[style*="--icon-custom-color"],
 .sheet-cta-icon[style*="--icon-custom-color"] {

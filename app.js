@@ -9,13 +9,13 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-  SUBMENU_TRANSLATIONS,
 } from "./content.js?v=20260610h";
 import {
   escapeAttribute,
   escapeHtml,
   normalizeCtaHref,
   normalizeCtaKind,
+  sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
 } from "./security.js?v=20260610h";
@@ -515,14 +515,17 @@ function iconForItem(item, sectionId) {
 }
 
 
-const expandedMenuGroups = { casa: false, citta: false };
+const expandedMenuGroups = {};
 
 function renderMenu(sections) {
   const visible = sections.filter((section) => section.id !== "host" && !section.hidden);
 
-  const topSections = visible.filter((s) => s.category === "top");
-  const casaSections = visible.filter((s) => s.category === "casa");
-  const cittaSections = visible.filter((s) => s.category === "citta");
+  const localeTemplate = localeState();
+  const categoriesList = Array.isArray(localeTemplate.categories) ? localeTemplate.categories : [];
+  const activeCategories = categoriesList.filter((cat) => cat && !cat.hidden);
+  const activeCategoryIds = new Set(activeCategories.map((cat) => cat.id));
+
+  const topSections = visible.filter((s) => s.category === "top" || !activeCategoryIds.has(s.category));
 
   const renderSectionItem = (section) => {
     const sectionIcon = iconForSection(section);
@@ -550,19 +553,34 @@ function renderMenu(sections) {
 
   const topHtml = topSections.map(renderSectionItem).join("");
 
-  const localeTemplate = localeState();
-  const groupNames = localeTemplate.categories || SUBMENU_TRANSLATIONS[currentLocale || "en"] || SUBMENU_TRANSLATIONS.en;
-
-  const renderGroup = (groupId, groupSections, groupLabel, groupIcon) => {
+  const renderGroup = (cat, groupSections) => {
     if (!groupSections.length) return "";
-    const isExpanded = expandedMenuGroups[groupId] === true;
+    const isExpanded = expandedMenuGroups[cat.id] === true;
+
+    const styles = [];
+    if (cat.iconColor) {
+      styles.push(`--icon-custom-color: ${sanitizeCssColor(cat.iconColor)}`);
+    }
+    if (cat.bgColor) {
+      styles.push(`background-color: ${sanitizeCssColor(cat.bgColor)}`);
+    }
+    if (cat.textColor) {
+      styles.push(`color: ${sanitizeCssColor(cat.textColor)}`);
+    }
+    if (cat.fontSize) {
+      styles.push(`font-size: ${cat.fontSize}`);
+    }
+    if (cat.padding) {
+      styles.push(`padding: ${cat.padding}`);
+    }
+    const styleAttr = styles.length ? ` style="${escapeAttribute(styles.join("; "))}"` : "";
 
     return `
-      <div class="menu-group-container${isExpanded ? " is-expanded" : ""}" data-group-id="${escapeAttribute(groupId)}">
-        <button class="menu-group-header" type="button" data-action="toggle-menu-group" data-group-id="${escapeAttribute(groupId)}" aria-expanded="${isExpanded ? "true" : "false"}">
-          <span class="menu-icon">${renderIcon(groupIcon)}</span>
+      <div class="menu-group-container${isExpanded ? " is-expanded" : ""}" data-group-id="${escapeAttribute(cat.id)}">
+        <button class="menu-group-header" type="button" data-action="toggle-menu-group" data-group-id="${escapeAttribute(cat.id)}" aria-expanded="${isExpanded ? "true" : "false"}"${styleAttr}>
+          <span class="menu-icon">${renderIcon(cat.icon || "spark")}</span>
           <span class="menu-copy">
-            <strong>${escapeHtml(groupLabel)}</strong>
+            <strong>${escapeHtml(cat.menuTitle)}</strong>
           </span>
           <span class="menu-group-chevron" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -579,10 +597,12 @@ function renderMenu(sections) {
     `;
   };
 
-  const casaHtml = renderGroup("casa", casaSections, groupNames.casa, "home");
-  const cittaHtml = renderGroup("citta", cittaSections, groupNames.citta, "globe");
+  const groupsHtml = activeCategories.map((cat) => {
+    const groupSections = visible.filter((s) => s.category === cat.id);
+    return renderGroup(cat, groupSections);
+  }).join("");
 
-  return `${topHtml}${casaHtml}${cittaHtml}`;
+  return `${topHtml}${groupsHtml}`;
 }
 
 function renderLocaleBar() {
@@ -1007,8 +1027,13 @@ function expandSectionInline(sectionId) {
   activeSectionId = sectionId;
   const sections = localeState().sections;
   const section = sections.find((s) => s.id === sectionId);
-  if (section && section.category) {
-    if (section.category === "top") {
+  const localeTemplate = localeState();
+  const categoriesList = Array.isArray(localeTemplate.categories) ? localeTemplate.categories : [];
+  const activeCategoryIds = new Set(categoriesList.filter((c) => c && !c.hidden).map((c) => c.id));
+  const resolvedCategory = (section && activeCategoryIds.has(section.category)) ? section.category : "top";
+
+  if (section) {
+    if (resolvedCategory === "top") {
       let changed = false;
       Object.keys(expandedMenuGroups).forEach((key) => {
         if (expandedMenuGroups[key]) {
@@ -1020,11 +1045,11 @@ function expandSectionInline(sectionId) {
         dom.mainMenu.innerHTML = renderMenu(sections);
       }
     } else {
-      if (!expandedMenuGroups[section.category]) {
+      if (!expandedMenuGroups[resolvedCategory]) {
         Object.keys(expandedMenuGroups).forEach((key) => {
           expandedMenuGroups[key] = false;
         });
-        expandedMenuGroups[section.category] = true;
+        expandedMenuGroups[resolvedCategory] = true;
         dom.mainMenu.innerHTML = renderMenu(sections);
       }
     }

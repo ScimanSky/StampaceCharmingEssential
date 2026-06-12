@@ -1637,12 +1637,69 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
         )
       : baseLocale.sections;
 
-  const categoriesSource = localeData?.categories && typeof localeData.categories === "object" ? localeData.categories : {};
-  const baseCategories = baseLocale?.categories ?? {};
-  const defaultCategories = {
-    casa: SUBMENU_TRANSLATIONS[localeCode]?.casa ?? SUBMENU_TRANSLATIONS.en.casa,
-    citta: SUBMENU_TRANSLATIONS[localeCode]?.citta ?? SUBMENU_TRANSLATIONS.en.citta,
-  };
+  let rawCategories = [];
+  if (Array.isArray(localeData?.categories)) {
+    rawCategories = localeData.categories;
+  } else if (localeData?.categories && typeof localeData.categories === "object") {
+    rawCategories = [
+      { id: "casa", menuTitle: localeData.categories.casa || "La Casa" },
+      { id: "citta", menuTitle: localeData.categories.citta || "Vivi la Città" }
+    ];
+  }
+  const defaultBaseCategories = [
+    {
+      id: "casa",
+      icon: "home",
+      iconColor: "#dfc39c",
+      bgColor: "",
+      textColor: "",
+      fontSize: "",
+      padding: "",
+      hidden: false,
+      menuTitle: "La Casa"
+    },
+    {
+      id: "citta",
+      icon: "globe",
+      iconColor: "#5fa8ff",
+      bgColor: "",
+      textColor: "",
+      fontSize: "",
+      padding: "",
+      hidden: false,
+      menuTitle: "Vivi la Città"
+    }
+  ];
+
+  const structureCategories =
+    localeCode === FIXED_LOCALE
+      ? (rawCategories.length ? rawCategories.map((cat, idx) => ({
+          id: cleanString(cat?.id) || `cat-${Date.now()}-${idx}`,
+          icon: cleanString(cat?.icon) || "spark",
+          iconColor: cleanIconColor(cat?.iconColor),
+          bgColor: cleanIconColor(cat?.bgColor),
+          textColor: cleanIconColor(cat?.textColor),
+          fontSize: cleanString(cat?.fontSize),
+          padding: cleanString(cat?.padding),
+          hidden: Boolean(cat?.hidden),
+          menuTitle: cleanString(cat?.menuTitle) || `Gruppo ${idx + 1}`,
+        })) : defaultBaseCategories)
+      : (baseLocale.categories || defaultBaseCategories);
+
+  const normalizedCategories = structureCategories.map((baseCat, index) => {
+    const matchingCat = rawCategories.find(cat => cat && cat.id === baseCat.id) ?? rawCategories[index];
+    return {
+      id: baseCat.id,
+      icon: baseCat.icon,
+      iconColor: baseCat.iconColor,
+      bgColor: baseCat.bgColor,
+      textColor: baseCat.textColor,
+      fontSize: baseCat.fontSize,
+      padding: baseCat.padding,
+      hidden: Boolean(baseCat.hidden),
+      menuTitle: cleanString(matchingCat?.menuTitle, baseCat.menuTitle),
+    };
+  });
 
   return {
     introLines: cleanLines(introLines),
@@ -1650,10 +1707,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       localeCode === FIXED_LOCALE
         ? cleanString(localeData?.subtitle, baseLocale.subtitle)
         : cleanString(DEFAULT_LOCALE_CONTENT[FIXED_LOCALE]?.subtitle, baseLocale.subtitle),
-    categories: {
-      casa: cleanString(categoriesSource.casa, baseCategories.casa ?? defaultCategories.casa),
-      citta: cleanString(categoriesSource.citta, baseCategories.citta ?? defaultCategories.citta),
-    },
+    categories: normalizedCategories,
     sections: normalizeLocaleSections(rawSections, structureSections, localeCode),
   };
 }
@@ -1871,6 +1925,10 @@ function mirrorItalianContent(localeMap) {
           {
             introLines: localized?.introLines?.length ? localized.introLines : italian.introLines,
             subtitle: italian.subtitle,
+            categories: (italian.categories || []).map((cat) => ({
+              ...cat,
+              menuTitle: cat.menuTitle,
+            })),
             sections: italian.sections.map((section, sectionIndex) => {
               const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
               const scBaseSection = SARDINIAN_TEMPLATE_BASE.sections[sectionIndex] ?? section;
@@ -1918,11 +1976,24 @@ function mirrorItalianContent(localeMap) {
       const pickLocalizedValue = (value, italianValue, fallbackValue) =>
         !value || value === italianValue ? fallbackValue : value;
 
+      const rawLocalizedCategories = Array.isArray(localized?.categories) ? localized.categories : [];
+      const localizedCategories = (italian.categories || []).map((cat, idx) => {
+        const matchingCat = rawLocalizedCategories.find(c => c && c.id === cat.id) ?? rawLocalizedCategories[idx];
+        const defaultTitle = SUBMENU_TRANSLATIONS[language.code]?.[cat.id] ?? 
+                             SUBMENU_TRANSLATIONS.en[cat.id] ?? 
+                             cat.menuTitle;
+        return {
+          ...cat,
+          menuTitle: cleanString(matchingCat?.menuTitle, defaultTitle),
+        };
+      });
+
       return [
         language.code,
         {
           introLines: localized?.introLines?.length ? localized.introLines : italian.introLines,
           subtitle: italian.subtitle,
+          categories: localizedCategories,
           sections: italian.sections.map((section, index) => {
             const localizedSection = localizedSectionForItalianSection(
               section,

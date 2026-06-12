@@ -15,6 +15,7 @@ import {
   loadTemplate,
   normalizeTemplate,
   saveTemplate,
+  SUBMENU_TRANSLATIONS,
 } from "./content.js?v=20260610h";
 import {
   deleteSectionImage,
@@ -73,12 +74,12 @@ const dom = {
   export: document.querySelector("#host-export"),
   import: document.querySelector("#host-import"),
   addSection: document.querySelector("#host-add-section"),
+  addCategory: document.querySelector("#host-add-category"),
+  categories: document.querySelector("#host-categories"),
   editorLocale: document.querySelector("#field-editor-locale"),
   optionalLocale: document.querySelector("#field-optional-locale"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
-  categoryCasa: document.querySelector("#field-category-casa"),
-  categoryCitta: document.querySelector("#field-category-citta"),
   introLines: document.querySelector("#field-intro-lines"),
   fontPrimary: document.querySelector("#field-font-primary"),
   fontSecondary: document.querySelector("#field-font-secondary"),
@@ -169,6 +170,7 @@ function saveTranslationCache() {
 }
 let lastTranslationFallbackLocales = [];
 const expandedSectionIds = new Set();
+const expandedCategoryIds = new Set(["casa", "citta"]);
 let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set();
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
@@ -968,10 +970,15 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
     return {
       introLines: [...(italianLocale.introLines ?? [])],
       subtitle: italianLocale.subtitle,
-      categories: {
-        casa: italianLocale.categories?.casa ?? "La Casa",
-        citta: italianLocale.categories?.citta ?? "Vivi la Città",
-      },
+      categories: (italianLocale.categories || []).map((cat) => {
+        const defaultTitle = SUBMENU_TRANSLATIONS.sc?.[cat.id] ?? 
+                             SUBMENU_TRANSLATIONS.en[cat.id] ?? 
+                             cat.menuTitle;
+        return {
+          ...cat,
+          menuTitle: defaultTitle,
+        };
+      }),
       sections: italianLocale.sections.map((section, sectionIndex) => {
         const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
         const scBaseSection = SARDINIAN_TEMPLATE_BASE.sections[sectionIndex] ?? section;
@@ -1023,7 +1030,10 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   const draftLocale = {
     introLines: [],
     subtitle: "",
-    categories: { casa: "", citta: "" },
+    categories: (italianLocale.categories || []).map((cat) => ({
+      ...cat,
+      menuTitle: "",
+    })),
     sections: italianLocale.sections.map((section) => ({
       id: section.id,
       icon: section.icon,
@@ -1045,15 +1055,11 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
     draftLocale.subtitle = value;
   });
 
-  const itCategories = italianLocale.categories ?? { casa: "La Casa", citta: "Vivi la Città" };
-  texts.push(itCategories.casa || "La Casa");
-  appliers.push((value) => {
-    draftLocale.categories.casa = value;
-  });
-
-  texts.push(itCategories.citta || "Vivi la Città");
-  appliers.push((value) => {
-    draftLocale.categories.citta = value;
+  (italianLocale.categories || []).forEach((cat, index) => {
+    texts.push(cat.menuTitle || "");
+    appliers.push((value) => {
+      draftLocale.categories[index].menuTitle = value;
+    });
   });
 
   italianLocale.sections.forEach((section, sectionIndex) => {
@@ -1525,8 +1531,9 @@ function renderSectionEditors() {
                 <span>Categoria menu</span>
                 <select data-field="category" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>
                   <option value="top" ${section.category === "top" ? "selected" : ""}>Sempre visibile (in alto)</option>
-                  <option value="casa" ${section.category === "casa" ? "selected" : ""}>${escapeHtml(localeState.categories?.casa || "La Casa")}</option>
-                  <option value="citta" ${section.category === "citta" ? "selected" : ""}>${escapeHtml(localeState.categories?.citta || "Vivi la Città")}</option>
+                  ${(localeState.categories || []).map((cat) => `
+                    <option value="${escapeAttribute(cat.id)}" ${section.category === cat.id ? "selected" : ""}>${escapeHtml(cat.menuTitle || "Nuovo Gruppo")}</option>
+                  `).join("")}
                 </select>
               </label>
               <label>
@@ -1604,6 +1611,145 @@ function renderSectionEditors() {
     .join("");
 }
 
+function renderCategoryEditors() {
+  if (!dom.categories) return;
+
+  const localeState = currentLocaleState();
+  const categories = localeState.categories || [];
+
+  dom.categories.innerHTML = categories
+    .map(
+      (cat, index) => `
+        <section class="host-section-card${expandedCategoryIds.has(cat.id) ? "" : " is-collapsed"}${cat.hidden ? " is-hidden-section" : ""}" data-category-id="${escapeAttribute(cat.id)}" data-category-hidden="${cat.hidden ? "true" : "false"}">
+          <div class="host-section-meta">
+            <div class="host-section-meta-main">
+              <button class="host-section-toggle" type="button" data-action="toggle-category" data-category-id="${escapeAttribute(cat.id)}" aria-expanded="${expandedCategoryIds.has(cat.id) ? "true" : "false"}">
+                <span class="host-section-icon" data-category-icon-preview${iconColorStyle(cat.iconColor)}>${renderIcon(cat.icon)}</span>
+                <span class="host-section-heading">
+                  <span>
+                    <p class="host-kicker">Pulsante Principale</p>
+                    <h2>${escapeHtml(cat.menuTitle || "Nuovo Gruppo")}</h2>
+                  </span>
+                  <span class="host-section-chevron" aria-hidden="true">⌄</span>
+                </span>
+              </button>
+            </div>
+            <div class="host-section-actions">
+              <button class="ghost-button host-section-secondary" type="button" data-action="toggle-category-visibility" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${cat.hidden ? "Mostra" : "Nascondi"}</button>
+              <button class="ghost-button host-remove-section" type="button" data-action="remove-category" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Rimuovi</button>
+            </div>
+          </div>
+          <div class="host-section-body">
+            <div class="host-section-grid">
+              <label>
+                <span>Nome pulsante</span>
+                <input data-field="menuTitle" type="text" value="${escapeAttribute(cat.menuTitle)}" />
+              </label>
+              <label>
+                <span>Icona</span>
+                <select data-field="icon" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                  ${sectionIconOptions(cat.icon).map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === cat.icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                </select>
+              </label>
+              <label>
+                <span>Colore icona</span>
+                ${colorInputHtml("iconColor", cat.iconColor)}
+              </label>
+              <label>
+                <span>Colore sfondo</span>
+                ${colorInputHtml("bgColor", cat.bgColor)}
+              </label>
+              <label>
+                <span>Colore testo</span>
+                ${colorInputHtml("textColor", cat.textColor)}
+              </label>
+              <label>
+                <span>Dimensione font</span>
+                <input data-field="fontSize" type="text" placeholder="es. 16px, 1.1rem" value="${escapeAttribute(cat.fontSize || "")}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
+              </label>
+              <label>
+                <span>Spaziatura (Padding)</span>
+                <input data-field="padding" type="text" placeholder="es. 12px 16px" value="${escapeAttribute(cat.padding || "")}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
+              </label>
+            </div>
+          </div>
+        </section>
+      `
+    )
+    .join("");
+}
+
+function addCategory() {
+  const newId = `cat-${Date.now()}`;
+  const newCat = {
+    id: newId,
+    icon: "spark",
+    iconColor: "#dfc39c",
+    bgColor: "",
+    textColor: "",
+    fontSize: "",
+    padding: "",
+    hidden: false,
+    menuTitle: "Nuovo Gruppo",
+  };
+  currentLocaleState().categories = currentLocaleState().categories || [];
+  currentLocaleState().categories.push(newCat);
+  expandedCategoryIds.add(newId);
+  state = saveTemplate(collectTemplate());
+  syncFields();
+  queueAutoPublish();
+}
+
+function toggleCategory(categoryId) {
+  if (expandedCategoryIds.has(categoryId)) {
+    expandedCategoryIds.delete(categoryId);
+  } else {
+    expandedCategoryIds.add(categoryId);
+  }
+  renderCategoryEditors();
+}
+
+function removeCategory(categoryId) {
+  if (categoryId === "casa" || categoryId === "citta") {
+    if (!confirm("Sei sicuro di voler eliminare questo gruppo predefinito? Le sezioni collegate diventeranno 'Sempre visibili'.")) return;
+  } else {
+    if (!confirm("Sei sicuro di voler eliminare questo gruppo? Le sezioni collegate diventeranno 'Sempre visibili'.")) return;
+  }
+  
+  const localeState = currentLocaleState();
+  localeState.categories = (localeState.categories || []).filter((cat) => cat.id !== categoryId);
+  expandedCategoryIds.delete(categoryId);
+  
+  state = saveTemplate(collectTemplate());
+  syncFields();
+  queueAutoPublish();
+}
+
+function toggleCategoryVisibility(categoryId) {
+  const localeState = currentLocaleState();
+  const cat = (localeState.categories || []).find((c) => c.id === categoryId);
+  if (cat) {
+    cat.hidden = !cat.hidden;
+    state = saveTemplate(collectTemplate());
+    syncFields();
+    queueAutoPublish();
+  }
+}
+
+function updateCategoryIconPreview(card) {
+  if (!card) return;
+  const preview = card.querySelector("[data-category-icon-preview]");
+  if (!preview) return;
+  const selectedIcon = card.querySelector('[data-field="icon"]')?.value || "spark";
+  const selectedColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);
+  preview.innerHTML = renderIcon(selectedIcon);
+  if (selectedColor) {
+    preview.style.setProperty("--icon-custom-color", selectedColor);
+  } else {
+    preview.style.removeProperty("--icon-custom-color");
+  }
+}
+
 function syncFields() {
   if (dom.fontPrimary && dom.fontPrimary.options.length === 0) {
     const fontOptions = optionsHtml(AVAILABLE_FONTS);
@@ -1618,8 +1764,7 @@ function syncFields() {
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
   fillDesignSelects(theme);
   dom.subtitle.value = localeState.subtitle;
-  dom.categoryCasa.value = localeState.categories?.casa || "";
-  dom.categoryCitta.value = localeState.categories?.citta || "";
+  renderCategoryEditors();
   dom.introLines.value = serializeFooterLines(localeState.introLines || []);
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
@@ -1634,6 +1779,26 @@ function syncFields() {
 
 function collectTemplate() {
   const next = JSON.parse(JSON.stringify(state));
+  const categoryCards = [...(dom.categories?.querySelectorAll("[data-category-id]") || [])];
+  const categories = categoryCards.map((card) => {
+    const id = card.dataset.categoryId;
+    const base = (currentLocaleState().categories || []).find((cat) => cat.id === id) || {};
+    const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);
+    const bgColor = sanitizeCssColor(card.querySelector('[data-field="bgColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="bgColor"]')?.value);
+    const textColor = sanitizeCssColor(card.querySelector('[data-field="textColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="textColor"]')?.value);
+    return {
+      id,
+      icon: card.querySelector('[data-field="icon"]')?.value || base.icon || "spark",
+      iconColor,
+      bgColor,
+      textColor,
+      fontSize: card.querySelector('[data-field="fontSize"]')?.value || "",
+      padding: card.querySelector('[data-field="padding"]')?.value || "",
+      hidden: card.dataset.categoryHidden === "true",
+      menuTitle: card.querySelector('[data-field="menuTitle"]')?.value || "",
+    };
+  });
+
   const sectionCards = [...dom.sections.querySelectorAll("[data-section-id]")];
   const sections = sectionCards.map((card) => {
     const id = card.dataset.sectionId;
@@ -1707,10 +1872,7 @@ function collectTemplate() {
     ...next.locales[selectedEditorLocale],
     introLines,
     subtitle: dom.subtitle.value,
-    categories: {
-      casa: dom.categoryCasa.value.trim(),
-      citta: dom.categoryCitta.value.trim(),
-    },
+    categories,
     sections,
   };
   delete next.locales[selectedEditorLocale].heroMeta;
@@ -2430,13 +2592,23 @@ function bindEditorEvents() {
   editorBound = true;
 
   dom.addSection.addEventListener("click", addSection);
+  if (dom.addCategory) {
+    dom.addCategory.addEventListener("click", addCategory);
+  }
   dom.logout.addEventListener("click", logout);
   dom.shareGuest.addEventListener("click", shareGuestApp);
 
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
-    if (event.target.matches('[data-field="menuTitle"], [data-field="sectionTitle"], [data-field="lead"]')) {
+    if (event.target.closest("[data-section-id]") && event.target.matches('[data-field="menuTitle"], [data-field="sectionTitle"], [data-field="lead"]')) {
       updateSectionIconPreview(event.target.closest("[data-section-id]"));
+    }
+    if (event.target.closest("[data-category-id]") && event.target.matches('[data-field="menuTitle"]')) {
+      const card = event.target.closest("[data-category-id]");
+      const h2 = card.querySelector(".host-section-heading h2");
+      if (h2) {
+        h2.textContent = event.target.value.trim() || "Nuovo Gruppo";
+      }
     }
     if (event.target.matches('[data-cta-field="label"]')) {
       const ctaCard = event.target.closest("[data-cta-item]");
@@ -2672,6 +2844,62 @@ function bindEditorEvents() {
     const panel = event.target.closest("[data-panel-id]");
     togglePanel(panel?.dataset.panelId);
   });
+
+  if (dom.categories) {
+    dom.categories.addEventListener("click", (event) => {
+      const toggleTrigger = event.target.closest('[data-action="toggle-category"]');
+      if (toggleTrigger) {
+        toggleCategory(toggleTrigger.dataset.categoryId);
+        return;
+      }
+
+      const removeTrigger = event.target.closest('[data-action="remove-category"]');
+      if (removeTrigger) {
+        const categoryCard = event.target.closest("[data-category-id]");
+        removeCategory(categoryCard?.dataset.categoryId);
+        return;
+      }
+
+      const toggleVisibilityTrigger = event.target.closest('[data-action="toggle-category-visibility"]');
+      if (toggleVisibilityTrigger) {
+        const categoryCard = event.target.closest("[data-category-id]");
+        toggleCategoryVisibility(categoryCard?.dataset.categoryId);
+        return;
+      }
+    });
+
+    dom.categories.addEventListener("change", (event) => {
+      if (event.target.matches('[data-field="icon"], [data-field="iconColor"]')) {
+        updateCategoryIconPreview(event.target.closest("[data-category-id]"));
+      }
+      if (event.target.matches('[data-field]')) {
+        state = saveTemplate(collectTemplate());
+        
+        // Re-sync fields to update other dropdowns (like the sections' category dropdown)
+        // Store focused element cursor details to restore them
+        const activeFocusedElement = document.activeElement;
+        const activeFocusedId = activeFocusedElement?.closest('[data-category-id]')?.dataset.categoryId;
+        const activeFocusedField = activeFocusedElement?.dataset.field;
+        const selectionStart = activeFocusedElement?.selectionStart;
+        const selectionEnd = activeFocusedElement?.selectionEnd;
+        
+        syncFields();
+        
+        if (activeFocusedId && activeFocusedField) {
+          const card = dom.categories.querySelector(`[data-category-id="${activeFocusedId}"]`);
+          const input = card?.querySelector(`[data-field="${activeFocusedField}"]`);
+          if (input) {
+            input.focus();
+            if (typeof selectionStart === "number") {
+              input.setSelectionRange(selectionStart, selectionEnd);
+            }
+          }
+        }
+        
+        queueAutoPublish();
+      }
+    });
+  }
 }
 
 function bindAuthEvents() {

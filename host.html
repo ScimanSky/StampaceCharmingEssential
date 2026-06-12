@@ -88,14 +88,6 @@
                 <span>Sottotitolo della lingua selezionata</span>
                 <input id="field-subtitle" type="text" />
               </label>
-              <label>
-                <span>Nome gruppo "La Casa" (lingua selezionata)</span>
-                <input id="field-category-casa" type="text" />
-              </label>
-              <label>
-                <span>Nome gruppo "Vivi la Città" (lingua selezionata)</span>
-                <input id="field-category-citta" type="text" />
-              </label>
               <label class="host-grid-wide">
                 <span>Testo sotto il sottotitolo della lingua selezionata, una riga per voce</span>
                 <textarea id="field-intro-lines"></textarea>
@@ -352,6 +344,29 @@
                 </div>
               </section>
             </div>
+          </div>
+        </section>
+
+        <section class="host-card host-panel is-collapsed" data-panel-id="categories">
+          <button class="host-panel-toggle" type="button" data-action="toggle-panel" aria-expanded="false">
+            <span class="host-panel-heading">
+              <span>
+                <p class="host-kicker">Struttura</p>
+                <h2>Pulsanti principali (Gruppi)</h2>
+              </span>
+              <span class="host-section-chevron" aria-hidden="true">⌄</span>
+            </span>
+          </button>
+          <div class="host-panel-body">
+            <div class="host-sections-head">
+              <div>
+                <p class="host-sections-note">
+                  Gestisci i sottomenu dell'homepage. Puoi aggiungere nuovi gruppi di sottomenu, rimuoverli, nasconderli e personalizzarne colore, icona, sfondo, font e spaziature.
+                </p>
+              </div>
+              <button id="host-add-category" type="button">Aggiungi gruppo</button>
+            </div>
+            <section class="host-sections" id="host-categories"></section>
           </div>
         </section>
 
