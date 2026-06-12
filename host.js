@@ -1798,28 +1798,32 @@ function removeCategory(categoryId) {
   }
 
   if (categoryId === "casa" || categoryId === "citta") {
-    if (!confirm("Sei sicuro di voler eliminare questo gruppo predefinito? Le sezioni collegate diventeranno 'Sempre visibili'.")) return;
+    if (!confirm("Sei sicuro di voler eliminare questo gruppo predefinito? Anche tutte le sezioni collegate ad esso verranno eliminate definitivamente.")) return;
   } else {
-    if (!confirm("Sei sicuro di voler eliminare questo gruppo? Le sezioni collegate diventeranno 'Sempre visibili'.")) return;
+    if (!confirm("Sei sicuro di voler eliminare questo gruppo? Anche tutte le sezioni collegate ad esso verranno eliminate definitivamente.")) return;
   }
   
   state = collectTemplate();
-  currentLocaleState().categories = (currentLocaleState().categories || []).filter((cat) => cat.id !== categoryId);
-  expandedCategoryIds.delete(categoryId);
+  const localeState = currentLocaleState();
 
-  // Update sections that belonged to this category to 'top' in the DOM dropdown selects
-  const sectionCards = [...dom.sections.querySelectorAll("[data-section-id]")];
-  sectionCards.forEach((card) => {
-    const select = card.querySelector('[data-field="category"]');
-    if (select && select.value === categoryId) {
-      select.value = "top";
-    }
-  });
+  // Remove all sections belonging to this category (except 'host')
+  if (localeState.sections) {
+    localeState.sections.forEach(sec => {
+      if (sec.category === categoryId && sec.id !== "host") {
+        expandedSectionIds.delete(sec.id);
+      }
+    });
+    localeState.sections = localeState.sections.filter(sec => sec.category !== categoryId || sec.id === "host");
+  }
+
+  // Remove the category
+  localeState.categories = (localeState.categories || []).filter((cat) => cat.id !== categoryId);
+  expandedCategoryIds.delete(categoryId);
   
   state = saveTemplate(state);
   syncFields();
   queueAutoPublish();
-  setStatus("Gruppo rimosso.", "success");
+  setStatus("Gruppo e sezioni collegate rimossi.", "success");
 }
 
 function toggleCategoryVisibility(categoryId) {
