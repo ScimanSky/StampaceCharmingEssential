@@ -1642,6 +1642,7 @@ function renderCategoryEditors() {
 
   const localeState = currentLocaleState();
   const categories = localeState.categories || [];
+  const sections = localeState.sections || [];
 
   dom.categories.innerHTML = categories
     .map(
@@ -1704,6 +1705,21 @@ function renderCategoryEditors() {
                 <span>Spaziatura (Padding)</span>
                 <input data-field="padding" type="text" placeholder="es. 12px 16px" value="${escapeAttribute(cat.padding || "")}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
               </label>
+            </div>
+
+            <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
+              <span style="font-weight: 500; display: block; margin-bottom: 0.75rem; font-size: 0.9rem;">Sottomenu collegati (Sezioni)</span>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; background: rgba(0,0,0,0.15); padding: 0.9rem; border-radius: var(--menu-radius, 8px); border: 1px solid var(--line);">
+                ${sections.filter(sec => sec.id !== "host").map((sec) => {
+                  const isChecked = sec.category === cat.id;
+                  return `
+                    <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; user-select: none;">
+                      <input type="checkbox" data-section-assign="${escapeAttribute(sec.id)}" data-category-id="${escapeAttribute(cat.id)}" ${isChecked ? "checked" : ""} ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} style="cursor: pointer;" />
+                      <span style="${isChecked ? "font-weight: 500; color: #fff;" : "color: var(--muted);"}" class="host-checkbox-label-text">${escapeHtml(sec.menuTitle || sec.id)}</span>
+                    </label>
+                  `;
+                }).join("")}
+              </div>
             </div>
           </div>
         </section>
@@ -2903,6 +2919,31 @@ function bindEditorEvents() {
     });
 
     dom.categories.addEventListener("change", (event) => {
+      const assignCheckbox = event.target.closest("[data-section-assign]");
+      if (assignCheckbox) {
+        const sectionId = assignCheckbox.dataset.sectionAssign;
+        const categoryId = assignCheckbox.dataset.categoryId;
+        const isChecked = assignCheckbox.checked;
+
+        const localeState = currentLocaleState();
+        const section = (localeState.sections || []).find((s) => s.id === sectionId);
+        if (section) {
+          section.category = isChecked ? categoryId : "top";
+          const sectionCard = dom.sections.querySelector(`[data-section-id="${sectionId}"]`);
+          if (sectionCard) {
+            const select = sectionCard.querySelector('[data-field="category"]');
+            if (select) {
+              select.value = section.category;
+            }
+          }
+        }
+
+        state = saveTemplate(collectTemplate());
+        syncFields();
+        queueAutoPublish();
+        return;
+      }
+
       if (event.target.matches('[data-field="icon"], [data-field="iconColor"]')) {
         updateCategoryIconPreview(event.target.closest("[data-category-id]"));
       }
