@@ -881,7 +881,7 @@ async function translateTexts(texts, targetLocale) {
       results[index] = text;
       return;
     }
-    if (text.toLowerCase().trim() === "keybox") {
+    if (text.toLowerCase().trim() === "keybox" || text.toLowerCase().trim() === "stampace") {
       results[index] = text;
       return;
     }
