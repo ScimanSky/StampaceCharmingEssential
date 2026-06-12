@@ -749,14 +749,25 @@ function renderSectionItems(items, sectionId) {
       let finalItem = item;
       if (item && typeof item === "object" && !isImageItem(item) && !isMediaItem(item)) {
         const itSection = template?.locales?.["it"]?.sections?.find((s) => s.id === sectionId);
-        const itItem = itSection?.items?.[idx];
-        if (itItem && typeof itItem === "object") {
-          const hasStampaceLabel = itItem.label && itItem.label.toLowerCase().trim() === "stampace";
-          const hasStampaceTitle = itItem.title && itItem.title.toLowerCase().trim() === "stampace";
-          if (hasStampaceLabel || hasStampaceTitle) {
-            finalItem = { ...item };
-            if (hasStampaceLabel) finalItem.label = itItem.label;
-            if (hasStampaceTitle) finalItem.title = itItem.title;
+        if (itSection && itSection.items) {
+          let itItem = null;
+          if (item.href) {
+            itItem = itSection.items.find((it) => it && typeof it === "object" && it.href === item.href);
+          }
+          if (!itItem) {
+            itItem = itSection.items[idx];
+          }
+
+          if (itItem && typeof itItem === "object") {
+            const cleanLabel = (itItem.label || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            const cleanTitle = (itItem.title || "").replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
+            const hasStampaceLabel = cleanLabel === "stampace";
+            const hasStampaceTitle = cleanTitle === "stampace";
+            if (hasStampaceLabel || hasStampaceTitle) {
+              finalItem = { ...item };
+              if (hasStampaceLabel) finalItem.label = itItem.label;
+              if (hasStampaceTitle) finalItem.title = itItem.title;
+            }
           }
         }
       }
@@ -973,16 +984,16 @@ function toggleMenuGroup(groupId) {
   });
 
   if (isExpanded) {
+    // Collapse all expanded sections anywhere in the menu (top-level and group-level)
+    const allExpandedSections = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+    allExpandedSections.forEach((sec) => {
+      collapseSectionState(sec);
+    });
+
     collapsingGroups.forEach((otherContainer) => {
       otherContainer.classList.remove("is-expanded");
       const otherHeader = otherContainer.querySelector(".menu-group-header");
       if (otherHeader) otherHeader.setAttribute("aria-expanded", "false");
-      
-      // Collapse all sections inside other collapsing groups
-      const sections = otherContainer.querySelectorAll(".menu-section-container.is-expanded");
-      sections.forEach((sec) => {
-        collapseSectionState(sec);
-      });
     });
   } else {
     // If the group is collapsed directly, collapse all internal sections
@@ -1010,13 +1021,26 @@ function expandSectionInline(sectionId) {
   activeSectionId = sectionId;
   const sections = localeState().sections;
   const section = sections.find((s) => s.id === sectionId);
-  if (section && section.category && section.category !== "top") {
-    if (!expandedMenuGroups[section.category]) {
+  if (section && section.category) {
+    if (section.category === "top") {
+      let changed = false;
       Object.keys(expandedMenuGroups).forEach((key) => {
-        expandedMenuGroups[key] = false;
+        if (expandedMenuGroups[key]) {
+          expandedMenuGroups[key] = false;
+          changed = true;
+        }
       });
-      expandedMenuGroups[section.category] = true;
-      dom.mainMenu.innerHTML = renderMenu(sections);
+      if (changed) {
+        dom.mainMenu.innerHTML = renderMenu(sections);
+      }
+    } else {
+      if (!expandedMenuGroups[section.category]) {
+        Object.keys(expandedMenuGroups).forEach((key) => {
+          expandedMenuGroups[key] = false;
+        });
+        expandedMenuGroups[section.category] = true;
+        dom.mainMenu.innerHTML = renderMenu(sections);
+      }
     }
   }
 
@@ -1071,13 +1095,24 @@ function toggleSectionInline(sectionId) {
   const isExpanded = !container.classList.contains("is-expanded");
 
   if (isExpanded) {
-    window.history.pushState(
-      {
-        ...(window.history.state ?? {}),
-        [SHEET_HISTORY_KEY]: sectionId,
-      },
-      "",
-    );
+    const hasExistingSectionState = !!window.history.state?.[SHEET_HISTORY_KEY];
+    if (hasExistingSectionState) {
+      window.history.replaceState(
+        {
+          ...(window.history.state ?? {}),
+          [SHEET_HISTORY_KEY]: sectionId,
+        },
+        "",
+      );
+    } else {
+      window.history.pushState(
+        {
+          ...(window.history.state ?? {}),
+          [SHEET_HISTORY_KEY]: sectionId,
+        },
+        "",
+      );
+    }
     expandSectionInline(sectionId);
   } else {
     collapseAllSectionsInline();
@@ -1435,6 +1470,9 @@ function render() {
   if (activeSectionId && activeSectionId !== "host") {
     const activeSection = localeTemplate.sections.find((s) => s.id === activeSectionId);
     if (activeSection && !activeSection.hidden) {
+      Object.keys(expandedMenuGroups).forEach((key) => {
+        expandedMenuGroups[key] = false;
+      });
       if (activeSection.category && activeSection.category !== "top") {
         expandedMenuGroups[activeSection.category] = true;
       }
