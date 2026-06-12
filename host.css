@@ -1027,100 +1027,99 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   gap: 0.75rem;
 }
 
-/* Submenu assignment grid & chips */
-.host-assignment-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.6rem;
+/* Submenu assignment via dropdown & chips */
+.host-category-sections-manager {
   background: rgba(0, 0, 0, 0.25);
-  padding: 1rem;
+  padding: 1.15rem;
   border-radius: var(--menu-radius, 8px);
   border: 1px solid var(--line);
   margin-top: 0.5rem;
+  display: grid;
+  gap: 1rem;
 }
 
-.host-assignment-chip {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.65rem 0.85rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.host-category-add-select {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  padding: 0.6rem 0.8rem;
+  outline: none;
+  min-height: unset;
+  height: auto;
+  font-size: 0.85rem;
   cursor: pointer;
-  user-select: none;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  color-scheme: dark;
 }
 
-.host-assignment-chip:hover {
-  background: rgba(255, 255, 255, 0.07);
+.host-category-add-select:hover {
+  background: rgba(255, 255, 255, 0.08);
   border-color: rgba(224, 205, 177, 0.25);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.host-assignment-chip input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
+.host-category-connected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
 }
 
-.host-chip-indicator {
+.host-category-connected-chip {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  border: 1.5px solid rgba(231, 216, 193, 0.3);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  transition: all 0.15s ease;
-  color: #090705;
-  font-size: 0.8rem;
-  font-weight: 900;
-  flex: 0 0 auto;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  background: rgba(223, 195, 156, 0.08);
+  border: 1px solid rgba(223, 195, 156, 0.22);
+  border-radius: 0.5rem;
+  font-size: 0.82rem;
+  color: #fff;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+  max-width: 100%;
 }
 
-.host-assignment-chip:hover .host-chip-indicator {
-  border-color: rgba(231, 216, 193, 0.6);
+.host-category-connected-chip:hover {
+  background: rgba(223, 195, 156, 0.12);
+  border-color: rgba(223, 195, 156, 0.35);
 }
 
-.host-assignment-chip input:checked ~ .host-chip-indicator {
-  background: #dfc39c; /* Gold accent matching design theme */
-  border-color: #dfc39c;
-}
-
-.host-assignment-chip input:checked ~ .host-chip-indicator::after {
-  content: "✓";
-}
-
-.host-assignment-chip input:disabled ~ .host-chip-indicator {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.host-chip-label {
-  color: var(--muted);
-  font-size: 0.85rem;
-  line-height: 1.3;
-  transition: color 0.15s ease, font-weight 0.15s ease;
-  font-weight: 400;
+.host-chip-label-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1 1 auto;
-}
-
-.host-assignment-chip input:checked ~ .host-chip-label {
-  color: #fff;
   font-weight: 500;
 }
 
-.host-assignment-chip input:disabled ~ .host-chip-label {
-  opacity: 0.4;
-  cursor: not-allowed;
+.host-chip-disconnect-btn {
+  background: transparent;
+  border: none;
+  padding: 0 0 0 0.25rem;
+  color: var(--danger);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: unset;
+  height: auto;
+  line-height: 1;
+  opacity: 0.75;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.host-chip-disconnect-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.host-category-connected-empty {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.4;
 }
 
 @media (prefers-reduced-motion: reduce) {

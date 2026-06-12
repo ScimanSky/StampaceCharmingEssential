@@ -1711,17 +1711,39 @@ function renderCategoryEditors() {
 
             <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
               <span style="font-weight: 500; display: block; margin-bottom: 0.75rem; font-size: 0.9rem;">Sottomenu collegati (Sezioni)</span>
-              <div class="host-assignment-grid">
-                ${sections.filter(sec => sec.id !== "host").map((sec) => {
-                  const isChecked = sec.category === cat.id;
-                  return `
-                    <label class="host-assignment-chip">
-                      <input type="checkbox" data-section-assign="${escapeAttribute(sec.id)}" data-category-id="${escapeAttribute(cat.id)}" ${isChecked ? "checked" : ""} ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
-                      <span class="host-chip-indicator"></span>
-                      <span class="host-chip-label" title="${escapeAttribute(sec.menuTitle || sec.id)}">${escapeHtml(sec.menuTitle || sec.id)}</span>
-                    </label>
-                  `;
-                }).join("")}
+              <div class="host-category-sections-manager">
+                <div style="max-width: 24rem;">
+                  <select class="host-category-add-select" data-action="connect-section" data-category-id="${escapeAttribute(cat.id)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                    <option value="">+ Collega un sottomenu...</option>
+                    ${sections
+                      .filter(sec => sec.id !== "host" && sec.category !== cat.id)
+                      .map((sec) => {
+                        let labelSuffix = "";
+                        if (sec.category && sec.category !== "top") {
+                          const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
+                          const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
+                          labelSuffix = ` (attualmente in: ${parentName})`;
+                        } else {
+                          labelSuffix = " (Sempre visibile)";
+                        }
+                        return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
+                      })
+                      .join("")}
+                  </select>
+                </div>
+                <div class="host-category-connected-list">
+                  ${sections.filter(sec => sec.category === cat.id).map((sec) => `
+                    <div class="host-category-connected-chip">
+                      <span class="host-chip-label-text" title="${escapeAttribute(sec.menuTitle || sec.id)}">${escapeHtml(sec.menuTitle || sec.id)}</span>
+                      ${selectedEditorLocale === FIXED_LOCALE ? `
+                        <button type="button" class="host-chip-disconnect-btn" data-action="disconnect-section" data-section-id="${escapeAttribute(sec.id)}" aria-label="Riconnetti sottomenu a Sempre visibile">×</button>
+                      ` : ""}
+                    </div>
+                  `).join("")}
+                  ${sections.filter(sec => sec.category === cat.id).length === 0 ? `
+                    <span class="host-category-connected-empty">Nessun sottomenu collegato. Usa il menu a tendina sopra per collegare una sezione a questo pulsante.</span>
+                  ` : ""}
+                </div>
               </div>
             </div>
           </div>
@@ -2958,31 +2980,51 @@ function bindEditorEvents() {
         toggleCategoryVisibility(categoryCard?.dataset.categoryId);
         return;
       }
-    });
 
-    dom.categories.addEventListener("change", (event) => {
-      const assignCheckbox = event.target.closest("[data-section-assign]");
-      if (assignCheckbox) {
-        const sectionId = assignCheckbox.dataset.sectionAssign;
-        const categoryId = assignCheckbox.dataset.categoryId;
-        const isChecked = assignCheckbox.checked;
-
+      const disconnectTrigger = event.target.closest('[data-action="disconnect-section"]');
+      if (disconnectTrigger) {
+        const sectionId = disconnectTrigger.dataset.sectionId;
         const localeState = currentLocaleState();
         const section = (localeState.sections || []).find((s) => s.id === sectionId);
         if (section) {
-          section.category = isChecked ? categoryId : "top";
+          section.category = "top";
           const sectionCard = dom.sections.querySelector(`[data-section-id="${sectionId}"]`);
           if (sectionCard) {
             const select = sectionCard.querySelector('[data-field="category"]');
             if (select) {
-              select.value = section.category;
+              select.value = "top";
             }
           }
         }
-
         state = saveTemplate(collectTemplate());
         syncFields();
         queueAutoPublish();
+        return;
+      }
+    });
+
+    dom.categories.addEventListener("change", (event) => {
+      const connectSelect = event.target.closest('[data-action="connect-section"]');
+      if (connectSelect) {
+        const sectionId = connectSelect.value;
+        const categoryId = connectSelect.dataset.categoryId;
+        if (sectionId) {
+          const localeState = currentLocaleState();
+          const section = (localeState.sections || []).find((s) => s.id === sectionId);
+          if (section) {
+            section.category = categoryId;
+            const sectionCard = dom.sections.querySelector(`[data-section-id="${sectionId}"]`);
+            if (sectionCard) {
+              const select = sectionCard.querySelector('[data-field="category"]');
+              if (select) {
+                select.value = categoryId;
+              }
+            }
+          }
+          state = saveTemplate(collectTemplate());
+          syncFields();
+          queueAutoPublish();
+        }
         return;
       }
 
