@@ -1639,7 +1639,15 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
 
   let rawCategories = [];
   if (Array.isArray(localeData?.categories)) {
-    rawCategories = localeData.categories;
+    const seenIds = new Set();
+    rawCategories = localeData.categories.filter((cat) => {
+      if (!cat) return false;
+      const cleanId = cleanString(cat.id);
+      if (!cleanId) return false;
+      if (seenIds.has(cleanId)) return false;
+      seenIds.add(cleanId);
+      return true;
+    });
   } else if (localeData?.categories && typeof localeData.categories === "object") {
     rawCategories = [
       { id: "casa", icon: "home", iconColor: "#dfc39c", fontFamily: "", menuTitle: localeData.categories.casa || "La Casa" },
