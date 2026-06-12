@@ -428,6 +428,8 @@ const SECTION_ICON_OPTIONS = [
   { value: "phone", label: "Telefono" },
   { value: "mail", label: "Email" },
   { value: "home", label: "Casa" },
+  { value: "city", label: "Città" },
+  { value: "skyline", label: "Skyline città" },
   { value: "user", label: "Host" },
 ];
 const CTA_PRESET_OPTIONS = [

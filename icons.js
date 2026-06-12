@@ -99,6 +99,8 @@ export const iconPaths = {
     '<path d="M12 19s-7-4.2-7-9a3.8 3.8 0 0 1 6.8-2.3A3.8 3.8 0 0 1 18.6 10c0 4.8-6.6 9-6.6 9z"/>',
   globe:
     '<circle cx="12" cy="12" r="8"/><path d="M4 12h16"/><path d="M12 4a12 12 0 0 1 0 16"/><path d="M12 4a12 12 0 0 0 0 16"/>',
+  city:
+    '<path d="M3 21h18M5 21V10h4v11M9 21V6h6v15M15 21V12h4v9"/><path d="M7 13v2M11 9v2M13 9v2M11 13v2M13 13v2M17 15v2"/>',
   book:
     '<path d="M5.5 5.5h6A2.5 2.5 0 0 1 14 8v11a2.5 2.5 0 0 0-2.5-2.5h-6z"/><path d="M18.5 5.5h-4A2.5 2.5 0 0 0 12 8v11a2.5 2.5 0 0 1 2.5-2.5h4z"/>',
   route:
