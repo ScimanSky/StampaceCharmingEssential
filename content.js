@@ -1642,8 +1642,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
     rawCategories = localeData.categories;
   } else if (localeData?.categories && typeof localeData.categories === "object") {
     rawCategories = [
-      { id: "casa", icon: "home", iconColor: "#dfc39c", menuTitle: localeData.categories.casa || "La Casa" },
-      { id: "citta", icon: "globe", iconColor: "#5fa8ff", menuTitle: localeData.categories.citta || "Vivi la Città" }
+      { id: "casa", icon: "home", iconColor: "#dfc39c", fontFamily: "", menuTitle: localeData.categories.casa || "La Casa" },
+      { id: "citta", icon: "globe", iconColor: "#5fa8ff", fontFamily: "", menuTitle: localeData.categories.citta || "Vivi la Città" }
     ];
   }
   const defaultBaseCategories = [
@@ -1654,6 +1654,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       bgColor: "",
       textColor: "",
       fontSize: "",
+      fontFamily: "",
       padding: "",
       hidden: false,
       menuTitle: "La Casa"
@@ -1665,6 +1666,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       bgColor: "",
       textColor: "",
       fontSize: "",
+      fontFamily: "",
       padding: "",
       hidden: false,
       menuTitle: "Vivi la Città"
@@ -1680,6 +1682,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
           bgColor: cleanIconColor(cat?.bgColor),
           textColor: cleanIconColor(cat?.textColor),
           fontSize: cleanString(cat?.fontSize),
+          fontFamily: cleanString(cat?.fontFamily),
           padding: cleanString(cat?.padding),
           hidden: Boolean(cat?.hidden),
           menuTitle: cleanString(cat?.menuTitle) || `Gruppo ${idx + 1}`,
@@ -1695,6 +1698,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       bgColor: baseCat.bgColor,
       textColor: baseCat.textColor,
       fontSize: baseCat.fontSize,
+      fontFamily: baseCat.fontFamily,
       padding: baseCat.padding,
       hidden: Boolean(baseCat.hidden),
       menuTitle: cleanString(matchingCat?.menuTitle, baseCat.menuTitle),

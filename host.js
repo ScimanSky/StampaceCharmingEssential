@@ -183,7 +183,25 @@ const AVAILABLE_FONTS = [
   { value: "Playfair Display", label: "Playfair Display (Serif elegante)" },
   { value: "Lora", label: "Lora (Serif editoriale leggibile)" },
   { value: "Montserrat", label: "Montserrat (Sans-serif bold moderno)" },
-  { value: "Cormorant Garamond", label: "Cormorant Garamond (Serif lusso tradizionale)" }
+  { value: "Cormorant Garamond", label: "Cormorant Garamond (Serif lusso tradizionale)" },
+  { value: "Poppins", label: "Poppins (Sans-serif geometrico morbido)" },
+  { value: "Lato", label: "Lato (Sans-serif caldo e leggibile)" },
+  { value: "Cinzel", label: "Cinzel (Serif classico romano scolpito)" },
+  { value: "Merriweather", label: "Merriweather (Serif caldo e accogliente)" },
+  { value: "Prata", label: "Prata (Serif elegante con forte contrasto)" },
+  { value: "Italiana", label: "Italiana (Serif ispirato al design italiano)" },
+  { value: "Bodoni Moda", label: "Bodoni Moda (Didone di lusso contemporaneo)" },
+  { value: "Josefin Sans", label: "Josefin Sans (Sans-serif geometrico retro-chic)" },
+  { value: "Oswald", label: "Oswald (Sans-serif condensato audace)" },
+  { value: "Manrope", label: "Manrope (Sans-serif geometrico moderno pulito)" },
+  { value: "Spectral", label: "Spectral (Serif elegante ottimizzato per lettura)" },
+  { value: "Syne", label: "Syne (Sans-serif artistico e contemporaneo)" },
+  { value: "DM Serif Display", label: "DM Serif Display (Display classico solido)" },
+  { value: "Syncopate", label: "Syncopate (Sans-serif esteso e tecnologico)" },
+  { value: "Cormorant", label: "Cormorant (Serif lussuoso e sottile)" },
+  { value: "Libre Baskerville", label: "Libre Baskerville (Serif classico tradizionale)" },
+  { value: "Quicksand", label: "Quicksand (Sans-serif geometrico arrotondato)" },
+  { value: "Plus Jakarta Sans", label: "Plus Jakarta Sans (Sans-serif moderno tech/design)" }
 ];
 const FONT_WEIGHT_OPTIONS = [
   { value: "300", label: "Leggero" },
@@ -535,6 +553,14 @@ function applyTheme(theme) {
     ctaFont,
     sectionTitleFont,
   ]);
+  const localeTemplate = currentLocaleState();
+  const categoriesList = Array.isArray(localeTemplate.categories) ? localeTemplate.categories : [];
+  categoriesList.forEach((cat) => {
+    if (cat && cat.fontFamily) {
+      fontsToLoad.add(cat.fontFamily);
+    }
+  });
+
   const linkId = "google-fonts-dynamic";
   let linkEl = document.getElementById(linkId);
   if (!linkEl) {
@@ -548,7 +574,7 @@ function applyTheme(theme) {
   fontsToLoad.forEach((font) => {
     if (font === "System") return;
     const formattedName = font.replace(/ /g, "+");
-    if (["Playfair Display", "Lora", "Cormorant Garamond"].includes(font)) {
+    if (["Playfair Display", "Lora", "Cormorant Garamond", "Cormorant", "Merriweather", "Spectral", "Libre Baskerville", "Bodoni Moda"].includes(font)) {
       fontQueries.push(`family=${formattedName}:ital,wght@0,300..700;1,300..700`);
     } else {
       fontQueries.push(`family=${formattedName}:wght@300;400;500;600`);
@@ -1668,6 +1694,13 @@ function renderCategoryEditors() {
                 <input data-field="fontSize" type="text" placeholder="es. 16px, 1.1rem" value="${escapeAttribute(cat.fontSize || "")}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
               </label>
               <label>
+                <span>Font family</span>
+                <select data-field="fontFamily" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                  <option value="">(Usa predefinito del tema)</option>
+                  ${AVAILABLE_FONTS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === cat.fontFamily ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                </select>
+              </label>
+              <label>
                 <span>Spaziatura (Padding)</span>
                 <input data-field="padding" type="text" placeholder="es. 12px 16px" value="${escapeAttribute(cat.padding || "")}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
               </label>
@@ -1793,6 +1826,7 @@ function collectTemplate() {
       bgColor,
       textColor,
       fontSize: card.querySelector('[data-field="fontSize"]')?.value || "",
+      fontFamily: card.querySelector('[data-field="fontFamily"]')?.value || "",
       padding: card.querySelector('[data-field="padding"]')?.value || "",
       hidden: card.dataset.categoryHidden === "true",
       menuTitle: card.querySelector('[data-field="menuTitle"]')?.value || "",

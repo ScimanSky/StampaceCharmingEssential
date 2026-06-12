@@ -570,6 +570,9 @@ function renderMenu(sections) {
     if (cat.fontSize) {
       styles.push(`font-size: ${cat.fontSize}`);
     }
+    if (cat.fontFamily) {
+      styles.push(`font-family: "${cat.fontFamily}", sans-serif`);
+    }
     if (cat.padding) {
       styles.push(`padding: ${cat.padding}`);
     }
@@ -1434,6 +1437,13 @@ function applyTheme(theme) {
     ctaFont,
     sectionTitleFont,
   ]);
+  const currentLocaleTemplate = localeState();
+  const categoriesList = Array.isArray(currentLocaleTemplate.categories) ? currentLocaleTemplate.categories : [];
+  categoriesList.forEach((cat) => {
+    if (cat && cat.fontFamily) {
+      fontsToLoad.add(cat.fontFamily);
+    }
+  });
   const linkId = "google-fonts-dynamic";
   let linkEl = document.getElementById(linkId);
   if (!linkEl) {
@@ -1447,7 +1457,7 @@ function applyTheme(theme) {
   fontsToLoad.forEach((font) => {
     if (font === "System") return;
     const formattedName = font.replace(/ /g, "+");
-    if (["Playfair Display", "Lora", "Cormorant Garamond"].includes(font)) {
+    if (["Playfair Display", "Lora", "Cormorant Garamond", "Cormorant", "Merriweather", "Spectral", "Libre Baskerville", "Bodoni Moda"].includes(font)) {
       fontQueries.push(`family=${formattedName}:ital,wght@0,300..700;1,300..700`);
     } else {
       fontQueries.push(`family=${formattedName}:wght@300;400;500;600`);
