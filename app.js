@@ -745,14 +745,18 @@ function renderSectionItems(items, sectionId) {
         return renderMediaItem(item);
       }
 
-      // Check if Italian label is "stampace" to prevent translation display
+      // Check if Italian label or title is "stampace" to prevent translation display
       let finalItem = item;
       if (item && typeof item === "object" && !isImageItem(item) && !isMediaItem(item)) {
         const itSection = template?.locales?.["it"]?.sections?.find((s) => s.id === sectionId);
         const itItem = itSection?.items?.[idx];
-        if (itItem && typeof itItem === "object" && itItem.label) {
-          if (itItem.label.toLowerCase().trim() === "stampace") {
-            finalItem = { ...item, label: itItem.label };
+        if (itItem && typeof itItem === "object") {
+          const hasStampaceLabel = itItem.label && itItem.label.toLowerCase().trim() === "stampace";
+          const hasStampaceTitle = itItem.title && itItem.title.toLowerCase().trim() === "stampace";
+          if (hasStampaceLabel || hasStampaceTitle) {
+            finalItem = { ...item };
+            if (hasStampaceLabel) finalItem.label = itItem.label;
+            if (hasStampaceTitle) finalItem.title = itItem.title;
           }
         }
       }
@@ -920,6 +924,20 @@ function closeSection({ fromHistory = false } = {}) {
   }
 }
 
+function collapseSectionState(secContainer) {
+  secContainer.classList.remove("is-expanded");
+  const btn = secContainer.querySelector('[data-action="toggle-section"]');
+  if (btn) btn.setAttribute("aria-expanded", "false");
+
+  const secId = secContainer.dataset.sectionId;
+  if (activeSectionId === secId) {
+    activeSectionId = null;
+    if (window.history.state?.[SHEET_HISTORY_KEY] === secId) {
+      window.history.back();
+    }
+  }
+}
+
 function toggleMenuGroup(groupId) {
   const container = dom.mainMenu.querySelector(`.menu-group-container[data-group-id="${groupId}"]`);
   if (!container) return;
@@ -963,27 +981,14 @@ function toggleMenuGroup(groupId) {
       // Collapse all sections inside other collapsing groups
       const sections = otherContainer.querySelectorAll(".menu-section-container.is-expanded");
       sections.forEach((sec) => {
-        sec.classList.remove("is-expanded");
-        const btn = sec.querySelector('[data-action="toggle-section"]');
-        if (btn) btn.setAttribute("aria-expanded", "false");
+        collapseSectionState(sec);
       });
     });
   } else {
     // If the group is collapsed directly, collapse all internal sections
-    if (activeSectionId) {
-      const activeSecInGroup = container.querySelector(`.menu-section-container[data-section-id="${activeSectionId}"]`);
-      if (activeSecInGroup) {
-        if (window.history.state?.[SHEET_HISTORY_KEY] === activeSectionId) {
-          window.history.back();
-        }
-      }
-    }
-
     const sections = container.querySelectorAll(".menu-section-container.is-expanded");
     sections.forEach((sec) => {
-      sec.classList.remove("is-expanded");
-      const btn = sec.querySelector('[data-action="toggle-section"]');
-      if (btn) btn.setAttribute("aria-expanded", "false");
+      collapseSectionState(sec);
     });
   }
 
@@ -1038,9 +1043,7 @@ function expandSectionInline(sectionId) {
 
   otherContainers.forEach((other) => {
     if (other !== container) {
-      other.classList.remove("is-expanded");
-      const otherButton = other.querySelector('[data-action="toggle-section"]');
-      if (otherButton) otherButton.setAttribute("aria-expanded", "false");
+      collapseSectionState(other);
     }
   });
 
@@ -1057,9 +1060,7 @@ function expandSectionInline(sectionId) {
 function collapseAllSectionsInline() {
   const containers = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
   containers.forEach((container) => {
-    container.classList.remove("is-expanded");
-    const button = container.querySelector('[data-action="toggle-section"]');
-    if (button) button.setAttribute("aria-expanded", "false");
+    collapseSectionState(container);
   });
 }
 
@@ -1079,12 +1080,7 @@ function toggleSectionInline(sectionId) {
     );
     expandSectionInline(sectionId);
   } else {
-    if (window.history.state?.[SHEET_HISTORY_KEY] === sectionId) {
-      window.history.back();
-    } else {
-      collapseAllSectionsInline();
-      activeSectionId = null;
-    }
+    collapseAllSectionsInline();
   }
 }
 
