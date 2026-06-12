@@ -9,6 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
+  SUBMENU_TRANSLATIONS,
 } from "./content.js?v=20260610h";
 import {
   escapeAttribute,
@@ -513,21 +514,6 @@ function iconForItem(item, sectionId) {
   return sectionFallbacks[sectionId] ?? "spark";
 }
 
-const SUBMENU_TRANSLATIONS = {
-  it: { casa: "La Casa", citta: "Vivi la Città" },
-  en: { casa: "The House", citta: "Live the City" },
-  fr: { casa: "La Maison", citta: "Vivre la Ville" },
-  es: { casa: "La Casa", citta: "Vive la Ciudad" },
-  de: { casa: "Das Haus", citta: "Erlebe die Stadt" },
-  nl: { casa: "Het Huis", citta: "Beleef de Stad" },
-  pt: { casa: "A Casa", citta: "Viva a Cidade" },
-  pl: { casa: "Dom", citta: "Życie w Mieście" },
-  cs: { casa: "Dům", citta: "Poznejte Město" },
-  ru: { casa: "Дом", citta: "Познакомьтесь с Городом" },
-  zh: { casa: "房子", citta: "城市生活" },
-  hi: { casa: "घर", citta: "शहर का अनुभव" },
-  ja: { casa: "家", citta: "街を楽しむ" }
-};
 
 const expandedMenuGroups = { casa: false, citta: false };
 
@@ -564,8 +550,8 @@ function renderMenu(sections) {
 
   const topHtml = topSections.map(renderSectionItem).join("");
 
-  const lang = currentLocale || "en";
-  const groupNames = SUBMENU_TRANSLATIONS[lang] ?? SUBMENU_TRANSLATIONS.en;
+  const localeTemplate = localeState();
+  const groupNames = localeTemplate.categories || SUBMENU_TRANSLATIONS[currentLocale || "en"] || SUBMENU_TRANSLATIONS.en;
 
   const renderGroup = (groupId, groupSections, groupLabel, groupIcon) => {
     if (!groupSections.length) return "";

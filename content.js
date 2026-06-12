@@ -30,6 +30,22 @@ const LANGUAGE_INDEX = Object.fromEntries(
   AVAILABLE_LANGUAGES.map((language) => [language.code, language]),
 );
 
+export const SUBMENU_TRANSLATIONS = {
+  it: { casa: "La Casa", citta: "Vivi la Città" },
+  en: { casa: "The House", citta: "Live the City" },
+  fr: { casa: "La Maison", citta: "Vivre la Ville" },
+  es: { casa: "La Casa", citta: "Vive la Ciudad" },
+  de: { casa: "Das Haus", citta: "Erlebe die Stadt" },
+  nl: { casa: "Het Huis", citta: "Beleef de Stad" },
+  pt: { casa: "A Casa", citta: "Viva a Cidade" },
+  pl: { casa: "Dom", citta: "Życie w Mieście" },
+  cs: { casa: "Dům", citta: "Poznejte Město" },
+  ru: { casa: "Дом", citta: "Познакомьтесь с Городом" },
+  zh: { casa: "房子", citta: "城市生活" },
+  hi: { casa: "घर", citta: "شهر का अनुभव" },
+  ja: { casa: "家", citta: "街を楽しむ" }
+};
+
 export const HOST_PRIVATE_ITEMS = Object.freeze({
   it: {
     title: "Area Host",
@@ -1621,12 +1637,23 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
         )
       : baseLocale.sections;
 
+  const categoriesSource = localeData?.categories && typeof localeData.categories === "object" ? localeData.categories : {};
+  const baseCategories = baseLocale?.categories ?? {};
+  const defaultCategories = {
+    casa: SUBMENU_TRANSLATIONS[localeCode]?.casa ?? SUBMENU_TRANSLATIONS.en.casa,
+    citta: SUBMENU_TRANSLATIONS[localeCode]?.citta ?? SUBMENU_TRANSLATIONS.en.citta,
+  };
+
   return {
     introLines: cleanLines(introLines),
     subtitle:
       localeCode === FIXED_LOCALE
         ? cleanString(localeData?.subtitle, baseLocale.subtitle)
         : cleanString(DEFAULT_LOCALE_CONTENT[FIXED_LOCALE]?.subtitle, baseLocale.subtitle),
+    categories: {
+      casa: cleanString(categoriesSource.casa, baseCategories.casa ?? defaultCategories.casa),
+      citta: cleanString(categoriesSource.citta, baseCategories.citta ?? defaultCategories.citta),
+    },
     sections: normalizeLocaleSections(rawSections, structureSections, localeCode),
   };
 }

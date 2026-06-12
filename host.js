@@ -77,6 +77,8 @@ const dom = {
   optionalLocale: document.querySelector("#field-optional-locale"),
   appName: document.querySelector("#field-app-name"),
   subtitle: document.querySelector("#field-subtitle"),
+  categoryCasa: document.querySelector("#field-category-casa"),
+  categoryCitta: document.querySelector("#field-category-citta"),
   introLines: document.querySelector("#field-intro-lines"),
   fontPrimary: document.querySelector("#field-font-primary"),
   fontSecondary: document.querySelector("#field-font-secondary"),
@@ -966,6 +968,10 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
     return {
       introLines: [...(italianLocale.introLines ?? [])],
       subtitle: italianLocale.subtitle,
+      categories: {
+        casa: italianLocale.categories?.casa ?? "La Casa",
+        citta: italianLocale.categories?.citta ?? "Vivi la Città",
+      },
       sections: italianLocale.sections.map((section, sectionIndex) => {
         const itBaseSection = ITALIAN_TEMPLATE_BASE.sections[sectionIndex] ?? {};
         const scBaseSection = SARDINIAN_TEMPLATE_BASE.sections[sectionIndex] ?? section;
@@ -1017,6 +1023,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   const draftLocale = {
     introLines: [],
     subtitle: "",
+    categories: { casa: "", citta: "" },
     sections: italianLocale.sections.map((section) => ({
       id: section.id,
       icon: section.icon,
@@ -1036,6 +1043,17 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
   texts.push(italianLocale.subtitle ?? "");
   appliers.push((value) => {
     draftLocale.subtitle = value;
+  });
+
+  const itCategories = italianLocale.categories ?? { casa: "La Casa", citta: "Vivi la Città" };
+  texts.push(itCategories.casa || "La Casa");
+  appliers.push((value) => {
+    draftLocale.categories.casa = value;
+  });
+
+  texts.push(itCategories.citta || "Vivi la Città");
+  appliers.push((value) => {
+    draftLocale.categories.citta = value;
   });
 
   italianLocale.sections.forEach((section, sectionIndex) => {
@@ -1507,8 +1525,8 @@ function renderSectionEditors() {
                 <span>Categoria menu</span>
                 <select data-field="category" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>
                   <option value="top" ${section.category === "top" ? "selected" : ""}>Sempre visibile (in alto)</option>
-                  <option value="casa" ${section.category === "casa" ? "selected" : ""}>La Casa</option>
-                  <option value="citta" ${section.category === "citta" ? "selected" : ""}>Vivi la Città</option>
+                  <option value="casa" ${section.category === "casa" ? "selected" : ""}>${escapeHtml(localeState.categories?.casa || "La Casa")}</option>
+                  <option value="citta" ${section.category === "citta" ? "selected" : ""}>${escapeHtml(localeState.categories?.citta || "Vivi la Città")}</option>
                 </select>
               </label>
               <label>
@@ -1600,6 +1618,8 @@ function syncFields() {
   dom.fontSecondary.value = state.theme?.fontSecondary || "Roboto";
   fillDesignSelects(theme);
   dom.subtitle.value = localeState.subtitle;
+  dom.categoryCasa.value = localeState.categories?.casa || "";
+  dom.categoryCitta.value = localeState.categories?.citta || "";
   dom.introLines.value = serializeFooterLines(localeState.introLines || []);
   dom.footerName.value = state.footer.name;
   dom.footerSubtitle.value = state.footer.subtitle;
@@ -1687,6 +1707,10 @@ function collectTemplate() {
     ...next.locales[selectedEditorLocale],
     introLines,
     subtitle: dom.subtitle.value,
+    categories: {
+      casa: dom.categoryCasa.value.trim(),
+      citta: dom.categoryCitta.value.trim(),
+    },
     sections,
   };
   delete next.locales[selectedEditorLocale].heroMeta;
