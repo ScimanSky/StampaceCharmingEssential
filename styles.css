@@ -1678,6 +1678,8 @@ svg,
   transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   width: 100%;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .menu-group-container.is-expanded .menu-group-content-wrapper {
@@ -1706,6 +1708,8 @@ svg,
   transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   width: 100%;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .menu-section-container.is-expanded .menu-section-content-wrapper {
