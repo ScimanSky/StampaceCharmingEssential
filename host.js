@@ -1729,6 +1729,12 @@ function renderCategoryEditors() {
 }
 
 function addCategory() {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Aggiungi nuovi gruppi solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
   const newId = `cat-${Date.now()}`;
   const newCat = {
     id: newId,
@@ -1737,6 +1743,7 @@ function addCategory() {
     bgColor: "",
     textColor: "",
     fontSize: "",
+    fontFamily: "",
     padding: "",
     hidden: false,
     menuTitle: "Nuovo Gruppo",
@@ -1744,9 +1751,10 @@ function addCategory() {
   currentLocaleState().categories = currentLocaleState().categories || [];
   currentLocaleState().categories.push(newCat);
   expandedCategoryIds.add(newId);
-  state = saveTemplate(collectTemplate());
+  state = saveTemplate(state);
   syncFields();
   queueAutoPublish();
+  setStatus("Nuovo gruppo aggiunto.", "success");
 }
 
 function toggleCategory(categoryId) {
@@ -1759,27 +1767,58 @@ function toggleCategory(categoryId) {
 }
 
 function removeCategory(categoryId) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Rimuovi i gruppi solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
   if (categoryId === "casa" || categoryId === "citta") {
     if (!confirm("Sei sicuro di voler eliminare questo gruppo predefinito? Le sezioni collegate diventeranno 'Sempre visibili'.")) return;
   } else {
     if (!confirm("Sei sicuro di voler eliminare questo gruppo? Le sezioni collegate diventeranno 'Sempre visibili'.")) return;
   }
   
-  const localeState = currentLocaleState();
-  localeState.categories = (localeState.categories || []).filter((cat) => cat.id !== categoryId);
+  state = collectTemplate();
+  currentLocaleState().categories = (currentLocaleState().categories || []).filter((cat) => cat.id !== categoryId);
   expandedCategoryIds.delete(categoryId);
+
+  // Update sections that belonged to this category to 'top' in the DOM dropdown selects
+  const sectionCards = [...dom.sections.querySelectorAll("[data-section-id]")];
+  sectionCards.forEach((card) => {
+    const select = card.querySelector('[data-field="category"]');
+    if (select && select.value === categoryId) {
+      select.value = "top";
+    }
+  });
   
-  state = saveTemplate(collectTemplate());
+  state = saveTemplate(state);
   syncFields();
   queueAutoPublish();
+  setStatus("Gruppo rimosso.", "success");
 }
 
 function toggleCategoryVisibility(categoryId) {
-  const localeState = currentLocaleState();
-  const cat = (localeState.categories || []).find((c) => c.id === categoryId);
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Modifica la visibilità dei gruppi solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  state = collectTemplate();
+  const cat = (currentLocaleState().categories || []).find((c) => c.id === categoryId);
   if (cat) {
     cat.hidden = !cat.hidden;
-    state = saveTemplate(collectTemplate());
+    
+    const card = dom.categories.querySelector(`[data-category-id="${categoryId}"]`);
+    if (card) {
+      card.dataset.categoryHidden = cat.hidden ? "true" : "false";
+      card.classList.toggle("is-hidden-section", cat.hidden);
+      const visibilityBtn = card.querySelector('[data-action="toggle-category-visibility"]');
+      if (visibilityBtn) {
+        visibilityBtn.textContent = cat.hidden ? "Mostra" : "Nascondi";
+      }
+    }
+
+    state = saveTemplate(state);
     syncFields();
     queueAutoPublish();
   }
