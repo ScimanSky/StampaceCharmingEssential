@@ -328,7 +328,7 @@ function renderImageItem(item, { plain = false, hostQr = false } = {}) {
   return `
     <article class="sheet-card sheet-card-media${plain ? " sheet-card-media--plain" : ""}${hostQrClass}">
       <div class="sheet-card-media-body">
-        <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}${plain ? " sheet-image--plain" : ""}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="lazy" />
+        <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}${plain ? " sheet-image--plain" : ""}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="eager" />
         ${
           item.caption
             ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
@@ -915,17 +915,38 @@ function toggleMenuGroup(groupId) {
   const isExpanded = !container.classList.contains("is-expanded");
   expandedMenuGroups[groupId] = isExpanded;
 
+  const collapsingGroups = [];
   if (isExpanded) {
     Object.keys(expandedMenuGroups).forEach((id) => {
       if (id !== groupId) {
-        expandedMenuGroups[id] = false;
         const otherContainer = dom.mainMenu.querySelector(`.menu-group-container[data-group-id="${id}"]`);
-        if (otherContainer) {
-          otherContainer.classList.remove("is-expanded");
-          const otherHeader = otherContainer.querySelector(".menu-group-header");
-          if (otherHeader) otherHeader.setAttribute("aria-expanded", "false");
+        if (otherContainer && otherContainer.classList.contains("is-expanded")) {
+          collapsingGroups.push(otherContainer);
+          expandedMenuGroups[id] = false;
         }
       }
+    });
+  }
+
+  // Calculate top offset before UI changes
+  const currentTop = container.getBoundingClientRect().top + window.scrollY;
+
+  let heightLostAbove = 0;
+  collapsingGroups.forEach((other) => {
+    const otherTop = other.getBoundingClientRect().top + window.scrollY;
+    if (otherTop < currentTop) {
+      const wrapper = other.querySelector(".menu-group-content-wrapper");
+      if (wrapper) {
+        heightLostAbove += wrapper.offsetHeight;
+      }
+    }
+  });
+
+  if (isExpanded) {
+    collapsingGroups.forEach((otherContainer) => {
+      otherContainer.classList.remove("is-expanded");
+      const otherHeader = otherContainer.querySelector(".menu-group-header");
+      if (otherHeader) otherHeader.setAttribute("aria-expanded", "false");
     });
   }
 
@@ -936,10 +957,10 @@ function toggleMenuGroup(groupId) {
   }
 
   if (isExpanded) {
-    window.setTimeout(() => {
-      const y = container.getBoundingClientRect().top + window.scrollY - 12;
-      window.scrollTo({ top: y, behavior: "smooth" });
-    }, 100);
+    const targetY = currentTop - heightLostAbove - 12;
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: targetY, behavior: "smooth" });
+    });
   }
 }
 
@@ -961,6 +982,23 @@ function expandSectionInline(sectionId) {
   if (!container) return;
 
   const otherContainers = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+
+  // Calculate top offset before UI changes
+  const currentTop = container.getBoundingClientRect().top + window.scrollY;
+
+  let heightLostAbove = 0;
+  otherContainers.forEach((other) => {
+    if (other !== container) {
+      const otherTop = other.getBoundingClientRect().top + window.scrollY;
+      if (otherTop < currentTop) {
+        const wrapper = other.querySelector(".menu-section-content-wrapper");
+        if (wrapper) {
+          heightLostAbove += wrapper.offsetHeight;
+        }
+      }
+    }
+  });
+
   otherContainers.forEach((other) => {
     if (other !== container) {
       other.classList.remove("is-expanded");
@@ -973,10 +1011,10 @@ function expandSectionInline(sectionId) {
   const button = container.querySelector('[data-action="toggle-section"]');
   if (button) button.setAttribute("aria-expanded", "true");
 
-  window.setTimeout(() => {
-    const y = container.getBoundingClientRect().top + window.scrollY - 16;
-    window.scrollTo({ top: y, behavior: "smooth" });
-  }, 100);
+  const targetY = currentTop - heightLostAbove - 16;
+  window.requestAnimationFrame(() => {
+    window.scrollTo({ top: targetY, behavior: "smooth" });
+  });
 }
 
 function collapseAllSectionsInline() {
@@ -1451,7 +1489,13 @@ async function init() {
   if (!template.enabledLocales.includes(currentLocale)) {
     currentLocale = FIXED_LOCALE;
   }
+  
+  dom.mainMenu.classList.add("is-animating");
   render();
+  window.setTimeout(() => {
+    dom.mainMenu.classList.remove("is-animating");
+  }, 1000);
+
   bindInputModality();
   bindMenu();
   bindHostShortcut();
