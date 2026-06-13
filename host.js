@@ -130,6 +130,7 @@ const dom = {
   footerSubtitle: document.querySelector("#field-footer-subtitle"),
   footerLines: document.querySelector("#field-footer-lines"),
   sections: document.querySelector("#host-sections"),
+  resetColorsButton: document.querySelector("#btn-reset-colors"),
 };
 
 const supabase = getHostSupabase();
@@ -2766,6 +2767,28 @@ function bindEditorEvents() {
   }
   dom.logout.addEventListener("click", logout);
   dom.shareGuest.addEventListener("click", shareGuestApp);
+
+  if (dom.resetColorsButton) {
+    dom.resetColorsButton.addEventListener("click", () => {
+      if (confirm("Sei sicuro di voler ripristinare i colori di default?")) {
+        dom.colorBackground.value = "#070605";
+        dom.colorText.value = "#e7d8c1";
+        dom.colorMuted.value = "#cbb99d";
+        dom.colorIcon.value = "#dfc39c";
+        dom.colorLine.value = "#504536";
+        dom.colorRow.value = "#17120e";
+        dom.colorRowHover.value = "#241d17";
+        dom.colorSheet.value = "#0f0c09";
+        dom.introColor.value = "#e7d8c1";
+        dom.sectionLeadColor.value = "#cbb99d";
+        dom.sectionBodyColor.value = "#e7d8c1";
+
+        state = saveTemplate(collectTemplate());
+        syncFields();
+        queueAutoPublish();
+      }
+    });
+  }
 
   dom.app.addEventListener("input", (event) => {
     if (!event.target.matches("input, textarea")) return;
