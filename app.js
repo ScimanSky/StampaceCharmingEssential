@@ -843,6 +843,7 @@ function renderOpenSection(sectionId) {
   }
 
   activeSectionId = section.id;
+  dom.sheet.dataset.section = section.id;
   if (section.id === "host") {
     dom.sheetIcon.innerHTML = renderHostAvatarMedia("sheet-host-avatar-media", { linked: true });
     dom.sheetIcon.className = "sheet-icon sheet-icon--host sheet-icon--host-avatar";
@@ -933,6 +934,7 @@ function openSection(sectionId, { pushHistory = true } = {}) {
 function closeSection({ fromHistory = false } = {}) {
   const focusTarget = lastFocusedElement;
   activeSectionId = null;
+  dom.sheet.dataset.section = "";
   dom.sheet.classList.remove("is-visible");
   dom.sheet.classList.add("is-closing");
   dom.sheet.setAttribute("aria-hidden", "true");

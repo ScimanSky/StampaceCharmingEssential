@@ -124,6 +124,12 @@ svg,
   padding: max(1rem, env(safe-area-inset-top)) var(--page-padding-x) max(1.4rem, env(safe-area-inset-bottom));
   position: relative;
   overflow-x: clip;
+  transition: opacity 260ms ease;
+}
+
+body.sheet-open .page-shell {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .topbar {
@@ -536,7 +542,7 @@ svg,
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   outline: none;
-  transition: background 190ms ease, border-color 190ms ease;
+  transition: background 190ms ease, border-color 190ms ease, box-shadow 190ms ease;
 }
 
 .menu-row.is-static {
@@ -667,7 +673,7 @@ svg,
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: var(--bg);
+  background: transparent;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -682,42 +688,6 @@ svg,
 .section-sheet.is-closing {
   opacity: 0;
   pointer-events: none;
-}
-
-.section-sheet::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(9, 7, 5, 0.88), rgba(9, 7, 5, 0.96)),
-    url("./img/patternlegn.webp") center top / 42rem auto repeat;
-  pointer-events: none;
-  transform: scale(1.02);
-  transition:
-    opacity 260ms ease,
-    transform 420ms ease;
-}
-
-.section-sheet::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top center, rgba(255, 222, 170, 0.08), transparent 45%);
-  pointer-events: none;
-  transition: opacity 260ms ease;
-}
-
-.section-sheet.is-visible::before {
-  transform: scale(1);
-}
-
-.section-sheet.is-closing::before {
-  opacity: 0.18;
-  transform: scale(1.04);
-}
-
-.section-sheet.is-closing::after {
-  opacity: 0;
 }
 
 .sheet-backdrop {
@@ -736,7 +706,7 @@ svg,
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: max(1rem, env(safe-area-inset-top)) 1rem max(1.4rem, env(safe-area-inset-bottom));
-  background: var(--sheet-bg);
+  background: transparent;
   opacity: 0;
   transform: translateY(var(--sheet-enter-y)) scale(var(--sheet-enter-scale));
   transition:
@@ -746,6 +716,26 @@ svg,
 
 .sheet-panel::-webkit-scrollbar {
   display: none;
+}
+
+#section-sheet[data-section="host"] .sheet-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+#section-sheet[data-section="host"] .sheet-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+#section-sheet[data-section="host"] .sheet-card-media--host-qr {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#section-sheet[data-section="host"] .app-footer {
+  margin-top: auto !important;
 }
 
 .section-sheet.is-visible .sheet-panel {
@@ -1630,7 +1620,7 @@ svg,
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   outline: none;
-  transition: background 190ms ease, border-color 190ms ease;
+  transition: background 190ms ease, border-color 190ms ease, box-shadow 190ms ease;
   font-family: var(--menu-font, var(--font-primary)), sans-serif;
 }
 
@@ -1671,6 +1661,16 @@ svg,
 
 .menu-group-container.is-expanded .menu-group-chevron {
   transform: rotate(180deg);
+}
+
+.menu-group-container.is-expanded .menu-group-header {
+  border-color: rgba(223, 195, 156, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 244, 224, 0.08), rgba(255, 244, 224, 0.03)),
+    var(--row-hover);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.16),
+    0 0 15px rgba(223, 195, 156, 0.12);
 }
 
 .menu-group-content-wrapper {
@@ -1755,6 +1755,16 @@ svg,
 
 .menu-section-container.is-expanded .menu-row-chevron {
   transform: rotate(180deg);
+}
+
+.menu-section-container.is-expanded .menu-row {
+  border-color: rgba(223, 195, 156, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 244, 224, 0.08), rgba(255, 244, 224, 0.03)),
+    var(--row-hover);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.16),
+    0 0 15px rgba(223, 195, 156, 0.12);
 }
 
 @media (prefers-reduced-motion: reduce) {
