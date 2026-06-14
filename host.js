@@ -1797,6 +1797,7 @@ function addCategory() {
     padding: "",
     hidden: false,
     menuTitle: "Nuovo Gruppo",
+    placement: "homepage",
   };
   currentLocaleState().categories = currentLocaleState().categories || [];
   currentLocaleState().categories.push(newCat);
