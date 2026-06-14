@@ -1643,7 +1643,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
     rawCategories = localeData.categories.filter((cat) => {
       if (!cat) return false;
       const cleanId = cleanString(cat.id);
-      if (!cleanId) return false;
+      if (!cleanId || cleanId === "contatti") return false;
       if (seenIds.has(cleanId)) return false;
       seenIds.add(cleanId);
       return true;
@@ -1651,8 +1651,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
   } else if (localeData?.categories && typeof localeData.categories === "object") {
     rawCategories = [
       { id: "casa", icon: "home", iconColor: "#dfc39c", fontFamily: "", menuTitle: localeData.categories.casa || "La Casa" },
-      { id: "citta", icon: "globe", iconColor: "#5fa8ff", fontFamily: "", menuTitle: localeData.categories.citta || "Vivi la Città" },
-      { id: "contatti", icon: "phone", iconColor: "#dfc39c", fontFamily: "", menuTitle: localeData.categories.contatti || "Contatti" }
+      { id: "citta", icon: "globe", iconColor: "#5fa8ff", fontFamily: "", menuTitle: localeData.categories.citta || "Vivi la Città" }
     ];
   }
   const defaultBaseCategories = [
@@ -1724,8 +1723,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       localeCode === FIXED_LOCALE
         ? cleanString(localeData?.subtitle, baseLocale.subtitle)
         : cleanString(DEFAULT_LOCALE_CONTENT[FIXED_LOCALE]?.subtitle, baseLocale.subtitle),
-    categories: normalizedCategories,
-    sections: normalizeLocaleSections(rawSections, structureSections, localeCode),
+    categories: normalizedCategories.filter(c => c && c.id !== "contatti"),
+    sections: normalizeLocaleSections(rawSections, structureSections, localeCode).filter(s => s && s.category !== "contatti"),
   };
 }
 
