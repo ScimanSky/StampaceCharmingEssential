@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260610h";
+} from "./content.js?v=20260614a";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -38,9 +38,9 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260610h";
-import { renderIcon, iconPaths } from "./icons.js?v=20260610h";
-import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260610h";
+} from "./security.js?v=20260614a";
+import { renderIcon, iconPaths } from "./icons.js?v=20260614a";
+import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260614a";
 
 // Unregister any active service worker on the host panel to avoid caching stale code
 if ("serviceWorker" in navigator) {
