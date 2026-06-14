@@ -1693,6 +1693,13 @@ function renderCategoryEditors() {
                 <input data-field="menuTitle" type="text" value="${escapeAttribute(cat.menuTitle)}" />
               </label>
               <label>
+                <span>Mostra in</span>
+                <select data-field="placement" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                  <option value="homepage" ${cat.placement === "homepage" || !cat.placement ? "selected" : ""}>Homepage</option>
+                  <option value="host" ${cat.placement === "host" ? "selected" : ""}>Scheda Dettagli Host</option>
+                </select>
+              </label>
+              <label>
                 <span>Icona</span>
                 <select data-field="icon" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
                   ${sectionIconOptions(cat.icon).map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === cat.icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
@@ -1932,6 +1939,7 @@ function collectTemplate() {
       padding: card.querySelector('[data-field="padding"]')?.value || "",
       hidden: card.dataset.categoryHidden === "true",
       menuTitle: card.querySelector('[data-field="menuTitle"]')?.value || "",
+      placement: card.querySelector('[data-field="placement"]')?.value || "homepage",
     };
   });
 

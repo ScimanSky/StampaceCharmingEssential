@@ -577,12 +577,20 @@ function renderGroup(cat, groupSections) {
   `;
 }
 
+function getCategoryPlacement(catId) {
+  const categoriesList = Array.isArray(localeState().categories) ? localeState().categories : [];
+  const cat = categoriesList.find((c) => c && c.id === catId);
+  if (cat && cat.placement) return cat.placement;
+  if (catId === "contatti") return "host";
+  return "homepage";
+}
+
 function renderMenu(sections) {
-  const visible = sections.filter((section) => section.id !== "host" && section.category !== "contatti" && !section.hidden);
+  const visible = sections.filter((section) => section.id !== "host" && getCategoryPlacement(section.category) !== "host" && !section.hidden);
 
   const localeTemplate = localeState();
   const categoriesList = Array.isArray(localeTemplate.categories) ? localeTemplate.categories : [];
-  const activeCategories = categoriesList.filter((cat) => cat && !cat.hidden && cat.id !== "contatti");
+  const activeCategories = categoriesList.filter((cat) => cat && !cat.hidden && getCategoryPlacement(cat.id) !== "host");
   const activeCategoryIds = new Set(activeCategories.map((cat) => cat.id));
 
   const topSections = visible.filter((s) => s.category === "top" || !activeCategoryIds.has(s.category));
@@ -856,13 +864,14 @@ function renderOpenSection(sectionId) {
 
   let contentHtml = renderSectionItems(section.items, section.id);
   if (section.id === "host") {
-    const contattiCat = localeState().categories?.find((c) => c && c.id === "contatti");
-    if (contattiCat && !contattiCat.hidden) {
-      const contattiSections = localeState().sections.filter(
-        (s) => s.category === "contatti" && s.id !== "host" && !s.hidden
+    const categoriesList = Array.isArray(localeState().categories) ? localeState().categories : [];
+    const hostCategories = categoriesList.filter((c) => c && !c.hidden && getCategoryPlacement(c.id) === "host");
+    hostCategories.forEach((cat) => {
+      const catSections = localeState().sections.filter(
+        (s) => s.category === cat.id && s.id !== "host" && !s.hidden
       );
-      contentHtml += renderGroup(contattiCat, contattiSections);
-    }
+      contentHtml += renderGroup(cat, catSections);
+    });
 
     contentHtml += `
       <footer class="app-footer" style="margin-top: 3rem; margin-bottom: 1.5rem;" aria-label="Footer">
@@ -1073,7 +1082,7 @@ function expandSectionInline(sectionId) {
           expandedMenuGroups[key] = false;
         });
         expandedMenuGroups[resolvedCategory] = true;
-        if (resolvedCategory !== "contatti") {
+        if (getCategoryPlacement(resolvedCategory) !== "host") {
           dom.mainMenu.innerHTML = renderMenu(sections);
         }
       }

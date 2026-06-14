@@ -80,6 +80,7 @@ describe('Content module', () => {
       const contattiCat = itCategories.find(cat => cat.id === 'contatti');
       assert.ok(contattiCat, 'Category contatti should exist');
       assert.strictEqual(contattiCat.menuTitle, 'Contatti');
+      assert.strictEqual(contattiCat.placement, 'host');
     });
 
     it('should append the contatti category if custom categories are provided without it', () => {
@@ -87,8 +88,8 @@ describe('Content module', () => {
         locales: {
           it: {
             categories: [
-              { id: 'casa', menuTitle: 'La Casa' },
-              { id: 'citta', menuTitle: 'Vivi la Città' }
+              { id: 'casa', menuTitle: 'La Casa', placement: 'homepage' },
+              { id: 'citta', menuTitle: 'Vivi la Città', placement: 'homepage' }
             ]
           }
         }
@@ -98,6 +99,31 @@ describe('Content module', () => {
       const contattiCat = itCategories.find(cat => cat.id === 'contatti');
       assert.ok(contattiCat, 'Category contatti should be auto-injected');
       assert.strictEqual(contattiCat.menuTitle, 'Contatti');
+      assert.strictEqual(contattiCat.placement, 'host');
+    });
+
+    it('should preserve placement for custom categories and default to homepage', () => {
+      const custom = {
+        locales: {
+          it: {
+            categories: [
+              { id: 'casa', menuTitle: 'La Casa', placement: 'homepage' },
+              { id: 'custom-cat-1', menuTitle: 'Custom Cat 1', placement: 'host' },
+              { id: 'custom-cat-2', menuTitle: 'Custom Cat 2' } // Defaults to homepage
+            ]
+          }
+        }
+      };
+      const normalized = normalizeTemplate(custom);
+      const itCategories = normalized.locales.it.categories;
+      
+      const custom1 = itCategories.find(cat => cat.id === 'custom-cat-1');
+      assert.ok(custom1);
+      assert.strictEqual(custom1.placement, 'host');
+
+      const custom2 = itCategories.find(cat => cat.id === 'custom-cat-2');
+      assert.ok(custom2);
+      assert.strictEqual(custom2.placement, 'homepage');
     });
   });
 

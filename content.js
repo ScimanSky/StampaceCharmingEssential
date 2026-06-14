@@ -1717,7 +1717,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       fontFamily: "",
       padding: "",
       hidden: false,
-      menuTitle: "La Casa"
+      menuTitle: "La Casa",
+      placement: "homepage"
     },
     {
       id: "citta",
@@ -1729,7 +1730,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       fontFamily: "",
       padding: "",
       hidden: false,
-      menuTitle: "Vivi la Città"
+      menuTitle: "Vivi la Città",
+      placement: "homepage"
     },
     {
       id: "contatti",
@@ -1741,7 +1743,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       fontFamily: "",
       padding: "",
       hidden: false,
-      menuTitle: "Contatti"
+      menuTitle: "Contatti",
+      placement: "host"
     }
   ];
 
@@ -1765,6 +1768,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
           padding: cleanString(cat?.padding),
           hidden: Boolean(cat?.hidden),
           menuTitle: cleanString(cat?.menuTitle) || `Gruppo ${idx + 1}`,
+          placement: cleanString(cat?.placement) || (cat?.id === "contatti" ? "host" : "homepage"),
         })) : defaultBaseCategories)
       : (baseLocale.categories || defaultBaseCategories);
 
@@ -1781,6 +1785,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       padding: baseCat.padding,
       hidden: Boolean(baseCat.hidden),
       menuTitle: cleanString(matchingCat?.menuTitle, baseCat.menuTitle),
+      placement: cleanString(matchingCat?.placement || baseCat.placement) || (baseCat.id === "contatti" ? "host" : "homepage"),
     };
   });
 
