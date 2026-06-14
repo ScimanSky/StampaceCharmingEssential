@@ -577,6 +577,61 @@ function renderGroup(cat, groupSections) {
   `;
 }
 
+function renderHostGroup(cat, groupSections) {
+  if (!groupSections.length) return "";
+  const isExpanded = expandedMenuGroups[cat.id] === true;
+
+  const styles = [];
+  if (cat.iconColor) {
+    styles.push(`--icon-custom-color: ${sanitizeCssColor(cat.iconColor)}`);
+  }
+  if (cat.bgColor) {
+    styles.push(`background-color: ${sanitizeCssColor(cat.bgColor)}`);
+  }
+  if (cat.textColor) {
+    styles.push(`color: ${sanitizeCssColor(cat.textColor)}`);
+  }
+  if (cat.fontSize) {
+    styles.push(`font-size: ${cat.fontSize}`);
+  }
+  if (cat.fontFamily) {
+    styles.push(`font-family: "${cat.fontFamily}", sans-serif`);
+  }
+  if (cat.padding) {
+    styles.push(`padding: ${cat.padding}`);
+  }
+  const styleAttr = styles.length ? ` style="${escapeAttribute(styles.join("; "))}"` : "";
+
+  // Collect all items across sections inside this host-page group
+  const allItems = [];
+  groupSections.forEach((sec) => {
+    if (Array.isArray(sec.items)) {
+      allItems.push(...sec.items);
+    }
+  });
+
+  return `
+    <div class="menu-group-container${isExpanded ? " is-expanded" : ""}" data-group-id="${escapeAttribute(cat.id)}">
+      <button class="menu-group-header" type="button" data-action="toggle-menu-group" data-group-id="${escapeAttribute(cat.id)}" aria-expanded="${isExpanded ? "true" : "false"}"${styleAttr}>
+        <span class="menu-icon">${renderIcon(cat.icon || "spark")}</span>
+        <span class="menu-copy">
+          <strong>${escapeHtml(cat.menuTitle)}</strong>
+        </span>
+        <span class="menu-group-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+      <div class="menu-group-content-wrapper">
+        <div class="menu-group-content" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+          ${renderSectionItems(allItems, "host-group-" + cat.id)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function getCategoryPlacement(catId) {
   const categoriesList = Array.isArray(localeState().categories) ? localeState().categories : [];
   const cat = categoriesList.find((c) => c && c.id === catId);
@@ -870,7 +925,7 @@ function renderOpenSection(sectionId) {
       const catSections = localeState().sections.filter(
         (s) => s.category === cat.id && s.id !== "host" && !s.hidden
       );
-      contentHtml += renderGroup(cat, catSections);
+      contentHtml += renderHostGroup(cat, catSections);
     });
 
     contentHtml += `

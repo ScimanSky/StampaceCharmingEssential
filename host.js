@@ -1460,6 +1460,77 @@ function renderSectionCtas(section) {
               <span>Visibilità</span>
               <select data-cta-field="hidden" ${!editable ? "disabled" : ""}>
                 <option value="false" ${!item.hidden ? "selected" : ""}>Visibile</option>
+                <option value="true" ${item.hidden ? "selected" : ""}>Nascosto</option>
+              </select>
+            </label>
+          </div>
+        </article>
+      `;
+      },
+    )
+    .join("");
+}
+
+function renderCategoryCtas(cat) {
+  const autoSecId = `section-${cat.id}`;
+  const autoSec = (currentLocaleState().sections || []).find((s) => s.id === autoSecId);
+  const ctas = autoSec ? autoSec.items.filter(isCtaItem) : [];
+  const editable = selectedEditorLocale === FIXED_LOCALE;
+
+  if (!ctas.length) {
+    return `<p class="host-cta-empty">Nessun pulsante grafico configurato.</p>`;
+  }
+
+  return ctas
+    .map(
+      (item, index) => {
+        const kind = normalizeCtaKind(item.kind);
+        const href = normalizeCtaHref(kind, item.href);
+        const icon = item.icon || ctaDefaultIcon(kind);
+        const iconColor = sanitizeCssColor(item.iconColor);
+        return `
+        <article class="host-cta-item host-cta-item--${escapeAttribute(kind)}${item.hidden ? " is-hidden-cta" : ""}" data-cta-item data-cta-index="${escapeAttribute(index)}">
+          <div class="host-cta-meta">
+            <span class="host-cta-icon-preview host-cta-icon-preview--${escapeAttribute(kind)}" aria-hidden="true"${iconColorStyle(iconColor)}>${renderIcon(icon)}</span>
+            <span class="host-cta-heading">
+              <strong>${escapeHtml(item.label || "Nuovo pulsante grafico")}${item.hidden ? " (Nascosto)" : ""}</strong>
+              <span>${escapeHtml(CTA_KIND_OPTIONS.find((option) => option.value === kind)?.label ?? "Web")}</span>
+            </span>
+            <div class="host-cta-actions">
+              <button class="ghost-button host-order-button" type="button" data-action="move-cta-up" ${!editable || index === 0 ? "disabled" : ""} aria-label="Sposta CTA in alto">↑</button>
+              <button class="ghost-button host-order-button" type="button" data-action="move-cta-down" ${!editable || index === ctas.length - 1 ? "disabled" : ""} aria-label="Sposta CTA in basso">↓</button>
+              <button class="ghost-button host-remove-cta" type="button" data-action="remove-cta" ${!editable ? "disabled" : ""}>Rimuovi</button>
+            </div>
+          </div>
+          <div class="host-cta-grid">
+            <label>
+              <span>Tipo</span>
+              <select data-cta-field="kind" ${!editable ? "disabled" : ""}>
+                ${CTA_KIND_OPTIONS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === kind ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+              </select>
+            </label>
+            <label>
+              <span>Icona</span>
+              <select data-cta-field="icon" ${!editable ? "disabled" : ""}>
+                ${CTA_ICON_OPTIONS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+              </select>
+            </label>
+            <label>
+              <span>Colore icona</span>
+              ${colorInputHtml("iconColor", iconColor, { cta: true })}
+            </label>
+            <label>
+              <span>Etichetta bottone</span>
+              <input data-cta-field="label" type="text" value="${escapeAttribute(item.label ?? "")}" ${!editable ? "disabled" : ""} />
+            </label>
+            <label>
+              <span>Destinazione</span>
+              <input data-cta-field="href" type="text" value="${escapeAttribute(href || item.href || "")}" ${!editable ? "disabled" : ""} />
+            </label>
+            <label>
+              <span>Visibilità</span>
+              <select data-cta-field="hidden" ${!editable ? "disabled" : ""}>
+                <option value="false" ${!item.hidden ? "selected" : ""}>Visibile</option>
                 <option value="true" ${item.hidden ? "selected" : ""}>Nascosta</option>
               </select>
             </label>
@@ -1520,7 +1591,16 @@ function renderSectionEditors() {
     .find((section) => section.id === "host")
     ?.items.find(isHostPrivateItem) ?? HOST_PRIVATE_ITEM;
 
+  const categories = localeState.categories || [];
+  const catIds = categories.map(cat => cat.id);
+
   dom.sections.innerHTML = localeState.sections
+    .filter((section) => {
+      if (!section || !section.id) return false;
+      if (section.id.startsWith("section-cat-")) return false;
+      if (catIds.some(catId => section.id === `section-${catId}`)) return false;
+      return true;
+    })
     .map(
       (section, index) => `
         <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${selectedEditorLocale === FIXED_LOCALE ? " is-draggable" : ""}" data-section-id="${escapeAttribute(section.id)}" data-section-hidden="${section.hidden ? "true" : "false"}">
@@ -1663,6 +1743,7 @@ function renderCategoryEditors() {
   const localeState = currentLocaleState();
   const categories = localeState.categories || [];
   const sections = localeState.sections || [];
+  const catIds = categories.map(c => c.id);
 
   dom.categories.innerHTML = categories
     .map(
@@ -1734,43 +1815,71 @@ function renderCategoryEditors() {
               </label>
             </div>
 
-            <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
-              <span style="font-weight: 500; display: block; margin-bottom: 0.75rem; font-size: 0.9rem;">Sottomenu collegati (Sezioni)</span>
-              <div class="host-category-sections-manager">
-                <div style="max-width: 24rem;">
-                  <select class="host-category-add-select" data-action="connect-section" data-category-id="${escapeAttribute(cat.id)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
-                    <option value="">+ Collega un sottomenu...</option>
-                    ${sections
-                      .filter(sec => sec.id !== "host" && sec.category !== cat.id)
-                      .map((sec) => {
-                        let labelSuffix = "";
-                        if (sec.category && sec.category !== "top") {
-                          const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
-                          const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
-                          labelSuffix = ` (attualmente in: ${parentName})`;
-                        } else {
-                          labelSuffix = " (Sempre visibile)";
-                        }
-                        return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
-                      })
-                      .join("")}
-                  </select>
-                </div>
-                <div class="host-category-connected-list">
-                  ${sections.filter(sec => sec.category === cat.id).map((sec) => `
-                    <div class="host-category-connected-chip">
-                      <span class="host-chip-label-text" title="${escapeAttribute(sec.menuTitle || sec.id)}">${escapeHtml(sec.menuTitle || sec.id)}</span>
-                      ${selectedEditorLocale === FIXED_LOCALE ? `
-                        <button type="button" class="host-chip-disconnect-btn" data-action="disconnect-section" data-section-id="${escapeAttribute(sec.id)}" aria-label="Riconnetti sottomenu a Sempre visibile">×</button>
-                      ` : ""}
-                    </div>
-                  `).join("")}
-                  ${sections.filter(sec => sec.category === cat.id).length === 0 ? `
-                    <span class="host-category-connected-empty">Nessun sottomenu collegato. Usa il menu a tendina sopra per collegare una sezione a questo pulsante.</span>
-                  ` : ""}
+            ${cat.placement === "host" ? `
+              <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
+                <div class="host-content-tools">
+                  <button class="ghost-button" type="button" data-action="category-add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
+                  <div class="host-cta-presets">
+                    ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="category-add-cta-preset" data-cta-kind="${escapeAttribute(preset.kind)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${escapeHtml(preset.label)}</button>`).join("")}
+                  </div>
                 </div>
               </div>
-            </div>
+              <div class="host-cta-editor">
+                <div class="host-section-media-head">
+                  <div>
+                    <p class="host-kicker">Pulsanti rapidi</p>
+                    <p class="host-media-note">CTA larghe con icona, etichetta e destinazione. Si aprono sempre in una nuova scheda.</p>
+                  </div>
+                </div>
+                <div class="host-cta-list">
+                  ${renderCategoryCtas(cat)}
+                </div>
+              </div>
+            ` : `
+              <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
+                <span style="font-weight: 500; display: block; margin-bottom: 0.75rem; font-size: 0.9rem;">Sottomenu collegati (Sezioni)</span>
+                <div class="host-category-sections-manager">
+                  <div style="max-width: 24rem;">
+                    <select class="host-category-add-select" data-action="connect-section" data-category-id="${escapeAttribute(cat.id)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
+                      <option value="">+ Collega un sottomenu...</option>
+                      ${sections
+                        .filter(sec => {
+                          if (sec.id === "host") return false;
+                          if (sec.category === cat.id) return false;
+                          if (sec.id.startsWith("section-cat-")) return false;
+                          if (catIds.some(catId => sec.id === `section-${catId}`)) return false;
+                          return true;
+                        })
+                        .map((sec) => {
+                          let labelSuffix = "";
+                          if (sec.category && sec.category !== "top") {
+                            const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
+                            const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
+                            labelSuffix = ` (attualmente in: ${parentName})`;
+                          } else {
+                            labelSuffix = " (Sempre visibile)";
+                          }
+                          return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
+                        })
+                        .join("")}
+                    </select>
+                  </div>
+                  <div class="host-category-connected-list">
+                    ${sections.filter(sec => sec.category === cat.id && !sec.id.startsWith("section-cat-") && !catIds.some(catId => sec.id === `section-${catId}`)).map((sec) => `
+                      <div class="host-category-connected-chip">
+                        <span class="host-chip-label-text" title="${escapeAttribute(sec.menuTitle || sec.id)}">${escapeHtml(sec.menuTitle || sec.id)}</span>
+                        ${selectedEditorLocale === FIXED_LOCALE ? `
+                          <button type="button" class="host-chip-disconnect-btn" data-action="disconnect-section" data-section-id="${escapeAttribute(sec.id)}" aria-label="Riconnetti sottomenu a Sempre visibile">×</button>
+                        ` : ""}
+                      </div>
+                    `).join("")}
+                    ${sections.filter(sec => sec.category === cat.id && !sec.id.startsWith("section-cat-") && !catIds.some(catId => sec.id === `section-${catId}`)).length === 0 ? `
+                      <span class="host-category-connected-empty">Nessun sottomenu collegato. Usa il menu a tendina sopra per collegare una sezione a questo pulsante.</span>
+                    ` : ""}
+                  </div>
+                </div>
+              </div>
+            `}
           </div>
         </section>
       `
@@ -1923,12 +2032,36 @@ function syncFields() {
 function collectTemplate() {
   const next = JSON.parse(JSON.stringify(state));
   const categoryCards = [...(dom.categories?.querySelectorAll("[data-category-id]") || [])];
+  const categoryCtas = {};
   const categories = categoryCards.map((card) => {
     const id = card.dataset.categoryId;
     const base = (currentLocaleState().categories || []).find((cat) => cat.id === id) || {};
     const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);
     const bgColor = sanitizeCssColor(card.querySelector('[data-field="bgColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="bgColor"]')?.value);
     const textColor = sanitizeCssColor(card.querySelector('[data-field="textColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="textColor"]')?.value);
+    const placement = card.querySelector('[data-field="placement"]')?.value || "homepage";
+
+    if (placement === "host") {
+      const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
+        const kind = normalizeCtaKind(item.querySelector('[data-cta-field="kind"]').value);
+        const label = item.querySelector('[data-cta-field="label"]').value.trim();
+        const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
+        const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
+        const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
+        const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
+        return {
+          type: CTA_ITEM_TYPE,
+          kind,
+          label,
+          href,
+          icon,
+          iconColor,
+          hidden,
+        };
+      }).filter((item) => item.label && item.href);
+      categoryCtas[id] = ctaItems;
+    }
+
     return {
       id,
       icon: card.querySelector('[data-field="icon"]')?.value || base.icon || "spark",
@@ -1940,12 +2073,12 @@ function collectTemplate() {
       padding: card.querySelector('[data-field="padding"]')?.value || "",
       hidden: card.dataset.categoryHidden === "true",
       menuTitle: card.querySelector('[data-field="menuTitle"]')?.value || "",
-      placement: card.querySelector('[data-field="placement"]')?.value || "homepage",
+      placement,
     };
   });
 
   const sectionCards = [...dom.sections.querySelectorAll("[data-section-id]")];
-  const sections = sectionCards.map((card) => {
+  let sections = sectionCards.map((card) => {
     const id = card.dataset.sectionId;
     const base = currentLocaleState().sections.find((section) => section.id === id);
     const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
@@ -1997,6 +2130,34 @@ function collectTemplate() {
       lead: card.querySelector('[data-field="lead"]').value,
       items: [...parseItems(card.querySelector('[data-field="items"]').value), ...ctaItems, ...imageItems, ...mediaItems],
     };
+  });
+
+  // Filter out any sections whose ID starts with "section-cat-" or matches section-${cat.id} for any category
+  const catIds = categories.map(cat => cat.id);
+  sections = sections.filter(sec => {
+    if (!sec || !sec.id) return false;
+    if (sec.id.startsWith("section-cat-")) return false;
+    if (catIds.some(catId => sec.id === `section-${catId}`)) return false;
+    return true;
+  });
+
+  // Append new automatic sections
+  categories.forEach((cat) => {
+    if (cat.placement === "host") {
+      const ctaItems = categoryCtas[cat.id] || [];
+      const autoSecId = `section-${cat.id}`;
+      sections.push({
+        id: autoSecId,
+        icon: cat.icon || "spark",
+        iconColor: cat.iconColor,
+        hidden: cat.hidden,
+        category: cat.id,
+        menuTitle: cat.menuTitle,
+        sectionTitle: cat.menuTitle,
+        lead: "",
+        items: ctaItems,
+      });
+    }
   });
 
   const optionalEnabled = dom.optionalLocale.value && !REQUIRED_LOCALES.includes(dom.optionalLocale.value)
@@ -2192,6 +2353,73 @@ function updateSectionCtas(sectionId, updater) {
   state = saveTemplate(state);
   syncFields();
   queueAutoPublish();
+}
+
+function updateCategoryCtas(categoryId, updater) {
+  state = collectTemplate();
+  const autoSecId = `section-${categoryId}`;
+  const localeState = currentLocaleState();
+  let section = (localeState.sections || []).find((item) => item.id === autoSecId);
+
+  if (!section) {
+    section = {
+      id: autoSecId,
+      icon: "spark",
+      iconColor: "#dfc39c",
+      hidden: false,
+      category: categoryId,
+      menuTitle: "Contatti",
+      sectionTitle: "Contatti",
+      lead: "",
+      items: [],
+    };
+    localeState.sections = localeState.sections || [];
+    localeState.sections.push(section);
+  }
+
+  const textItems = section.items.filter((item) => !isImageItem(item) && !isCtaItem(item));
+  const imageItems = section.items.filter(isImageItem);
+  const ctaItems = section.items.filter(isCtaItem);
+  const nextCtas = updater([...ctaItems]) ?? ctaItems;
+
+  section.items = [...textItems, ...nextCtas, ...imageItems];
+  state = saveTemplate(state);
+  syncFields();
+  queueAutoPublish();
+}
+
+function addCategoryCta(categoryId, kind = "web") {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Aggiungi pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+
+  updateCategoryCtas(categoryId, (ctaItems) => {
+    ctaItems.push(buildCtaPreset(kind));
+    return ctaItems;
+  });
+  setStatus("Nuovo pulsante grafico aggiunto. Compila etichetta, destinazione e icona.", "success");
+}
+
+function removeCategoryCta(categoryId, ctaIndex) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Rimuovi pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+  updateCategoryCtas(categoryId, (ctaItems) => ctaItems.filter((_, index) => index !== ctaIndex));
+}
+
+function moveCategoryCta(categoryId, ctaIndex, direction) {
+  if (selectedEditorLocale !== FIXED_LOCALE) {
+    setStatus("Sposta pulsanti grafici solo mentre modifichi la lingua italiana.", "error");
+    return;
+  }
+  updateCategoryCtas(categoryId, (ctaItems) => {
+    const nextIndex = ctaIndex + direction;
+    if (nextIndex < 0 || nextIndex >= ctaItems.length) return ctaItems;
+    [ctaItems[ctaIndex], ctaItems[nextIndex]] = [ctaItems[nextIndex], ctaItems[ctaIndex]];
+    return ctaItems;
+  });
 }
 
 function addCta(sectionId, kind = "web") {
@@ -2997,11 +3225,32 @@ function bindEditorEvents() {
       return;
     }
 
+    const categoryAddCtaTrigger = event.target.closest('[data-action="category-add-cta"]');
+    if (categoryAddCtaTrigger) {
+      const categoryCard = event.target.closest("[data-category-id]");
+      addCategoryCta(categoryCard?.dataset.categoryId);
+      return;
+    }
+
+    const categoryAddCtaPresetTrigger = event.target.closest('[data-action="category-add-cta-preset"]');
+    if (categoryAddCtaPresetTrigger) {
+      const categoryCard = event.target.closest("[data-category-id]");
+      addCategoryCta(categoryCard?.dataset.categoryId, categoryAddCtaPresetTrigger.dataset.ctaKind || "web");
+      return;
+    }
+
     const removeCtaTrigger = event.target.closest('[data-action="remove-cta"]');
     if (removeCtaTrigger) {
       const ctaCard = event.target.closest("[data-cta-item]");
       const sectionCard = event.target.closest("[data-section-id]");
-      removeCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
+      if (sectionCard) {
+        removeCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
+      } else {
+        const categoryCard = event.target.closest("[data-category-id]");
+        if (categoryCard) {
+          removeCategoryCta(categoryCard.dataset.categoryId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
+        }
+      }
       return;
     }
 
@@ -3009,7 +3258,15 @@ function bindEditorEvents() {
     if (moveCtaUpTrigger) {
       const ctaCard = event.target.closest("[data-cta-item]");
       const sectionCard = event.target.closest("[data-section-id]");
-      moveCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10), -1);
+      const ctaIndex = Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10);
+      if (sectionCard) {
+        moveCta(sectionCard?.dataset.sectionId, ctaIndex, -1);
+      } else {
+        const categoryCard = event.target.closest("[data-category-id]");
+        if (categoryCard) {
+          moveCategoryCta(categoryCard.dataset.categoryId, ctaIndex, -1);
+        }
+      }
       return;
     }
 
@@ -3017,7 +3274,15 @@ function bindEditorEvents() {
     if (moveCtaDownTrigger) {
       const ctaCard = event.target.closest("[data-cta-item]");
       const sectionCard = event.target.closest("[data-section-id]");
-      moveCta(sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10), 1);
+      const ctaIndex = Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10);
+      if (sectionCard) {
+        moveCta(sectionCard?.dataset.sectionId, ctaIndex, 1);
+      } else {
+        const categoryCard = event.target.closest("[data-category-id]");
+        if (categoryCard) {
+          moveCategoryCta(categoryCard.dataset.categoryId, ctaIndex, 1);
+        }
+      }
       return;
     }
 
