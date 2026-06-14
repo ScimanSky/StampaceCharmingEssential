@@ -171,7 +171,7 @@ function saveTranslationCache() {
 }
 let lastTranslationFallbackLocales = [];
 const expandedSectionIds = new Set();
-const expandedCategoryIds = new Set(["casa", "citta", "contatti"]);
+const expandedCategoryIds = new Set(["casa", "citta"]);
 let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set();
 const ITALIAN_TEMPLATE_BASE = defaultTemplate.locales[FIXED_LOCALE];
@@ -1823,7 +1823,7 @@ function removeCategory(categoryId) {
     return;
   }
 
-  if (categoryId === "casa" || categoryId === "citta" || categoryId === "contatti") {
+  if (categoryId === "casa" || categoryId === "citta") {
     if (!confirm("Sei sicuro di voler eliminare questo gruppo predefinito? Anche tutte le sezioni collegate ad esso verranno eliminate definitivamente.")) return;
   } else {
     if (!confirm("Sei sicuro di voler eliminare questo gruppo? Anche tutte le sezioni collegate ad esso verranno eliminate definitivamente.")) return;

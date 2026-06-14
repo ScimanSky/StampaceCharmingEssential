@@ -226,23 +226,6 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           HOST_PRIVATE_ITEMS.it,
         ],
       },
-      {
-        id: "contatti_whatsapp",
-        icon: "chat",
-        menuTitle: "WhatsApp",
-        sectionTitle: "WhatsApp",
-        lead: "Scrivici su WhatsApp per qualsiasi informazione o supporto.",
-        category: "contatti",
-        items: [
-          {
-            type: "cta",
-            kind: "whatsapp",
-            label: "Avvia Chat",
-            href: "https://wa.me/393330000000",
-            icon: "chat"
-          }
-        ]
-      },
     ],
   },
   en: {
@@ -334,23 +317,6 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           "Email: add here",
           HOST_PRIVATE_ITEMS.en,
         ],
-      },
-      {
-        id: "contatti_whatsapp",
-        icon: "chat",
-        menuTitle: "WhatsApp",
-        sectionTitle: "WhatsApp",
-        lead: "Message us on WhatsApp for any information or support.",
-        category: "contatti",
-        items: [
-          {
-            type: "cta",
-            kind: "whatsapp",
-            label: "Start Chat",
-            href: "https://wa.me/393330000000",
-            icon: "chat"
-          }
-        ]
       },
     ],
   },
@@ -627,23 +593,6 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           "E-Mail: hier eintragen",
           HOST_PRIVATE_ITEMS.de,
         ],
-      },
-      {
-        id: "contatti_whatsapp",
-        icon: "chat",
-        menuTitle: "WhatsApp",
-        sectionTitle: "WhatsApp",
-        lead: "Schreiben Sie uns auf WhatsApp für Fragen oder Unterstützung.",
-        category: "contatti",
-        items: [
-          {
-            type: "cta",
-            kind: "whatsapp",
-            label: "Chat starten",
-            href: "https://wa.me/393330000000",
-            icon: "chat"
-          }
-        ]
       },
     ],
   },
@@ -1732,35 +1681,15 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       hidden: false,
       menuTitle: "Vivi la Città",
       placement: "homepage"
-    },
-    {
-      id: "contatti",
-      icon: "phone",
-      iconColor: "#dfc39c",
-      bgColor: "",
-      textColor: "",
-      fontSize: "",
-      fontFamily: "",
-      padding: "",
-      hidden: false,
-      menuTitle: "Contatti",
-      placement: "host"
     }
   ];
-
-  if (rawCategories.length > 0 && !rawCategories.some(cat => cat.id === "contatti")) {
-    const defaultContatti = defaultBaseCategories.find(c => c.id === "contatti");
-    if (defaultContatti) {
-      rawCategories.push({ ...defaultContatti });
-    }
-  }
 
   const structureCategories =
     localeCode === FIXED_LOCALE
       ? (rawCategories.length ? rawCategories.map((cat, idx) => ({
           id: cleanString(cat?.id) || `cat-${Date.now()}-${idx}`,
-          icon: cleanString(cat?.icon) || (cat?.id === "casa" ? "home" : cat?.id === "citta" ? "globe" : cat?.id === "contatti" ? "phone" : "spark"),
-          iconColor: cleanIconColor(cat?.iconColor) || (cat?.id === "casa" ? "#dfc39c" : cat?.id === "citta" ? "#5fa8ff" : cat?.id === "contatti" ? "#dfc39c" : ""),
+          icon: cleanString(cat?.icon) || (cat?.id === "casa" ? "home" : cat?.id === "citta" ? "globe" : "spark"),
+          iconColor: cleanIconColor(cat?.iconColor) || (cat?.id === "casa" ? "#dfc39c" : cat?.id === "citta" ? "#5fa8ff" : ""),
           bgColor: cleanIconColor(cat?.bgColor),
           textColor: cleanIconColor(cat?.textColor),
           fontSize: cleanString(cat?.fontSize),
@@ -1768,7 +1697,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
           padding: cleanString(cat?.padding),
           hidden: Boolean(cat?.hidden),
           menuTitle: cleanString(cat?.menuTitle) || `Gruppo ${idx + 1}`,
-          placement: cleanString(cat?.placement) || (cat?.id === "contatti" ? "host" : "homepage"),
+          placement: cleanString(cat?.placement) || "homepage",
         })) : defaultBaseCategories)
       : (baseLocale.categories || defaultBaseCategories);
 
@@ -1785,7 +1714,7 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       padding: baseCat.padding,
       hidden: Boolean(baseCat.hidden),
       menuTitle: cleanString(matchingCat?.menuTitle, baseCat.menuTitle),
-      placement: cleanString(matchingCat?.placement || baseCat.placement) || (baseCat.id === "contatti" ? "host" : "homepage"),
+      placement: cleanString(matchingCat?.placement || baseCat.placement) || "homepage",
     };
   });
 

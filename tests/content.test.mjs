@@ -74,33 +74,7 @@ describe('Content module', () => {
       assert.deepStrictEqual(normalized.enabledLocales, ['it', 'en', 'fr']);
     });
 
-    it('should always include the contatti category', () => {
-      const normalized = normalizeTemplate({});
-      const itCategories = normalized.locales.it.categories;
-      const contattiCat = itCategories.find(cat => cat.id === 'contatti');
-      assert.ok(contattiCat, 'Category contatti should exist');
-      assert.strictEqual(contattiCat.menuTitle, 'Contatti');
-      assert.strictEqual(contattiCat.placement, 'host');
-    });
 
-    it('should append the contatti category if custom categories are provided without it', () => {
-      const custom = {
-        locales: {
-          it: {
-            categories: [
-              { id: 'casa', menuTitle: 'La Casa', placement: 'homepage' },
-              { id: 'citta', menuTitle: 'Vivi la Città', placement: 'homepage' }
-            ]
-          }
-        }
-      };
-      const normalized = normalizeTemplate(custom);
-      const itCategories = normalized.locales.it.categories;
-      const contattiCat = itCategories.find(cat => cat.id === 'contatti');
-      assert.ok(contattiCat, 'Category contatti should be auto-injected');
-      assert.strictEqual(contattiCat.menuTitle, 'Contatti');
-      assert.strictEqual(contattiCat.placement, 'host');
-    });
 
     it('should preserve placement for custom categories and default to homepage', () => {
       const custom = {
