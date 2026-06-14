@@ -734,14 +734,17 @@ select:focus-visible {
   flex: 0 0 auto;
 }
 
-.host-cta-icon-preview svg {
-  width: 1.45rem;
-  height: 1.45rem;
+.host-cta-icon-preview svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.host-cta-icon-preview svg {
+  width: 1.45rem;
+  height: 1.45rem;
 }
 
 .host-cta-icon-preview--airbnb {
@@ -847,14 +850,17 @@ select:focus-visible {
   color: var(--icon-custom-color, rgba(231, 216, 193, 0.88));
 }
 
-.host-section-icon svg {
-  width: 1.75rem;
-  height: 1.75rem;
+.host-section-icon svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.host-section-icon svg {
+  width: 1.75rem;
+  height: 1.75rem;
 }
 
 .host-section-card.is-hidden-section {

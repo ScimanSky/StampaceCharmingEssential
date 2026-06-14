@@ -591,14 +591,17 @@ body.sheet-open .page-shell {
   color: var(--icon-custom-color, var(--muted-strong));
 }
 
-.menu-icon svg {
-  width: var(--menu-icon-size);
-  height: var(--menu-icon-size);
+.menu-icon svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.menu-icon svg {
+  width: var(--menu-icon-size);
+  height: var(--menu-icon-size);
 }
 
 .menu-row--wifi .menu-icon,
@@ -765,14 +768,17 @@ body.sheet-open .page-shell {
   color: var(--icon-custom-color, var(--muted-strong));
 }
 
-.sheet-icon svg {
-  width: 2.18rem;
-  height: 2.18rem;
+.sheet-icon svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.sheet-icon svg {
+  width: 2.18rem;
+  height: 2.18rem;
 }
 
 .sheet-icon--host-avatar {
@@ -952,14 +958,17 @@ body.sheet-open .page-shell {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.sheet-card-icon svg {
-  width: 1.45rem;
-  height: 1.45rem;
+.sheet-card-icon svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.65;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.sheet-card-icon svg {
+  width: 1.45rem;
+  height: 1.45rem;
 }
 
 .sheet-card-number {
@@ -1157,15 +1166,18 @@ body.sheet-open .page-shell {
     background 170ms ease;
 }
 
-.sheet-host-action svg {
-  width: 1.78rem;
-  height: 1.78rem;
-  display: block;
+.sheet-host-action svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.65;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.sheet-host-action svg {
+  width: 1.78rem;
+  height: 1.78rem;
+  display: block;
 }
 
 .sheet-host-action--whatsapp {
@@ -1316,14 +1328,17 @@ body.sheet-open .page-shell {
     transform 180ms ease;
 }
 
-.sheet-cta-icon svg {
-  width: var(--menu-icon-size);
-  height: var(--menu-icon-size);
+.sheet-cta-icon svg:not(.icon-brand) {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.55;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.sheet-cta-icon svg {
+  width: var(--menu-icon-size);
+  height: var(--menu-icon-size);
 }
 
 .sheet-cta-label {

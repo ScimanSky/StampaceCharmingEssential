@@ -428,6 +428,9 @@ const SECTION_ICON_OPTIONS = [
   { value: "book", label: "Guida" },
   { value: "phone", label: "Telefono" },
   { value: "mail", label: "Email" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "gmail", label: "Gmail" },
+  { value: "telegram", label: "Telegram" },
   { value: "home", label: "Casa" },
   { value: "city", label: "Città" },
   { value: "skyline", label: "Skyline città" },
@@ -466,6 +469,9 @@ function normalizedSectionText(section) {
 function inferSectionIcon(section) {
   const text = normalizedSectionText(section);
 
+  if (/whatsapp|wa\.me|wa\b/.test(text)) return "whatsapp";
+  if (/telegram|t\.me|tg\b/.test(text)) return "telegram";
+  if (/gmail/.test(text)) return "gmail";
   if (/key[-\s]?box|keybox|lockbox|cassetta.*chiav|chiav.*cassetta|tastier|keypad|codic/.test(text)) return "keypad";
   if (/contator|elettric|corrente|energia|salvavita|quadro|luce/.test(text)) return "bolt";
   if (/bagagli|bagaglio|valig|deposito|luggage|baggage/.test(text)) return "luggage";

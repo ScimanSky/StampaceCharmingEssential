@@ -89,36 +89,23 @@ function normalizePhoneDigits(value) {
 }
 
 function renderWhatsAppBrandIcon() {
-  return `
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <defs>
-        <radialGradient id="whatsapp-green" cx="64%" cy="22%" r="82%">
-          <stop offset="0%" stop-color="#7fff5b"/>
-          <stop offset="48%" stop-color="#19d119"/>
-          <stop offset="100%" stop-color="#007a05"/>
-        </radialGradient>
-      </defs>
-      <circle cx="12" cy="12" r="11.4" fill="url(#whatsapp-green)" stroke="none"/>
-      <path d="M5.55 19.3 6.75 15.7a6.95 6.95 0 1 1 2.25 2.05z" fill="none" stroke="#fff" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M9.05 8.35c.28-.55.48-.6.83-.6h.45c.22 0 .42.15.52.42l.72 1.72c.1.28.06.48-.15.72l-.48.55c.72 1.24 1.68 2.16 2.95 2.82l.6-.67c.2-.22.42-.26.72-.12l1.62.78c.28.14.42.34.42.65v.45c0 .35-.2.66-.56.82-.75.34-1.78.28-3.05-.3-2.18-.96-4.34-3.1-5.2-5.28-.46-1.17-.33-1.84-.05-2.48z" fill="#fff" stroke="none"/>
-    </svg>
-  `;
+  return renderIcon("whatsapp");
 }
 
 function renderGmailBrandIcon() {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.gmail}</svg>`;
+  return renderIcon("gmail");
 }
 
 function renderAirbnbBrandIcon() {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.airbnb}</svg>`;
+  return renderIcon("airbnb");
 }
 
 function renderBookingBrandIcon() {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.booking}</svg>`;
+  return renderIcon("booking");
 }
 
 function renderVrboBrandIcon() {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true">${iconPaths.vrbo}</svg>`;
+  return renderIcon("vrbo");
 }
 
 function gmailComposeHref(email) {
