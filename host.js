@@ -2866,7 +2866,7 @@ function bindEditorEvents() {
   });
 
   dom.app.addEventListener("change", (event) => {
-    if (!event.target.matches("[data-theme-field]")) return;
+    if (!event.target.matches("select, [data-theme-field], [data-field], [data-cta-field]")) return;
     state = saveTemplate(collectTemplate());
     syncFields();
     queueAutoPublish();
