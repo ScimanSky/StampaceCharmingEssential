@@ -73,6 +73,32 @@ describe('Content module', () => {
       assert.strictEqual(normalized.address, 'Custom Address 123');
       assert.deepStrictEqual(normalized.enabledLocales, ['it', 'en', 'fr']);
     });
+
+    it('should always include the contatti category', () => {
+      const normalized = normalizeTemplate({});
+      const itCategories = normalized.locales.it.categories;
+      const contattiCat = itCategories.find(cat => cat.id === 'contatti');
+      assert.ok(contattiCat, 'Category contatti should exist');
+      assert.strictEqual(contattiCat.menuTitle, 'Contatti');
+    });
+
+    it('should append the contatti category if custom categories are provided without it', () => {
+      const custom = {
+        locales: {
+          it: {
+            categories: [
+              { id: 'casa', menuTitle: 'La Casa' },
+              { id: 'citta', menuTitle: 'Vivi la Città' }
+            ]
+          }
+        }
+      };
+      const normalized = normalizeTemplate(custom);
+      const itCategories = normalized.locales.it.categories;
+      const contattiCat = itCategories.find(cat => cat.id === 'contatti');
+      assert.ok(contattiCat, 'Category contatti should be auto-injected');
+      assert.strictEqual(contattiCat.menuTitle, 'Contatti');
+    });
   });
 
   describe('getLocaleContent', () => {

@@ -31,19 +31,19 @@ const LANGUAGE_INDEX = Object.fromEntries(
 );
 
 export const SUBMENU_TRANSLATIONS = {
-  it: { casa: "La Casa", citta: "Vivi la Città" },
-  en: { casa: "The House", citta: "Live the City" },
-  fr: { casa: "La Maison", citta: "Vivre la Ville" },
-  es: { casa: "La Casa", citta: "Vive la Ciudad" },
-  de: { casa: "Das Haus", citta: "Erlebe die Stadt" },
-  nl: { casa: "Het Huis", citta: "Beleef de Stad" },
-  pt: { casa: "A Casa", citta: "Viva a Cidade" },
-  pl: { casa: "Dom", citta: "Życie w Mieście" },
-  cs: { casa: "Dům", citta: "Poznejte Město" },
-  ru: { casa: "Дом", citta: "Познакомьтесь с Городом" },
-  zh: { casa: "房子", citta: "城市生活" },
-  hi: { casa: "घर", citta: "شهر का अनुभव" },
-  ja: { casa: "家", citta: "街を楽しむ" }
+  it: { casa: "La Casa", citta: "Vivi la Città", contatti: "Contatti" },
+  en: { casa: "The House", citta: "Live the City", contatti: "Contacts" },
+  fr: { casa: "La Maison", citta: "Vivre la Ville", contatti: "Contacts" },
+  es: { casa: "La Casa", citta: "Vive la Ciudad", contatti: "Contactos" },
+  de: { casa: "Das Haus", citta: "Erlebe die Stadt", contatti: "Kontakte" },
+  nl: { casa: "Het Huis", citta: "Beleef de Stad", contatti: "Contacten" },
+  pt: { casa: "A Casa", citta: "Viva a Cidade", contatos: "Contatos", contatti: "Contatos" },
+  pl: { casa: "Dom", citta: "Życie w Mieście", contatti: "Kontakty" },
+  cs: { casa: "Dům", citta: "Poznejte Město", contatti: "Kontakty" },
+  ru: { casa: "Дом", citta: "Познакомьтесь с Городом", contatti: "Контакты" },
+  zh: { casa: "房子", citta: "城市生活", contatti: "联系方式" },
+  hi: { casa: "घर", citta: "شهر का अनुभव", contatti: "संपrk" },
+  ja: { casa: "家", citta: "街を楽しむ", contatti: "連絡先" }
 };
 
 export const HOST_PRIVATE_ITEMS = Object.freeze({
@@ -226,6 +226,23 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           HOST_PRIVATE_ITEMS.it,
         ],
       },
+      {
+        id: "contatti_whatsapp",
+        icon: "chat",
+        menuTitle: "WhatsApp",
+        sectionTitle: "WhatsApp",
+        lead: "Scrivici su WhatsApp per qualsiasi informazione o supporto.",
+        category: "contatti",
+        items: [
+          {
+            type: "cta",
+            kind: "whatsapp",
+            label: "Avvia Chat",
+            href: "https://wa.me/393330000000",
+            icon: "chat"
+          }
+        ]
+      },
     ],
   },
   en: {
@@ -317,6 +334,23 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           "Email: add here",
           HOST_PRIVATE_ITEMS.en,
         ],
+      },
+      {
+        id: "contatti_whatsapp",
+        icon: "chat",
+        menuTitle: "WhatsApp",
+        sectionTitle: "WhatsApp",
+        lead: "Message us on WhatsApp for any information or support.",
+        category: "contatti",
+        items: [
+          {
+            type: "cta",
+            kind: "whatsapp",
+            label: "Start Chat",
+            href: "https://wa.me/393330000000",
+            icon: "chat"
+          }
+        ]
       },
     ],
   },
@@ -593,6 +627,23 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
           "E-Mail: hier eintragen",
           HOST_PRIVATE_ITEMS.de,
         ],
+      },
+      {
+        id: "contatti_whatsapp",
+        icon: "chat",
+        menuTitle: "WhatsApp",
+        sectionTitle: "WhatsApp",
+        lead: "Schreiben Sie uns auf WhatsApp für Fragen oder Unterstützung.",
+        category: "contatti",
+        items: [
+          {
+            type: "cta",
+            kind: "whatsapp",
+            label: "Chat starten",
+            href: "https://wa.me/393330000000",
+            icon: "chat"
+          }
+        ]
       },
     ],
   },
@@ -1651,7 +1702,8 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
   } else if (localeData?.categories && typeof localeData.categories === "object") {
     rawCategories = [
       { id: "casa", icon: "home", iconColor: "#dfc39c", fontFamily: "", menuTitle: localeData.categories.casa || "La Casa" },
-      { id: "citta", icon: "globe", iconColor: "#5fa8ff", fontFamily: "", menuTitle: localeData.categories.citta || "Vivi la Città" }
+      { id: "citta", icon: "globe", iconColor: "#5fa8ff", fontFamily: "", menuTitle: localeData.categories.citta || "Vivi la Città" },
+      { id: "contatti", icon: "phone", iconColor: "#dfc39c", fontFamily: "", menuTitle: localeData.categories.contatti || "Contatti" }
     ];
   }
   const defaultBaseCategories = [
@@ -1678,15 +1730,34 @@ function normalizeLocaleContent(localeData, baseLocale, localeCode) {
       padding: "",
       hidden: false,
       menuTitle: "Vivi la Città"
+    },
+    {
+      id: "contatti",
+      icon: "phone",
+      iconColor: "#dfc39c",
+      bgColor: "",
+      textColor: "",
+      fontSize: "",
+      fontFamily: "",
+      padding: "",
+      hidden: false,
+      menuTitle: "Contatti"
     }
   ];
+
+  if (rawCategories.length > 0 && !rawCategories.some(cat => cat.id === "contatti")) {
+    const defaultContatti = defaultBaseCategories.find(c => c.id === "contatti");
+    if (defaultContatti) {
+      rawCategories.push({ ...defaultContatti });
+    }
+  }
 
   const structureCategories =
     localeCode === FIXED_LOCALE
       ? (rawCategories.length ? rawCategories.map((cat, idx) => ({
           id: cleanString(cat?.id) || `cat-${Date.now()}-${idx}`,
-          icon: cleanString(cat?.icon) || (cat?.id === "casa" ? "home" : cat?.id === "citta" ? "globe" : "spark"),
-          iconColor: cleanIconColor(cat?.iconColor) || (cat?.id === "casa" ? "#dfc39c" : cat?.id === "citta" ? "#5fa8ff" : ""),
+          icon: cleanString(cat?.icon) || (cat?.id === "casa" ? "home" : cat?.id === "citta" ? "globe" : cat?.id === "contatti" ? "phone" : "spark"),
+          iconColor: cleanIconColor(cat?.iconColor) || (cat?.id === "casa" ? "#dfc39c" : cat?.id === "citta" ? "#5fa8ff" : cat?.id === "contatti" ? "#dfc39c" : ""),
           bgColor: cleanIconColor(cat?.bgColor),
           textColor: cleanIconColor(cat?.textColor),
           fontSize: cleanString(cat?.fontSize),

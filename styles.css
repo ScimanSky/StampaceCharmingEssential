@@ -391,7 +391,7 @@ body.sheet-open .page-shell {
   overflow: hidden;
   min-height: var(--hero-height);
   aspect-ratio: 4 / 3;
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: var(--radius-lg);
   background: url("./img/sfondo9.jpeg") center center / cover no-repeat;
   box-shadow: var(--shadow);

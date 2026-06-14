@@ -22,6 +22,26 @@
   "locales": {
     "it": {
       "subtitle": "Luxury apartment",
+      "categories": [
+        {
+          "id": "casa",
+          "icon": "home",
+          "iconColor": "#dfc39c",
+          "menuTitle": "La Casa"
+        },
+        {
+          "id": "citta",
+          "icon": "globe",
+          "iconColor": "#5fa8ff",
+          "menuTitle": "Vivi la Città"
+        },
+        {
+          "id": "contatti",
+          "icon": "phone",
+          "iconColor": "#dfc39c",
+          "menuTitle": "Contatti"
+        }
+      ],
       "sections": [
         {
           "id": "checkin",
@@ -107,6 +127,23 @@
             "Nome host: da inserire",
             "Telefono / WhatsApp: da inserire",
             "Email: da inserire"
+          ]
+        },
+        {
+          "id": "contatti_whatsapp",
+          "icon": "chat",
+          "menuTitle": "WhatsApp",
+          "sectionTitle": "WhatsApp",
+          "lead": "Scrivici su WhatsApp per qualsiasi informazione o supporto.",
+          "category": "contatti",
+          "items": [
+            {
+              "type": "cta",
+              "kind": "whatsapp",
+              "label": "Avvia Chat",
+              "href": "https://wa.me/393330000000",
+              "icon": "chat"
+            }
           ]
         }
       ]

@@ -517,88 +517,88 @@ function iconForItem(item, sectionId) {
 
 const expandedMenuGroups = {};
 
+function renderSectionItem(section) {
+  const sectionIcon = iconForSection(section);
+  return `
+    <div class="menu-section-container" data-section-id="${escapeAttribute(section.id)}">
+      <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(sectionIcon))}" type="button" data-action="toggle-section" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
+        <span class="menu-icon">${renderIcon(sectionIcon)}</span>
+        <span class="menu-copy">
+          <strong>${escapeHtml(section.menuTitle)}</strong>
+        </span>
+        <span class="menu-row-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+      <div class="menu-section-content-wrapper">
+        <div class="menu-section-content">
+          ${renderSectionItems(section.items, section.id)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGroup(cat, groupSections) {
+  if (!groupSections.length) return "";
+  const isExpanded = expandedMenuGroups[cat.id] === true;
+
+  const styles = [];
+  if (cat.iconColor) {
+    styles.push(`--icon-custom-color: ${sanitizeCssColor(cat.iconColor)}`);
+  }
+  if (cat.bgColor) {
+    styles.push(`background-color: ${sanitizeCssColor(cat.bgColor)}`);
+  }
+  if (cat.textColor) {
+    styles.push(`color: ${sanitizeCssColor(cat.textColor)}`);
+  }
+  if (cat.fontSize) {
+    styles.push(`font-size: ${cat.fontSize}`);
+  }
+  if (cat.fontFamily) {
+    styles.push(`font-family: "${cat.fontFamily}", sans-serif`);
+  }
+  if (cat.padding) {
+    styles.push(`padding: ${cat.padding}`);
+  }
+  const styleAttr = styles.length ? ` style="${escapeAttribute(styles.join("; "))}"` : "";
+
+  return `
+    <div class="menu-group-container${isExpanded ? " is-expanded" : ""}" data-group-id="${escapeAttribute(cat.id)}">
+      <button class="menu-group-header" type="button" data-action="toggle-menu-group" data-group-id="${escapeAttribute(cat.id)}" aria-expanded="${isExpanded ? "true" : "false"}"${styleAttr}>
+        <span class="menu-icon">${renderIcon(cat.icon || "spark")}</span>
+        <span class="menu-copy">
+          <strong>${escapeHtml(cat.menuTitle)}</strong>
+        </span>
+        <span class="menu-group-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+      <div class="menu-group-content-wrapper">
+        <div class="menu-group-content">
+          ${groupSections.map(renderSectionItem).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderMenu(sections) {
-  const visible = sections.filter((section) => section.id !== "host" && !section.hidden);
+  const visible = sections.filter((section) => section.id !== "host" && section.category !== "contatti" && !section.hidden);
 
   const localeTemplate = localeState();
   const categoriesList = Array.isArray(localeTemplate.categories) ? localeTemplate.categories : [];
-  const activeCategories = categoriesList.filter((cat) => cat && !cat.hidden);
+  const activeCategories = categoriesList.filter((cat) => cat && !cat.hidden && cat.id !== "contatti");
   const activeCategoryIds = new Set(activeCategories.map((cat) => cat.id));
 
   const topSections = visible.filter((s) => s.category === "top" || !activeCategoryIds.has(s.category));
 
-  const renderSectionItem = (section) => {
-    const sectionIcon = iconForSection(section);
-    return `
-      <div class="menu-section-container" data-section-id="${escapeAttribute(section.id)}">
-        <button class="menu-row menu-row--${escapeAttribute(sectionClassToken(section.id))} menu-row--icon-${escapeAttribute(sectionClassToken(sectionIcon))}" type="button" data-action="toggle-section" data-section-id="${escapeAttribute(section.id)}"${iconColorStyle(sectionIconColor(section))}>
-          <span class="menu-icon">${renderIcon(sectionIcon)}</span>
-          <span class="menu-copy">
-            <strong>${escapeHtml(section.menuTitle)}</strong>
-          </span>
-          <span class="menu-row-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </span>
-        </button>
-        <div class="menu-section-content-wrapper">
-          <div class="menu-section-content">
-            ${renderSectionItems(section.items, section.id)}
-          </div>
-        </div>
-      </div>
-    `;
-  };
-
   const topHtml = topSections.map(renderSectionItem).join("");
-
-  const renderGroup = (cat, groupSections) => {
-    if (!groupSections.length) return "";
-    const isExpanded = expandedMenuGroups[cat.id] === true;
-
-    const styles = [];
-    if (cat.iconColor) {
-      styles.push(`--icon-custom-color: ${sanitizeCssColor(cat.iconColor)}`);
-    }
-    if (cat.bgColor) {
-      styles.push(`background-color: ${sanitizeCssColor(cat.bgColor)}`);
-    }
-    if (cat.textColor) {
-      styles.push(`color: ${sanitizeCssColor(cat.textColor)}`);
-    }
-    if (cat.fontSize) {
-      styles.push(`font-size: ${cat.fontSize}`);
-    }
-    if (cat.fontFamily) {
-      styles.push(`font-family: "${cat.fontFamily}", sans-serif`);
-    }
-    if (cat.padding) {
-      styles.push(`padding: ${cat.padding}`);
-    }
-    const styleAttr = styles.length ? ` style="${escapeAttribute(styles.join("; "))}"` : "";
-
-    return `
-      <div class="menu-group-container${isExpanded ? " is-expanded" : ""}" data-group-id="${escapeAttribute(cat.id)}">
-        <button class="menu-group-header" type="button" data-action="toggle-menu-group" data-group-id="${escapeAttribute(cat.id)}" aria-expanded="${isExpanded ? "true" : "false"}"${styleAttr}>
-          <span class="menu-icon">${renderIcon(cat.icon || "spark")}</span>
-          <span class="menu-copy">
-            <strong>${escapeHtml(cat.menuTitle)}</strong>
-          </span>
-          <span class="menu-group-chevron" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </span>
-        </button>
-        <div class="menu-group-content-wrapper">
-          <div class="menu-group-content">
-            ${groupSections.map(renderSectionItem).join("")}
-          </div>
-        </div>
-      </div>
-    `;
-  };
 
   const groupsHtml = activeCategories.map((cat) => {
     const groupSections = visible.filter((s) => s.category === cat.id);
@@ -867,6 +867,14 @@ function renderOpenSection(sectionId) {
 
   let contentHtml = renderSectionItems(section.items, section.id);
   if (section.id === "host") {
+    const contattiCat = localeState().categories?.find((c) => c && c.id === "contatti");
+    if (contattiCat && !contattiCat.hidden) {
+      const contattiSections = localeState().sections.filter(
+        (s) => s.category === "contatti" && s.id !== "host" && !s.hidden
+      );
+      contentHtml += renderGroup(contattiCat, contattiSections);
+    }
+
     contentHtml += `
       <footer class="app-footer" style="margin-top: 3rem; margin-bottom: 1.5rem;" aria-label="Footer">
         <div class="app-footer-rule" aria-hidden="true"></div>
@@ -975,7 +983,7 @@ function collapseSectionState(secContainer) {
 }
 
 function toggleMenuGroup(groupId) {
-  const container = dom.mainMenu.querySelector(`.menu-group-container[data-group-id="${groupId}"]`);
+  const container = document.querySelector(`.menu-group-container[data-group-id="${groupId}"]`);
   if (!container) return;
 
   const isExpanded = !container.classList.contains("is-expanded");
@@ -985,7 +993,7 @@ function toggleMenuGroup(groupId) {
   if (isExpanded) {
     Object.keys(expandedMenuGroups).forEach((id) => {
       if (id !== groupId) {
-        const otherContainer = dom.mainMenu.querySelector(`.menu-group-container[data-group-id="${id}"]`);
+        const otherContainer = document.querySelector(`.menu-group-container[data-group-id="${id}"]`);
         if (otherContainer && otherContainer.classList.contains("is-expanded")) {
           collapsingGroups.push(otherContainer);
           expandedMenuGroups[id] = false;
@@ -1010,7 +1018,7 @@ function toggleMenuGroup(groupId) {
 
   if (isExpanded) {
     // Collapse all expanded sections anywhere in the menu (top-level and group-level)
-    const allExpandedSections = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+    const allExpandedSections = document.querySelectorAll(".menu-section-container.is-expanded");
     allExpandedSections.forEach((sec) => {
       collapseSectionState(sec);
     });
@@ -1037,7 +1045,14 @@ function toggleMenuGroup(groupId) {
   if (isExpanded) {
     const targetY = currentTop - heightLostAbove - 12;
     window.requestAnimationFrame(() => {
-      window.scrollTo({ top: targetY, behavior: "smooth" });
+      if (dom.mainMenu.contains(container)) {
+        window.scrollTo({ top: targetY, behavior: "smooth" });
+      } else {
+        const sheetPanel = container.closest(".sheet-panel");
+        if (sheetPanel) {
+          sheetPanel.scrollTo({ top: container.offsetTop - 12, behavior: "smooth" });
+        }
+      }
     });
   }
 }
@@ -1069,15 +1084,17 @@ function expandSectionInline(sectionId) {
           expandedMenuGroups[key] = false;
         });
         expandedMenuGroups[resolvedCategory] = true;
-        dom.mainMenu.innerHTML = renderMenu(sections);
+        if (resolvedCategory !== "contatti") {
+          dom.mainMenu.innerHTML = renderMenu(sections);
+        }
       }
     }
   }
 
-  const container = dom.mainMenu.querySelector(`.menu-section-container[data-section-id="${sectionId}"]`);
+  const container = document.querySelector(`.menu-section-container[data-section-id="${sectionId}"]`);
   if (!container) return;
 
-  const otherContainers = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+  const otherContainers = document.querySelectorAll(".menu-section-container.is-expanded");
 
   // Calculate top offset before UI changes
   const currentTop = container.getBoundingClientRect().top + window.scrollY;
@@ -1107,19 +1124,26 @@ function expandSectionInline(sectionId) {
 
   const targetY = currentTop - heightLostAbove - 16;
   window.requestAnimationFrame(() => {
-    window.scrollTo({ top: targetY, behavior: "smooth" });
+    if (dom.mainMenu.contains(container)) {
+      window.scrollTo({ top: targetY, behavior: "smooth" });
+    } else {
+      const sheetPanel = container.closest(".sheet-panel");
+      if (sheetPanel) {
+        sheetPanel.scrollTo({ top: container.offsetTop - 16, behavior: "smooth" });
+      }
+    }
   });
 }
 
 function collapseAllSectionsInline() {
-  const containers = dom.mainMenu.querySelectorAll(".menu-section-container.is-expanded");
+  const containers = document.querySelectorAll(".menu-section-container.is-expanded");
   containers.forEach((container) => {
     collapseSectionState(container);
   });
 }
 
 function toggleSectionInline(sectionId) {
-  const container = dom.mainMenu.querySelector(`.menu-section-container[data-section-id="${sectionId}"]`);
+  const container = document.querySelector(`.menu-section-container[data-section-id="${sectionId}"]`);
   if (!container) return;
 
   const isExpanded = !container.classList.contains("is-expanded");
@@ -1244,6 +1268,22 @@ function bindLocaleBar() {
 function bindSheet() {
   dom.sheetBackdrop.addEventListener("click", () => closeSection());
   dom.sheetClose.addEventListener("click", () => closeSection());
+
+  dom.sheet.addEventListener("click", (event) => {
+    const groupToggle = event.target.closest('[data-action="toggle-menu-group"]');
+    if (groupToggle) {
+      const groupId = groupToggle.dataset.groupId;
+      toggleMenuGroup(groupId);
+      return;
+    }
+
+    const sectionToggle = event.target.closest('[data-action="toggle-section"]');
+    if (sectionToggle) {
+      const sectionId = sectionToggle.dataset.sectionId;
+      toggleSectionInline(sectionId);
+      return;
+    }
+  });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Tab" && activeSectionId) {
