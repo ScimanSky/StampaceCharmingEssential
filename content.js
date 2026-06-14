@@ -1541,7 +1541,7 @@ export function isMediaItem(item) {
 }
 
 export function isCtaItem(item) {
-  return Boolean(item && typeof item === "object" && item.type === CTA_ITEM_TYPE && item.label && item.href);
+  return Boolean(item && typeof item === "object" && item.type === CTA_ITEM_TYPE);
 }
 
 function migrateSectionIcon(section) {

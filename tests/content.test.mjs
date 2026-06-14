@@ -37,8 +37,8 @@ describe('Content module', () => {
     it('isCtaItem should identify valid CTA items', () => {
       assert.strictEqual(isCtaItem(null), false);
       assert.strictEqual(isCtaItem({ type: 'cta', label: 'Call', href: 'tel:123' }), true);
-      assert.strictEqual(isCtaItem({ type: 'cta', href: 'tel:123' }), false);
-      assert.strictEqual(isCtaItem({ type: 'cta', label: 'Call' }), false);
+      assert.strictEqual(isCtaItem({ type: 'cta', href: 'tel:123' }), true);
+      assert.strictEqual(isCtaItem({ type: 'cta', label: 'Call' }), true);
     });
 
     it('isHostPrivateItem should identify host private item', () => {

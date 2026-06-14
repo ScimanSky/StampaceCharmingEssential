@@ -2058,7 +2058,7 @@ function collectTemplate() {
           iconColor,
           hidden,
         };
-      }).filter((item) => item.label && item.href);
+      });
       categoryCtas[id] = ctaItems;
     }
 
@@ -2097,7 +2097,7 @@ function collectTemplate() {
         iconColor,
         hidden,
       };
-    }).filter((item) => item.label && item.href);
+    });
     const imageItems = [...card.querySelectorAll("[data-image-item]")].map((item) => ({
       type: "image",
       path: item.dataset.imagePath || "",
