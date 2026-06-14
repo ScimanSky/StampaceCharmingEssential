@@ -1,6 +1,6 @@
 const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 const SAFE_WEB_PROTOCOLS = new Set(["http:", "https:"]);
-const CTA_KINDS = new Set(["web", "maps", "whatsapp", "email", "tel", "airbnb", "booking", "vrbo"]);
+const CTA_KINDS = new Set(["web", "maps", "whatsapp", "telegram", "email", "gmail", "tel", "airbnb", "booking", "vrbo"]);
 const SAFE_CSS_NAMED_COLORS = new Set(["currentcolor", "transparent"]);
 
 export function escapeHtml(value) {
@@ -111,6 +111,21 @@ function normalizeWhatsappHref(value) {
   return digits ? `https://wa.me/${digits}` : "";
 }
 
+function normalizeTelegramHref(value) {
+  const raw = String(value ?? "").trim();
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      const url = new URL(raw);
+      return url.protocol === "https:" && (url.hostname === "t.me" || url.hostname === "telegram.me") ? url.href : "";
+    } catch {
+      return "";
+    }
+  }
+
+  const username = raw.replace(/^@/, "").trim();
+  return username ? `https://t.me/${username}` : "";
+}
+
 export function normalizeCtaKind(kind) {
   return CTA_KINDS.has(kind) ? kind : "web";
 }
@@ -119,7 +134,8 @@ export function normalizeCtaHref(kind, href) {
   const safeKind = normalizeCtaKind(kind);
 
   if (safeKind === "whatsapp") return normalizeWhatsappHref(href);
-  if (safeKind === "email") return normalizeEmailHref(href);
+  if (safeKind === "telegram") return normalizeTelegramHref(href);
+  if (safeKind === "email" || safeKind === "gmail") return normalizeEmailHref(href);
   if (safeKind === "tel") return normalizeTelHref(href);
   if (safeKind === "maps") return sanitizeWebHref(href);
   if (safeKind === "airbnb" || safeKind === "booking" || safeKind === "vrbo") return sanitizeWebHref(href);

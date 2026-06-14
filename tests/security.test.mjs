@@ -73,11 +73,21 @@ describe('Security module', () => {
       assert.strictEqual(normalizeCtaHref('email', 'test@example.com'), 'mailto:test@example.com');
       assert.strictEqual(normalizeCtaHref('email', 'mailto:test@example.com'), 'mailto:test@example.com');
       assert.strictEqual(normalizeCtaHref('email', 'invalid'), '');
+      assert.strictEqual(normalizeCtaHref('gmail', 'test@example.com'), 'mailto:test@example.com');
+      assert.strictEqual(normalizeCtaHref('gmail', 'mailto:test@example.com'), 'mailto:test@example.com');
     });
 
     it('should normalize tel links', () => {
       assert.strictEqual(normalizeCtaHref('tel', '070 123456'), 'tel:070123456');
       assert.strictEqual(normalizeCtaHref('tel', 'tel:+39123'), 'tel:+39123');
+    });
+
+    it('should normalize Telegram links and usernames', () => {
+      assert.strictEqual(normalizeCtaHref('telegram', 'myhost'), 'https://t.me/myhost');
+      assert.strictEqual(normalizeCtaHref('telegram', '@myhost'), 'https://t.me/myhost');
+      assert.strictEqual(normalizeCtaHref('telegram', 'https://t.me/myhost'), 'https://t.me/myhost');
+      assert.strictEqual(normalizeCtaHref('telegram', 'https://telegram.me/myhost'), 'https://telegram.me/myhost');
+      assert.strictEqual(normalizeCtaHref('telegram', 'http://t.me/myhost'), ''); // Only https is allowed
     });
   });
 });
