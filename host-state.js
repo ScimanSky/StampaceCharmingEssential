@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260615b";
+} from "./content.js?v=20260615c";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260615b";
+} from "./security.js?v=20260615c";
 
 // State variables
 let state = null;

@@ -11,7 +11,7 @@ import {
   isMediaItem,
   isHostPrivateItem,
   normalizeTemplate,
-} from "./content.js?v=20260615b";
+} from "./content.js?v=20260615c";
 import {
   IMAGE_MAX_BYTES,
   DOCUMENT_MAX_BYTES,
@@ -25,9 +25,9 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260615b";
-import { renderIcon, iconPaths } from "./icons.js?v=20260615b";
-import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260615b";
+} from "./security.js?v=20260615c";
+import { renderIcon, iconPaths } from "./icons.js?v=20260615c";
+import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260615c";
 import {
   getState,
   getSelectedEditorLocale,
@@ -36,8 +36,8 @@ import {
   getExpandedPanelIds,
   currentLocaleState,
   syncExpandedSections,
-} from "./host-state.js?v=20260615b";
-import { dom } from "./host.js?v=20260615b";
+} from "./host-state.js?v=20260615c";
+import { dom } from "./host.js?v=20260615c";
 
 const AVAILABLE_FONTS = [
   { value: "Roboto", label: "Roboto (Sans-serif pulito)" },
