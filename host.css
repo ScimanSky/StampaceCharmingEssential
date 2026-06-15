@@ -111,6 +111,7 @@ select option:checked {
   background: var(--panel);
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.2);
   transition: border-color 220ms ease, box-shadow 220ms ease;
+  min-width: 0;
 }
 
 .host-panel:not(.is-collapsed),
@@ -154,6 +155,7 @@ select option:checked {
 
 .host-gate-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.85rem;
   margin-top: 1rem;
 }
@@ -243,6 +245,7 @@ select:focus-visible {
 
 .host-app {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
@@ -260,6 +263,7 @@ select:focus-visible {
   flex-direction: column;
   gap: 0.75rem;
 }
+
 @media (min-width: 48rem) {
   .host-header {
     flex-direction: row;
@@ -342,7 +346,7 @@ select:focus-visible {
   gap: 0.9rem;
 }
 
-.host-panel-heading > span:first-child {
+.host-panel-heading>span:first-child {
   min-width: 0;
 }
 
@@ -350,7 +354,7 @@ select:focus-visible {
   margin-top: 1rem;
 }
 
-.host-panel-body > .host-sections {
+.host-panel-body>.host-sections {
   margin-top: 1rem;
 }
 
@@ -393,11 +397,13 @@ select:focus-visible {
 
 .host-design-groups {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
 }
 
 .host-design-group {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.85rem;
   padding-top: 0.9rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -418,6 +424,7 @@ select:focus-visible {
 
 .host-language-field {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.42rem;
 }
 
@@ -430,6 +437,7 @@ select:focus-visible {
 
 .host-sections {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.95rem;
 }
 
@@ -452,6 +460,7 @@ select:focus-visible {
 
 .host-section-grid {
   margin-top: 0.9rem;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .host-section-meta {
@@ -535,7 +544,7 @@ select:focus-visible {
   gap: 0.9rem;
 }
 
-.host-section-heading > span:first-child {
+.host-section-heading>span:first-child {
   min-width: 0;
 }
 
@@ -584,6 +593,7 @@ select:focus-visible {
 
 .host-image-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.85rem;
   margin-top: 0.9rem;
 }
@@ -671,6 +681,7 @@ select:focus-visible {
 
 .host-cta-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.85rem;
   margin-top: 0.9rem;
 }
@@ -944,10 +955,13 @@ select:focus-visible {
     justify-content: space-between !important;
     width: 100% !important;
     gap: 0.5rem !important;
+    white-space: normal !important;
   }
 
   .host-header-locale-select {
-    width: 60% !important;
+    width: auto !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
     max-width: 15rem !important;
     display: block !important;
   }
@@ -977,38 +991,33 @@ select:focus-visible {
     gap: 0.5rem !important;
   }
 
-  .host-actions > * {
+  .host-actions>* {
     width: 100% !important;
     flex: none !important;
   }
 
   .host-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .host-grid-wide {
     grid-column: auto;
   }
 
-  .host-live-actions > * {
+  .host-live-actions>* {
     width: 100%;
   }
 
   .host-section-media-head,
-  .host-sections-head,
-  .host-panel-heading {
+  .host-sections-head {
     display: grid;
     align-items: start;
+    gap: 0.75rem;
   }
 
   .host-section-meta {
     display: grid !important;
     gap: 0.75rem !important;
-    align-items: start !important;
-  }
-
-  .host-section-heading {
-    display: grid !important;
     align-items: start !important;
   }
 
@@ -1057,7 +1066,7 @@ select:focus-visible {
   }
 
   .host-cta-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .host-remove-cta {
@@ -1116,6 +1125,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
 
 .host-media-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.85rem;
   margin-top: 0.9rem;
 }
@@ -1207,6 +1217,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   color: #fff;
   transition: background-color 0.15s ease, border-color 0.15s ease;
   max-width: 100%;
+  min-width: 0;
 }
 
 .host-category-connected-chip:hover {
@@ -1219,6 +1230,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 500;
+  min-width: 0;
 }
 
 .host-chip-disconnect-btn {
@@ -1259,15 +1271,18 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   gap: 1rem;
   width: 100%;
 }
+
 @media (min-width: 48rem) {
   .host-header-main {
     width: auto;
   }
 }
+
 .host-header-info {
   display: flex;
   flex-direction: column;
 }
+
 .host-header-controls {
   display: flex;
   align-items: center;
@@ -1275,12 +1290,14 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   flex-wrap: wrap;
   width: 100%;
 }
+
 @media (min-width: 48rem) {
   .host-header-controls {
     width: auto;
     justify-content: flex-end;
   }
 }
+
 .host-header-locale-label {
   display: flex;
   align-items: center;
@@ -1289,10 +1306,12 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   color: var(--muted);
   white-space: nowrap;
 }
+
 .host-header-locale-label span {
   font-size: 0.82rem;
   color: var(--muted);
 }
+
 .host-header-locale-select {
   min-height: 2.2rem;
   padding: 0.35rem 1.8rem 0.35rem 0.65rem;
@@ -1307,6 +1326,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   display: flex;
   align-items: center;
 }
+
 .host-status-pill {
   display: inline-flex;
   align-items: center;
@@ -1314,53 +1334,74 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   padding: 0.38rem 0.75rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 2rem;
+  border-radius: 1.2rem;
   font-size: 0.78rem;
   font-weight: 500;
   color: var(--muted);
   transition: all 0.3s ease;
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.35;
 }
+
 .host-status-dot {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
   background: #aaa;
   display: inline-block;
+  flex: 0 0 auto;
 }
+
 .host-status-pill.is-success {
   background: rgba(159, 215, 164, 0.08);
   border-color: rgba(159, 215, 164, 0.25);
   color: var(--success);
 }
+
 .host-status-pill.is-success .host-status-dot {
   background: var(--success);
   box-shadow: 0 0 8px var(--success);
   animation: statusPulse 2s infinite ease-in-out;
 }
+
 .host-status-pill.is-pending {
   background: rgba(223, 195, 156, 0.08);
   border-color: rgba(223, 195, 156, 0.25);
   color: #dfc39c;
 }
+
 .host-status-pill.is-pending .host-status-dot {
   background: #dfc39c;
   box-shadow: 0 0 8px #dfc39c;
   animation: statusPulse 1.2s infinite ease-in-out;
 }
+
 .host-status-pill.is-error {
   background: rgba(239, 176, 168, 0.08);
   border-color: rgba(239, 176, 168, 0.25);
   color: var(--danger);
 }
+
 .host-status-pill.is-error .host-status-dot {
   background: var(--danger);
   box-shadow: 0 0 8px var(--danger);
   animation: statusPulse 0.8s infinite ease-in-out;
 }
+
 @keyframes statusPulse {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.4;
+  }
 }
 
 /* Tab Navigation */
@@ -1369,6 +1410,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   border-bottom: 1px solid var(--line);
   padding-bottom: 0.2rem;
 }
+
 .host-tabs {
   display: flex;
   flex-wrap: nowrap;
@@ -1380,9 +1422,11 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   -ms-overflow-style: none;
   padding-bottom: 0.5rem;
 }
+
 .host-tabs::-webkit-scrollbar {
   display: none;
 }
+
 .host-tab-btn {
   display: inline-flex;
   align-items: center;
@@ -1399,16 +1443,19 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
+
 .host-tab-btn:hover {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
 }
+
 .host-tab-btn.active {
   background: rgba(223, 195, 156, 0.08);
   border-color: rgba(223, 195, 156, 0.32);
   color: #dfc39c;
   box-shadow: 0 0 12px rgba(223, 195, 156, 0.08);
 }
+
 .host-tab-btn .tab-icon {
   font-size: 1.05rem;
 }
@@ -1427,6 +1474,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding-bottom: 0.75rem;
 }
+
 .host-panel-header h2 {
   margin-top: 0.2rem;
   font-size: 1.38rem;
@@ -1441,6 +1489,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
