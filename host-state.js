@@ -373,9 +373,12 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
       introLines: [...(italianLocale.introLines ?? [])],
       subtitle: italianLocale.subtitle,
       categories: (italianLocale.categories || []).map((cat) => {
-        const defaultTitle = SUBMENU_TRANSLATIONS.sc?.[cat.id] ?? 
-                             SUBMENU_TRANSLATIONS.en[cat.id] ?? 
-                             cat.menuTitle;
+        const italianTitleKey = (cat.menuTitle || "").toLowerCase().trim();
+        const defaultTitle = SUBMENU_TRANSLATIONS.sc?.[cat.id] ??
+          SUBMENU_TRANSLATIONS.sc?.[italianTitleKey] ??
+          SUBMENU_TRANSLATIONS.en[cat.id] ??
+          SUBMENU_TRANSLATIONS.en?.[italianTitleKey] ??
+          cat.menuTitle;
         return {
           ...cat,
           menuTitle: defaultTitle,
@@ -865,7 +868,7 @@ export function removeCategory(collected, categoryId) {
   // Remove the category
   localeState.categories = (localeState.categories || []).filter((cat) => cat.id !== categoryId);
   expandedCategoryIds.delete(categoryId);
-  
+
   state = saveTemplate(collected);
   queueAutoPublish();
   notifyStateChange();

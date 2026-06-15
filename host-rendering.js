@@ -1079,11 +1079,10 @@ export function renderSectionEditors() {
               <div class="host-cta-list">
                 ${renderSectionCtas(section)}
               </div>
-              ${
-                selectedEditorLocale !== FIXED_LOCALE
-                  ? `<p class="host-lock-note">I pulsanti grafici si gestiscono solo mentre modifichi la lingua italiana.</p>`
-                  : ""
-              }
+              ${selectedEditorLocale !== FIXED_LOCALE
+          ? `<p class="host-lock-note">I pulsanti grafici si gestiscono solo mentre modifichi la lingua italiana.</p>`
+          : ""
+        }
             </div>
             <div class="host-section-media">
               <div class="host-section-media-head">
@@ -1115,11 +1114,10 @@ export function renderSectionEditors() {
                 ${renderSectionMedia(section)}
               </div>
             </div>
-            ${
-              section.id === "host"
-                ? `<p class="host-lock-note">L'accesso riservato resta sempre disponibile come icona tonda nella sezione Host.</p>`
-                : ""
-            }
+            ${section.id === "host"
+          ? `<p class="host-lock-note">L'accesso riservato resta sempre disponibile come icona tonda nella sezione Host.</p>`
+          : ""
+        }
           </div>
         </section>
       `,
@@ -1236,25 +1234,25 @@ export function renderCategoryEditors() {
                     <select class="host-category-add-select" data-action="connect-section" data-category-id="${escapeAttribute(cat.id)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
                       <option value="">+ Collega un sottomenu...</option>
                       ${sections
-                        .filter(sec => {
-                          if (sec.id === "host") return false;
-                          if (sec.category === cat.id) return false;
-                          if (sec.id.startsWith("section-cat-")) return false;
-                          if (catIds.some(catId => sec.id === `section-${catId}`)) return false;
-                          return true;
-                        })
-                        .map((sec) => {
-                          let labelSuffix = "";
-                          if (sec.category && sec.category !== "top") {
-                            const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
-                            const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
-                            labelSuffix = ` (attualmente in: ${parentName})`;
-                          } else {
-                            labelSuffix = " (Sempre visibile)";
-                          }
-                          return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
-                        })
-                        .join("")}
+          .filter(sec => {
+            if (sec.id === "host") return false;
+            if (sec.category === cat.id) return false;
+            if (sec.id.startsWith("section-cat-")) return false;
+            if (catIds.some(catId => sec.id === `section-${catId}`)) return false;
+            return true;
+          })
+          .map((sec) => {
+            let labelSuffix = "";
+            if (sec.category && sec.category !== "top") {
+              const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
+              const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
+              labelSuffix = ` (attualmente in: ${parentName})`;
+            } else {
+              labelSuffix = " (Sempre visibile)";
+            }
+            return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
+          })
+          .join("")}
                     </select>
                   </div>
                   <div class="host-category-connected-list">
@@ -1309,7 +1307,7 @@ export function syncFields() {
 
       id: activeEl.id || null,
       tagName: activeEl.tagName,
-      
+
       selectionStart: ("selectionStart" in activeEl) ? activeEl.selectionStart : null,
       selectionEnd: ("selectionEnd" in activeEl) ? activeEl.selectionEnd : null,
     };
@@ -1345,7 +1343,7 @@ export function syncFields() {
     appContainer.className = appContainer.className.split(" ").filter(c => !c.startsWith("tab-")).join(" ");
     appContainer.classList.add(`tab-${activeTab}`);
   }
-  
+
   const tabButtons = document.querySelectorAll(".host-tab-btn");
   tabButtons.forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.tab === activeTab);
@@ -1412,7 +1410,11 @@ export function collectTemplate() {
       const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
         const kind = normalizeCtaKind(item.querySelector('[data-cta-field="kind"]').value);
         const label = item.querySelector('[data-cta-field="label"]').value.trim();
-        const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
+        let rawHref = item.querySelector('[data-cta-field="href"]').value.trim();
+        if (kind === "telegram") {
+          rawHref = rawHref.replace(/@/g, "");
+        }
+        const href = normalizeCtaHref(kind, rawHref);
         const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
         const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
         const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
@@ -1451,7 +1453,11 @@ export function collectTemplate() {
     const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
       const kind = normalizeCtaKind(item.querySelector('[data-cta-field="kind"]').value);
       const label = item.querySelector('[data-cta-field="label"]').value.trim();
-      const href = normalizeCtaHref(kind, item.querySelector('[data-cta-field="href"]').value);
+      let rawHref = item.querySelector('[data-cta-field="href"]').value.trim();
+      if (kind === "telegram") {
+        rawHref = rawHref.replace(/@/g, "");
+      }
+      const href = normalizeCtaHref(kind, rawHref);
       const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
       const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
       const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
