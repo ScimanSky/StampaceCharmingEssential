@@ -1033,15 +1033,18 @@ export function updateCategoryCtas(collected, categoryId, updater) {
   const localeState = collected.locales[selectedEditorLocale] ?? collected.locales[FIXED_LOCALE];
   let section = (localeState.sections || []).find((item) => item.id === autoSecId);
 
+  const category = (localeState.categories || []).find(c => c.id === categoryId);
+  const catMenuTitle = category ? category.menuTitle : "Pulsanti rapidi";
+
   if (!section) {
     section = {
       id: autoSecId,
-      icon: "spark",
-      iconColor: "#dfc39c",
+      icon: category ? category.icon : "spark",
+      iconColor: category ? category.iconColor : "#dfc39c",
       hidden: false,
       category: categoryId,
-      menuTitle: "Contatti",
-      sectionTitle: "Contatti",
+      menuTitle: catMenuTitle,
+      sectionTitle: catMenuTitle,
       lead: "",
       items: [],
     };

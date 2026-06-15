@@ -1206,27 +1206,27 @@ export function renderCategoryEditors() {
               </label>
             </div>
 
-            ${cat.placement === "host" ? `
-              <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
-                <div class="host-content-tools">
-                  <button class="ghost-button" type="button" data-action="category-add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
-                  <div class="host-cta-presets">
-                    ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="category-add-cta-preset" data-cta-kind="${escapeAttribute(preset.kind)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${escapeHtml(preset.label)}</button>`).join("")}
-                  </div>
+            <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
+              <div class="host-content-tools">
+                <button class="ghost-button" type="button" data-action="category-add-cta" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>Aggiungi pulsante grafico</button>
+                <div class="host-cta-presets">
+                  ${CTA_PRESET_OPTIONS.map((preset) => `<button class="ghost-button host-cta-preset" type="button" data-action="category-add-cta-preset" data-cta-kind="${escapeAttribute(preset.kind)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>${escapeHtml(preset.label)}</button>`).join("")}
                 </div>
               </div>
-              <div class="host-cta-editor">
-                <div class="host-section-media-head">
-                  <div>
-                    <p class="host-kicker">Pulsanti rapidi</p>
-                    <p class="host-media-note">CTA larghe con icona, etichetta e destinazione. Si aprono sempre in una nuova scheda.</p>
-                  </div>
-                </div>
-                <div class="host-cta-list">
-                  ${renderCategoryCtas(cat)}
+            </div>
+            <div class="host-cta-editor">
+              <div class="host-section-media-head">
+                <div>
+                  <p class="host-kicker">Pulsanti rapidi</p>
+                  <p class="host-media-note">CTA larghe con icona, etichetta e destinazione. Si aprono sempre in una nuova scheda.</p>
                 </div>
               </div>
-            ` : `
+              <div class="host-cta-list">
+                ${renderCategoryCtas(cat)}
+              </div>
+            </div>
+
+            ${cat.placement === "host" ? "" : `
               <div class="host-grid-wide" style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--line);">
                 <span style="font-weight: 500; display: block; margin-bottom: 0.75rem; font-size: 0.9rem;">Sottomenu collegati (Sezioni)</span>
                 <div class="host-category-sections-manager">
@@ -1234,25 +1234,25 @@ export function renderCategoryEditors() {
                     <select class="host-category-add-select" data-action="connect-section" data-category-id="${escapeAttribute(cat.id)}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}>
                       <option value="">+ Collega un sottomenu...</option>
                       ${sections
-          .filter(sec => {
-            if (sec.id === "host") return false;
-            if (sec.category === cat.id) return false;
-            if (sec.id.startsWith("section-cat-")) return false;
-            if (catIds.some(catId => sec.id === `section-${catId}`)) return false;
-            return true;
-          })
-          .map((sec) => {
-            let labelSuffix = "";
-            if (sec.category && sec.category !== "top") {
-              const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
-              const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
-              labelSuffix = ` (attualmente in: ${parentName})`;
-            } else {
-              labelSuffix = " (Sempre visibile)";
-            }
-            return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
-          })
-          .join("")}
+            .filter(sec => {
+              if (sec.id === "host") return false;
+              if (sec.category === cat.id) return false;
+              if (sec.id.startsWith("section-cat-")) return false;
+              if (catIds.some(catId => sec.id === `section-${catId}`)) return false;
+              return true;
+            })
+            .map((sec) => {
+              let labelSuffix = "";
+              if (sec.category && sec.category !== "top") {
+                const parentCat = (localeState.categories || []).find(c => c.id === sec.category);
+                const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : sec.category;
+                labelSuffix = ` (attualmente in: ${parentName})`;
+              } else {
+                labelSuffix = " (Sempre visibile)";
+              }
+              return `<option value="${escapeAttribute(sec.id)}">${escapeHtml((sec.menuTitle || sec.id) + labelSuffix)}</option>`;
+            })
+            .join("")}
                     </select>
                   </div>
                   <div class="host-category-connected-list">
@@ -1406,30 +1406,28 @@ export function collectTemplate() {
     const textColor = sanitizeCssColor(card.querySelector('[data-field="textColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="textColor"]')?.value);
     const placement = card.querySelector('[data-field="placement"]')?.value || "homepage";
 
-    if (placement === "host") {
-      const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
-        const kind = normalizeCtaKind(item.querySelector('[data-cta-field="kind"]').value);
-        const label = item.querySelector('[data-cta-field="label"]').value.trim();
-        let rawHref = item.querySelector('[data-cta-field="href"]').value.trim();
-        if (kind === "telegram") {
-          rawHref = rawHref.replace(/@/g, "");
-        }
-        const href = normalizeCtaHref(kind, rawHref);
-        const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
-        const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
-        const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
-        return {
-          type: CTA_ITEM_TYPE,
-          kind,
-          label,
-          href,
-          icon,
-          iconColor,
-          hidden,
-        };
-      });
-      categoryCtas[id] = ctaItems;
-    }
+    const ctaItems = [...card.querySelectorAll("[data-cta-item]")].map((item) => {
+      const kind = normalizeCtaKind(item.querySelector('[data-cta-field="kind"]').value);
+      const label = item.querySelector('[data-cta-field="label"]').value.trim();
+      let rawHref = item.querySelector('[data-cta-field="href"]').value.trim();
+      if (kind === "telegram") {
+        rawHref = rawHref.replace(/@/g, "");
+      }
+      const href = normalizeCtaHref(kind, rawHref);
+      const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
+      const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
+      const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
+      return {
+        type: CTA_ITEM_TYPE,
+        kind,
+        label,
+        href,
+        icon,
+        iconColor,
+        hidden,
+      };
+    });
+    categoryCtas[id] = ctaItems;
 
     return {
       id,
@@ -1514,8 +1512,8 @@ export function collectTemplate() {
   });
 
   categories.forEach((cat) => {
-    if (cat.placement === "host") {
-      const ctaItems = categoryCtas[cat.id] || [];
+    const ctaItems = categoryCtas[cat.id] || [];
+    if (cat.placement === "host" || ctaItems.length > 0) {
       const autoSecId = `section-${cat.id}`;
       sections.push({
         id: autoSecId,
