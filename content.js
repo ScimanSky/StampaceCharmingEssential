@@ -1924,7 +1924,7 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
   });
 }
 
-function mirrorItalianContent(localeMap) {
+function mirrorItalianContent(localeMap, rawLocales = {}) {
   const italian = localeMap[FIXED_LOCALE];
   if (!italian) return localeMap;
 
@@ -1992,7 +1992,8 @@ function mirrorItalianContent(localeMap) {
       const pickLocalizedValue = (value, italianValue, fallbackValue) =>
         !value || value === italianValue ? fallbackValue : value;
 
-      const rawLocalizedCategories = Array.isArray(localized?.categories) ? localized.categories : [];
+      const rawLocale = rawLocales[language.code] || {};
+      const rawLocalizedCategories = Array.isArray(rawLocale.categories) ? rawLocale.categories : [];
       const localizedCategories = (italian.categories || []).map((cat, idx) => {
         const matchingCat = rawLocalizedCategories.find(c => c && c.id === cat.id) ?? rawLocalizedCategories[idx];
         const italianTitleKey = (cat.menuTitle || "").toLowerCase().trim();
@@ -2041,14 +2042,28 @@ function mirrorItalianContent(localeMap) {
               fallbackItems,
               language.code,
             );
+
+            let resolvedMenuTitle = pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle);
+            let resolvedSectionTitle = pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle);
+
+            // Keep auto-generated category section titles in sync with the category's resolved menuTitle
+            if (section.id.startsWith("section-cat-") || (section.category && section.id === `section-${section.category}`)) {
+              const catId = section.category;
+              const matchedCategory = localizedCategories.find((c) => c.id === catId);
+              if (matchedCategory) {
+                resolvedMenuTitle = matchedCategory.menuTitle;
+                resolvedSectionTitle = matchedCategory.menuTitle;
+              }
+            }
+
             return {
               id: section.id,
               icon: section.icon,
               iconColor: section.iconColor,
               hidden: Boolean(section.hidden),
               category: section.category,
-              menuTitle: pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle),
-              sectionTitle: pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle),
+              menuTitle: resolvedMenuTitle,
+              sectionTitle: resolvedSectionTitle,
               lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),
               items:
                 section.id === "host"
@@ -2084,7 +2099,7 @@ function buildLocaleMap(rawTemplate = {}) {
     }),
   );
 
-  return mirrorItalianContent(localeMap);
+  return mirrorItalianContent(localeMap, rawLocales);
 }
 
 export function normalizeTemplate(rawTemplate = {}) {

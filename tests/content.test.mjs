@@ -159,4 +159,71 @@ describe('Content module', () => {
       assert.strictEqual(defaultCategoryForSection('custom-456', 'My Custom Section'), 'citta');
     });
   });
+
+  describe('custom category translation and section title sync', () => {
+    it('should preserve manual custom category translations in non-Italian locales', () => {
+      const template = {
+        enabledLocales: ['it', 'en'],
+        locales: {
+          it: {
+            categories: [
+              { id: 'cat-custom-1', menuTitle: 'Contatti', placement: 'host' }
+            ],
+            sections: [
+              { id: 'section-cat-custom-1', category: 'cat-custom-1', menuTitle: 'Contatti', sectionTitle: 'Contatti', items: [] }
+            ]
+          },
+          en: {
+            categories: [
+              { id: 'cat-custom-1', menuTitle: 'Contacts' }
+            ],
+            sections: [
+              { id: 'section-cat-custom-1', category: 'cat-custom-1', menuTitle: 'Contacts', sectionTitle: 'Contacts', items: [] }
+            ]
+          }
+        }
+      };
+
+      const normalized = normalizeTemplate(template);
+      const enCat = normalized.locales.en.categories.find(c => c.id === 'cat-custom-1');
+      assert.ok(enCat);
+      assert.strictEqual(enCat.menuTitle, 'Contacts');
+
+      const enSection = normalized.locales.en.sections.find(s => s.id === 'section-cat-custom-1');
+      assert.ok(enSection);
+      assert.strictEqual(enSection.menuTitle, 'Contacts');
+      assert.strictEqual(enSection.sectionTitle, 'Contacts');
+    });
+
+    it('should synchronize auto-generated category section titles even if they were not manually translated', () => {
+      const template = {
+        enabledLocales: ['it', 'en'],
+        locales: {
+          it: {
+            categories: [
+              { id: 'cat-custom-2', menuTitle: 'Contatti', placement: 'host' }
+            ],
+            sections: [
+              { id: 'section-cat-custom-2', category: 'cat-custom-2', menuTitle: 'Contatti', sectionTitle: 'Contatti', items: [] }
+            ]
+          },
+          en: {
+            categories: [], // No manual category translation provided
+            sections: []    // No manual section translation provided
+          }
+        }
+      };
+
+      const normalized = normalizeTemplate(template);
+      const enCat = normalized.locales.en.categories.find(c => c.id === 'cat-custom-2');
+      assert.ok(enCat);
+      // fallback translation for Contatti key in SUBMENU_TRANSLATIONS should be 'Contacts'
+      assert.strictEqual(enCat.menuTitle, 'Contacts');
+
+      const enSection = normalized.locales.en.sections.find(s => s.id === 'section-cat-custom-2');
+      assert.ok(enSection);
+      assert.strictEqual(enSection.menuTitle, 'Contacts');
+      assert.strictEqual(enSection.sectionTitle, 'Contacts');
+    });
+  });
 });
