@@ -1516,7 +1516,7 @@ function normalizeItems(items, fallbackItems) {
       if (typeof item === "string") return Boolean(item);
       if (item.type === IMAGE_ITEM_TYPE) return Boolean(item.src);
       if (item.type === MEDIA_ITEM_TYPE) return Boolean(item.src);
-      if (item.type === CTA_ITEM_TYPE) return Boolean(item.label && item.href);
+      if (item.type === CTA_ITEM_TYPE) return true;
       return Boolean(item.title || item.body || item.href || item.label);
     });
 
