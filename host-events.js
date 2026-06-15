@@ -137,6 +137,19 @@ export function bindEditorEvents() {
   if (editorBound) return;
   editorBound = true;
 
+  const tabsContainer = document.querySelector(".host-tabs");
+  if (tabsContainer) {
+    tabsContainer.addEventListener("click", (event) => {
+      const btn = event.target.closest(".host-tab-btn");
+      if (!btn) return;
+      const tabId = btn.dataset.tab;
+      if (tabId) {
+        window.localStorage.setItem("stampace-host-active-tab", tabId);
+        syncFields();
+      }
+    });
+  }
+
   dom.addSection.addEventListener("click", () => {
     const collected = collectTemplate();
     try {
@@ -714,6 +727,7 @@ export function bindAuthEvents(onOpenEditor) {
     try {
       await login(password);
       dom.password.value = "";
+      await onOpenEditor();
     } catch (err) {
       setStatus(err.message, "error");
     }

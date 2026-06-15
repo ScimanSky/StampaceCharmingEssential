@@ -610,6 +610,18 @@ function sectionBadge(section) {
   } else {
     parts.push(section.id);
   }
+
+  const locState = currentLocaleState();
+  if (locState && section.category) {
+    if (section.category === "top") {
+      parts.push("Sempre visibile");
+    } else {
+      const parentCat = (locState.categories || []).find((c) => c.id === section.category);
+      const parentName = parentCat ? (parentCat.menuTitle || parentCat.id) : section.category;
+      parts.push(`In: "${parentName}"`);
+    }
+  }
+
   if (section.hidden) {
     parts.push("Nascosta nell'app ospiti");
   }
@@ -632,9 +644,26 @@ function renderOptionalLocaleSelect() {
 }
 
 export function setStatus(message, variant = "") {
-  if (!dom.status) return;
-  dom.status.textContent = message;
-  dom.status.className = `host-status${variant ? ` is-${variant}` : ""}`;
+  if (dom.status) {
+    dom.status.textContent = message;
+    dom.status.className = `host-status${variant ? ` is-${variant}` : ""}`;
+  }
+
+  const pill = document.querySelector("#host-status-pill");
+  if (pill) {
+    const text = pill.querySelector(".host-status-text");
+    pill.className = "host-status-pill";
+    if (variant === "success") {
+      pill.classList.add("is-success");
+      if (text) text.textContent = message || "Sincronizzato live";
+    } else if (variant === "error") {
+      pill.classList.add("is-error");
+      if (text) text.textContent = message || "Errore di sincronizzazione";
+    } else {
+      pill.classList.add("is-pending");
+      if (text) text.textContent = message || "Salvataggio in corso...";
+    }
+  }
 }
 
 export function serializeItems(items) {
@@ -1273,6 +1302,19 @@ export function syncFields() {
   dom.editorLocale.innerHTML = AVAILABLE_LANGUAGES.map(
     (language) => `<option value="${escapeAttribute(language.code)}" ${language.code === selectedEditorLocale ? "selected" : ""}>${escapeHtml(language.label)} (${escapeHtml(language.nativeLabel)})</option>`,
   ).join("");
+  // Sync tab active class
+  const activeTab = window.localStorage.getItem("stampace-host-active-tab") || "general";
+  const appContainer = document.querySelector("#host-app");
+  if (appContainer) {
+    appContainer.className = appContainer.className.split(" ").filter(c => !c.startsWith("tab-")).join(" ");
+    appContainer.classList.add(`tab-${activeTab}`);
+  }
+  
+  const tabButtons = document.querySelectorAll(".host-tab-btn");
+  tabButtons.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.tab === activeTab);
+  });
+
   syncPanelState();
   renderOptionalLocaleSelect();
   renderSectionEditors();
@@ -1487,11 +1529,9 @@ export function updateCategoryIconPreview(card) {
 }
 
 export function syncPanelState() {
-  const expandedPanelIds = getExpandedPanelIds();
   dom.app.querySelectorAll("[data-panel-id]").forEach((panel) => {
-    const expanded = expandedPanelIds.has(panel.dataset.panelId);
-    panel.classList.toggle("is-collapsed", !expanded);
+    panel.classList.remove("is-collapsed");
     const toggle = panel.querySelector('[data-action="toggle-panel"]');
-    if (toggle) toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+    if (toggle) toggle.setAttribute("aria-expanded", "true");
   });
 }
