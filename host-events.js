@@ -6,14 +6,14 @@ import {
   isImageItem,
   isMediaItem,
   saveTemplate,
-} from "./content.js?v=20260615c";
+} from "./content.js?v=20260615d";
 import { getHostSupabase, HOST_EMAIL } from "./supabase.js";
 import {
   escapeAttribute,
   escapeHtml,
   sanitizeCssColor,
-} from "./security.js?v=20260615c";
-import { iconColorStyle } from "./theme-utils.js?v=20260615c";
+} from "./security.js?v=20260615d";
+import { iconColorStyle } from "./theme-utils.js?v=20260615d";
 import {
   setState,
   getState,
@@ -45,7 +45,7 @@ import {
   removeMedia,
   currentLocaleState,
   queueAutoPublish,
-} from "./host-state.js?v=20260615c";
+} from "./host-state.js?v=20260615d";
 import {
   collectTemplate,
   syncFields,
@@ -54,8 +54,8 @@ import {
   updateCtaIconPreview,
   updateCategoryIconPreview,
   syncPanelState,
-} from "./host-rendering.js?v=20260615c";
-import { dom } from "./host.js?v=20260615c";
+} from "./host-rendering.js?v=20260615d";
+import { dom } from "./host.js?v=20260615d";
 
 let draggingSectionId = null;
 let authBound = false;
@@ -832,7 +832,7 @@ export function bindAuthEvents(onOpenEditor) {
     const previousSession = getState();
     // We pass to host-state.js
     // Wait, let's call the exported state setter
-    import("./host-state.js?v=20260615c").then((mod) => {
+    import("./host-state.js?v=20260615d").then((mod) => {
       mod.setSession(nextSession);
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
@@ -860,7 +860,7 @@ export function bindAuthEvents(onOpenEditor) {
   });
 
   window.addEventListener("hashchange", () => {
-    import("./host-state.js?v=20260615c").then((mod) => {
+    import("./host-state.js?v=20260615d").then((mod) => {
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
       

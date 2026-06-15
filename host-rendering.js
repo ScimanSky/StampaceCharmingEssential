@@ -11,7 +11,7 @@ import {
   isMediaItem,
   isHostPrivateItem,
   normalizeTemplate,
-} from "./content.js?v=20260615c";
+} from "./content.js?v=20260615d";
 import {
   IMAGE_MAX_BYTES,
   DOCUMENT_MAX_BYTES,
@@ -25,9 +25,9 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260615c";
-import { renderIcon, iconPaths } from "./icons.js?v=20260615c";
-import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260615c";
+} from "./security.js?v=20260615d";
+import { renderIcon, iconPaths } from "./icons.js?v=20260615d";
+import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260615d";
 import {
   getState,
   getSelectedEditorLocale,
@@ -36,8 +36,8 @@ import {
   getExpandedPanelIds,
   currentLocaleState,
   syncExpandedSections,
-} from "./host-state.js?v=20260615c";
-import { dom } from "./host.js?v=20260615c";
+} from "./host-state.js?v=20260615d";
+import { dom } from "./host.js?v=20260615d";
 
 const AVAILABLE_FONTS = [
   { value: "Roboto", label: "Roboto (Sans-serif pulito)" },
@@ -655,13 +655,13 @@ export function setStatus(message, variant = "") {
     pill.className = "host-status-pill";
     if (variant === "success") {
       pill.classList.add("is-success");
-      if (text) text.textContent = message || "Sincronizzato live";
+      if (text) text.textContent = "Attivo";
     } else if (variant === "error") {
       pill.classList.add("is-error");
-      if (text) text.textContent = message || "Errore di sincronizzazione";
+      if (text) text.textContent = "Errore";
     } else {
       pill.classList.add("is-pending");
-      if (text) text.textContent = message || "Salvataggio in corso...";
+      if (text) text.textContent = (message && message.includes("Caricamento")) ? "Caricamento..." : "Salvataggio...";
     }
   }
 }
