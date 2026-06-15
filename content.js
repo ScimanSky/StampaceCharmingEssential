@@ -1570,7 +1570,7 @@ function buildFallbackSection(section = {}, index = 0) {
     menuTitle: fallbackTitle,
     sectionTitle: cleanString(section?.sectionTitle, fallbackTitle),
     lead: cleanString(section?.lead, ""),
-    items: [],
+    items: section.items || [],
   };
 }
 
