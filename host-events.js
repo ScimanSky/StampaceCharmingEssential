@@ -550,11 +550,7 @@ export function bindEditorEvents() {
 
     event.preventDefault();
     const rect = sectionCard.getBoundingClientRect();
-    let position = event.clientY > rect.top + rect.height / 2 ? "after" : "before";
-    if (sectionCard.dataset.sectionId === "host") {
-      position = "before";
-    }
-
+    const position = event.clientY > rect.top + rect.height / 2 ? "after" : "before";
     dom.sections.querySelectorAll("[data-section-id]").forEach((card) => {
       if (card !== sectionCard) delete card.dataset.dropPosition;
     });
@@ -785,7 +781,7 @@ export function bindAuthEvents(onOpenEditor) {
 
   supabase.auth.onAuthStateChange(async (_event, nextSession) => {
     const sessionAllowed = nextSession && nextSession.user?.email?.toLowerCase() === HOST_EMAIL.toLowerCase();
-
+    
     // We update session state in the model
     const previousSession = getState();
     // We pass to host-state.js
@@ -794,7 +790,7 @@ export function bindAuthEvents(onOpenEditor) {
       mod.setSession(nextSession);
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
-
+      
       if (!isAuth) {
         mod.setEditorReady(false);
         mod.setEditorLoading(false);
@@ -821,7 +817,7 @@ export function bindAuthEvents(onOpenEditor) {
     import("./host-state.js?v=20260615g").then((mod) => {
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
-
+      
       if (isAuth && window.location.hash === "#editor" && !editorReady) {
         onOpenEditor().catch(() => {
           setStatus("Caricamento editor fallito.", "error");

@@ -897,7 +897,7 @@ export function addSection(collected) {
 
   const newId = `custom-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
   const localeState = collected.locales[selectedEditorLocale] ?? collected.locales[FIXED_LOCALE];
-  const newSection = {
+  localeState.sections.push({
     id: newId,
     icon: "spark",
     iconColor: "",
@@ -906,13 +906,7 @@ export function addSection(collected) {
     sectionTitle: "Nuova sezione",
     lead: "",
     items: [],
-  };
-  const hostIndex = localeState.sections.findIndex(s => s.id === "host");
-  if (hostIndex >= 0) {
-    localeState.sections.splice(hostIndex, 0, newSection);
-  } else {
-    localeState.sections.push(newSection);
-  }
+  });
   expandedSectionIds.add(newId);
   state = saveTemplate(collected);
   queueAutoPublish();
@@ -995,17 +989,12 @@ export function reorderSection(collected, sectionId, targetSectionId, position =
   }
 
   if (!sectionId || !targetSectionId || sectionId === targetSectionId) return null;
-  if (sectionId === "host") return null;
 
   const localeState = collected.locales[selectedEditorLocale] ?? collected.locales[FIXED_LOCALE];
   const sections = localeState.sections;
   const sourceIndex = sections.findIndex((section) => section.id === sectionId);
   const targetIndex = sections.findIndex((section) => section.id === targetSectionId);
   if (sourceIndex < 0 || targetIndex < 0) return null;
-
-  if (targetSectionId === "host" && position === "after") {
-    position = "before";
-  }
 
   const [movedSection] = sections.splice(sourceIndex, 1);
   let insertIndex = sections.findIndex((section) => section.id === targetSectionId);

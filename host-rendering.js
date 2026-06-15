@@ -987,18 +987,11 @@ export function renderSectionEditors() {
     return true;
   });
   const totalVisibleSections = visibleSections.length;
-  const lastIsHost = visibleSections[totalVisibleSections - 1]?.id === "host";
 
   dom.sections.innerHTML = visibleSections
     .map(
-      (section, index) => {
-        const isHost = section.id === "host";
-        const canMoveUp = selectedEditorLocale === FIXED_LOCALE && index > 0 && !isHost;
-        const canMoveDown = selectedEditorLocale === FIXED_LOCALE && index < totalVisibleSections - 1 && !isHost && !(lastIsHost && index === totalVisibleSections - 2);
-        const canDrag = selectedEditorLocale === FIXED_LOCALE && !isHost;
-
-        return `
-        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${canDrag ? " is-draggable" : ""}" data-section-id="${escapeAttribute(section.id)}" data-section-hidden="${section.hidden ? "true" : "false"}">
+      (section, index) => `
+        <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${selectedEditorLocale === FIXED_LOCALE ? " is-draggable" : ""}" data-section-id="${escapeAttribute(section.id)}" data-section-hidden="${section.hidden ? "true" : "false"}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
               <button class="host-section-toggle" type="button" data-action="toggle-section" aria-expanded="${expandedSectionIds.has(section.id) ? "true" : "false"}">
@@ -1014,20 +1007,20 @@ export function renderSectionEditors() {
               </button>
             </div>
             <div class="host-section-actions">
-              <button class="ghost-button host-order-button" type="button" data-action="move-section-up" ${!canMoveUp ? "disabled" : ""} aria-label="Sposta sezione in alto" title="Sposta sezione in alto">↑</button>
-              <button class="ghost-button host-order-button" type="button" data-action="move-section-down" ${!canMoveDown ? "disabled" : ""} aria-label="Sposta sezione in basso" title="Sposta sezione in basso">↓</button>
+              <button class="ghost-button host-order-button" type="button" data-action="move-section-up" ${selectedEditorLocale !== FIXED_LOCALE || index === 0 ? "disabled" : ""} aria-label="Sposta sezione in alto" title="Sposta sezione in alto">↑</button>
+              <button class="ghost-button host-order-button" type="button" data-action="move-section-down" ${selectedEditorLocale !== FIXED_LOCALE || index === totalVisibleSections - 1 ? "disabled" : ""} aria-label="Sposta sezione in basso" title="Sposta sezione in basso">↓</button>
               <button
                 class="ghost-button host-drag-handle"
                 type="button"
                 data-action="drag-section"
-                draggable="${canDrag ? "true" : "false"}"
-                ${!canDrag ? "disabled" : ""}
+                draggable="${selectedEditorLocale === FIXED_LOCALE ? "true" : "false"}"
+                ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""}
                 aria-label="Trascina per riordinare"
                 title="Trascina per riordinare"
               >↕</button>
-              <button class="ghost-button host-section-secondary" type="button" data-action="duplicate-section" ${selectedEditorLocale !== FIXED_LOCALE || isHost ? "disabled" : ""}>Duplica</button>
-              <button class="ghost-button host-section-secondary" type="button" data-action="toggle-section-visibility" ${selectedEditorLocale !== FIXED_LOCALE || isHost ? "disabled" : ""}>${section.hidden ? "Mostra" : "Nascondi"}</button>
-              <button class="ghost-button host-remove-section" type="button" data-action="remove-section" ${isHost ? "disabled" : ""}>Rimuovi pulsante</button>
+              <button class="ghost-button host-section-secondary" type="button" data-action="duplicate-section" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>Duplica</button>
+              <button class="ghost-button host-section-secondary" type="button" data-action="toggle-section-visibility" ${selectedEditorLocale !== FIXED_LOCALE || section.id === "host" ? "disabled" : ""}>${section.hidden ? "Mostra" : "Nascondi"}</button>
+              <button class="ghost-button host-remove-section" type="button" data-action="remove-section" ${section.id === "host" ? "disabled" : ""}>Rimuovi pulsante</button>
             </div>
           </div>
           <div class="host-section-body">
@@ -1087,9 +1080,9 @@ export function renderSectionEditors() {
                 ${renderSectionCtas(section)}
               </div>
               ${selectedEditorLocale !== FIXED_LOCALE
-            ? `<p class="host-lock-note">I pulsanti grafici si gestiscono solo mentre modifichi la lingua italiana.</p>`
-            : ""
-          }
+          ? `<p class="host-lock-note">I pulsanti grafici si gestiscono solo mentre modifichi la lingua italiana.</p>`
+          : ""
+        }
             </div>
             <div class="host-section-media">
               <div class="host-section-media-head">
@@ -1122,13 +1115,12 @@ export function renderSectionEditors() {
               </div>
             </div>
             ${section.id === "host"
-            ? `<p class="host-lock-note">L'accesso riservato resta sempre disponibile come icona tonda nella sezione Host.</p>`
-            : ""
-          }
+          ? `<p class="host-lock-note">L'accesso riservato resta sempre disponibile come icona tonda nella sezione Host.</p>`
+          : ""
+        }
           </div>
         </section>
       `,
-      }
     )
     .join("");
 }
