@@ -17,14 +17,15 @@
   box-sizing: border-box;
 }
 
-html {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  display: none;
+input,
+textarea,
+select,
+.host-section-card,
+.host-card,
+.host-cta-item,
+.host-image-item,
+.host-media-item {
+  scroll-margin-top: 5.5rem;
 }
 
 body {
@@ -956,15 +957,16 @@ select:focus-visible {
   }
 
   .host-actions {
-    justify-content: stretch;
-    width: 100%;
-    display: flex;
-    gap: 0.5rem;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    display: flex !important;
+    gap: 0.5rem !important;
   }
 
   .host-actions > * {
-    flex: 1 1 0;
-    width: auto;
+    width: 100% !important;
+    flex: none !important;
   }
 
   .host-grid {

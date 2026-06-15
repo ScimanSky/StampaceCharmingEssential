@@ -980,13 +980,15 @@ export function renderSectionEditors() {
   const expandedSectionIds = getExpandedSectionIds();
   const selectedEditorLocale = getSelectedEditorLocale();
 
-  dom.sections.innerHTML = localeState.sections
-    .filter((section) => {
-      if (!section || !section.id) return false;
-      if (section.id.startsWith("section-cat-")) return false;
-      if (catIds.some(catId => section.id === `section-${catId}`)) return false;
-      return true;
-    })
+  const visibleSections = localeState.sections.filter((section) => {
+    if (!section || !section.id) return false;
+    if (section.id.startsWith("section-cat-")) return false;
+    if (catIds.some(catId => section.id === `section-${catId}`)) return false;
+    return true;
+  });
+  const totalVisibleSections = visibleSections.length;
+
+  dom.sections.innerHTML = visibleSections
     .map(
       (section, index) => `
         <section class="host-section-card${expandedSectionIds.has(section.id) ? "" : " is-collapsed"}${section.hidden ? " is-hidden-section" : ""}${selectedEditorLocale === FIXED_LOCALE ? " is-draggable" : ""}" data-section-id="${escapeAttribute(section.id)}" data-section-hidden="${section.hidden ? "true" : "false"}">
@@ -1005,6 +1007,8 @@ export function renderSectionEditors() {
               </button>
             </div>
             <div class="host-section-actions">
+              <button class="ghost-button host-order-button" type="button" data-action="move-section-up" ${selectedEditorLocale !== FIXED_LOCALE || index === 0 ? "disabled" : ""} aria-label="Sposta sezione in alto" title="Sposta sezione in alto">↑</button>
+              <button class="ghost-button host-order-button" type="button" data-action="move-section-down" ${selectedEditorLocale !== FIXED_LOCALE || index === totalVisibleSections - 1 ? "disabled" : ""} aria-label="Sposta sezione in basso" title="Sposta sezione in basso">↓</button>
               <button
                 class="ghost-button host-drag-handle"
                 type="button"

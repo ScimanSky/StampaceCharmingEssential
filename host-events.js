@@ -146,6 +146,7 @@ export function bindEditorEvents() {
       if (tabId) {
         window.localStorage.setItem("stampace-host-active-tab", tabId);
         syncFields();
+        window.scrollTo(0, 0);
       }
     });
   }
@@ -345,6 +346,54 @@ export function bindEditorEvents() {
     if (toggleTrigger) {
       const sectionCard = event.target.closest("[data-section-id]");
       toggleSection(sectionCard?.dataset.sectionId);
+      return;
+    }
+
+    const moveSectionUpTrigger = event.target.closest('[data-action="move-section-up"]');
+    if (moveSectionUpTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      const sectionId = sectionCard?.dataset.sectionId;
+      if (sectionId) {
+        const collected = collectTemplate();
+        const localeState = collected.locales[getSelectedEditorLocale()] ?? collected.locales[FIXED_LOCALE];
+        const categories = localeState.categories || [];
+        const catIds = categories.map(c => c.id);
+        const visibleSections = localeState.sections.filter(s => s && s.id && !s.id.startsWith("section-cat-") && !catIds.some(catId => s.id === `section-${catId}`));
+        const visibleIndex = visibleSections.findIndex(s => s.id === sectionId);
+        if (visibleIndex > 0) {
+          const targetSectionId = visibleSections[visibleIndex - 1].id;
+          try {
+            const res = reorderSection(collected, sectionId, targetSectionId, "before");
+            if (res) setStatus(res.message, res.variant);
+          } catch (err) {
+            setStatus(err.message, "error");
+          }
+        }
+      }
+      return;
+    }
+
+    const moveSectionDownTrigger = event.target.closest('[data-action="move-section-down"]');
+    if (moveSectionDownTrigger) {
+      const sectionCard = event.target.closest("[data-section-id]");
+      const sectionId = sectionCard?.dataset.sectionId;
+      if (sectionId) {
+        const collected = collectTemplate();
+        const localeState = collected.locales[getSelectedEditorLocale()] ?? collected.locales[FIXED_LOCALE];
+        const categories = localeState.categories || [];
+        const catIds = categories.map(c => c.id);
+        const visibleSections = localeState.sections.filter(s => s && s.id && !s.id.startsWith("section-cat-") && !catIds.some(catId => s.id === `section-${catId}`));
+        const visibleIndex = visibleSections.findIndex(s => s.id === sectionId);
+        if (visibleIndex >= 0 && visibleIndex < visibleSections.length - 1) {
+          const targetSectionId = visibleSections[visibleIndex + 1].id;
+          try {
+            const res = reorderSection(collected, sectionId, targetSectionId, "after");
+            if (res) setStatus(res.message, res.variant);
+          } catch (err) {
+            setStatus(err.message, "error");
+          }
+        }
+      }
       return;
     }
 
