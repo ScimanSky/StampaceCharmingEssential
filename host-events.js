@@ -425,32 +425,6 @@ export function bindEditorEvents() {
       return;
     }
 
-    const categoryAddCtaTrigger = event.target.closest('[data-action="category-add-cta"]');
-    if (categoryAddCtaTrigger) {
-      const categoryCard = event.target.closest("[data-category-id]");
-      const collected = collectTemplate();
-      try {
-        const res = addCategoryCta(collected, categoryCard?.dataset.categoryId);
-        if (res) setStatus(res.message, res.variant);
-      } catch (err) {
-        setStatus(err.message, "error");
-      }
-      return;
-    }
-
-    const categoryAddCtaPresetTrigger = event.target.closest('[data-action="category-add-cta-preset"]');
-    if (categoryAddCtaPresetTrigger) {
-      const categoryCard = event.target.closest("[data-category-id]");
-      const collected = collectTemplate();
-      try {
-        const res = addCategoryCta(collected, categoryCard?.dataset.categoryId, categoryAddCtaPresetTrigger.dataset.ctaKind || "web");
-        if (res) setStatus(res.message, res.variant);
-      } catch (err) {
-        setStatus(err.message, "error");
-      }
-      return;
-    }
-
     const removeCtaTrigger = event.target.closest('[data-action="remove-cta"]');
     if (removeCtaTrigger) {
       const ctaCard = event.target.closest("[data-cta-item]");
@@ -460,11 +434,6 @@ export function bindEditorEvents() {
         if (sectionCard) {
           removeCta(collected, sectionCard?.dataset.sectionId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
           setStatus("Pulsante grafico rimosso.", "success");
-        } else {
-          const categoryCard = event.target.closest("[data-category-id]");
-          if (categoryCard) {
-            removeCategoryCta(collected, categoryCard.dataset.categoryId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
-          }
         }
       } catch (err) {
         setStatus(err.message, "error");
@@ -482,11 +451,6 @@ export function bindEditorEvents() {
         if (sectionCard) {
           moveCta(collected, sectionCard?.dataset.sectionId, ctaIndex, -1);
           setStatus("Ordine dei pulsanti grafici aggiornato.", "success");
-        } else {
-          const categoryCard = event.target.closest("[data-category-id]");
-          if (categoryCard) {
-            moveCategoryCta(collected, categoryCard.dataset.categoryId, ctaIndex, -1);
-          }
         }
       } catch (err) {
         setStatus(err.message, "error");
@@ -504,11 +468,6 @@ export function bindEditorEvents() {
         if (sectionCard) {
           moveCta(collected, sectionCard?.dataset.sectionId, ctaIndex, 1);
           setStatus("Ordine dei pulsanti grafici aggiornato.", "success");
-        } else {
-          const categoryCard = event.target.closest("[data-category-id]");
-          if (categoryCard) {
-            moveCategoryCta(collected, categoryCard.dataset.categoryId, ctaIndex, 1);
-          }
         }
       } catch (err) {
         setStatus(err.message, "error");
@@ -659,6 +618,82 @@ export function bindEditorEvents() {
         const collected = collectTemplate();
         setState(saveTemplate(collected));
         queueAutoPublish();
+        return;
+      }
+
+      const categoryAddCtaTrigger = event.target.closest('[data-action="category-add-cta"]');
+      if (categoryAddCtaTrigger) {
+        const categoryCard = event.target.closest("[data-category-id]");
+        const collected = collectTemplate();
+        try {
+          const res = addCategoryCta(collected, categoryCard?.dataset.categoryId);
+          if (res) setStatus(res.message, res.variant);
+        } catch (err) {
+          setStatus(err.message, "error");
+        }
+        return;
+      }
+
+      const categoryAddCtaPresetTrigger = event.target.closest('[data-action="category-add-cta-preset"]');
+      if (categoryAddCtaPresetTrigger) {
+        const categoryCard = event.target.closest("[data-category-id]");
+        const collected = collectTemplate();
+        try {
+          const res = addCategoryCta(collected, categoryCard?.dataset.categoryId, categoryAddCtaPresetTrigger.dataset.ctaKind || "web");
+          if (res) setStatus(res.message, res.variant);
+        } catch (err) {
+          setStatus(err.message, "error");
+        }
+        return;
+      }
+
+      const removeCtaTrigger = event.target.closest('[data-action="remove-cta"]');
+      if (removeCtaTrigger) {
+        const ctaCard = event.target.closest("[data-cta-item]");
+        const categoryCard = event.target.closest("[data-category-id]");
+        const collected = collectTemplate();
+        try {
+          if (categoryCard) {
+            removeCategoryCta(collected, categoryCard.dataset.categoryId, Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10));
+            setStatus("Pulsante grafico rimosso.", "success");
+          }
+        } catch (err) {
+          setStatus(err.message, "error");
+        }
+        return;
+      }
+
+      const moveCtaUpTrigger = event.target.closest('[data-action="move-cta-up"]');
+      if (moveCtaUpTrigger) {
+        const ctaCard = event.target.closest("[data-cta-item]");
+        const categoryCard = event.target.closest("[data-category-id]");
+        const ctaIndex = Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10);
+        const collected = collectTemplate();
+        try {
+          if (categoryCard) {
+            moveCategoryCta(collected, categoryCard.dataset.categoryId, ctaIndex, -1);
+            setStatus("Ordine dei pulsanti grafici aggiornato.", "success");
+          }
+        } catch (err) {
+          setStatus(err.message, "error");
+        }
+        return;
+      }
+
+      const moveCtaDownTrigger = event.target.closest('[data-action="move-cta-down"]');
+      if (moveCtaDownTrigger) {
+        const ctaCard = event.target.closest("[data-cta-item]");
+        const categoryCard = event.target.closest("[data-category-id]");
+        const ctaIndex = Number.parseInt(ctaCard?.dataset.ctaIndex ?? "-1", 10);
+        const collected = collectTemplate();
+        try {
+          if (categoryCard) {
+            moveCategoryCta(collected, categoryCard.dataset.categoryId, ctaIndex, 1);
+            setStatus("Ordine dei pulsanti grafici aggiornato.", "success");
+          }
+        } catch (err) {
+          setStatus(err.message, "error");
+        }
         return;
       }
     });
