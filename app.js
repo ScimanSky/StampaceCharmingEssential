@@ -624,7 +624,7 @@ function renderHostGroup(cat, groupSections) {
         </span>
       </button>
       <div class="menu-group-content-wrapper">
-        <div class="menu-group-content" style="padding-top: 0.5rem; padding-bottom: 0.5rem;">
+        <div class="menu-group-content menu-group-content--host">
           ${renderSectionItems(allItems, "host-group-" + cat.id)}
         </div>
       </div>
