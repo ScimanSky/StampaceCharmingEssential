@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260615d";
+} from "./content.js?v=20260615e";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260615d";
+} from "./security.js?v=20260615e";
 
 // State variables
 let state = null;
@@ -95,6 +95,7 @@ export function notifyStateChange() {
 // Getters and Setters
 export function getState() { return state; }
 export function setState(val) { state = val; notifyStateChange(); }
+export function setStateSilent(val) { state = val; }
 export function getSession() { return session; }
 export function setSession(val) { session = val; notifyStateChange(); }
 export function getLatestRemoteUpdatedAt() { return latestRemoteUpdatedAt; }

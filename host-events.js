@@ -6,16 +6,17 @@ import {
   isImageItem,
   isMediaItem,
   saveTemplate,
-} from "./content.js?v=20260615d";
+} from "./content.js?v=20260615e";
 import { getHostSupabase, HOST_EMAIL } from "./supabase.js";
 import {
   escapeAttribute,
   escapeHtml,
   sanitizeCssColor,
-} from "./security.js?v=20260615d";
-import { iconColorStyle } from "./theme-utils.js?v=20260615d";
+} from "./security.js?v=20260615e";
+import { iconColorStyle } from "./theme-utils.js?v=20260615e";
 import {
   setState,
+  setStateSilent,
   getState,
   getSelectedEditorLocale,
   setSelectedEditorLocale,
@@ -45,7 +46,7 @@ import {
   removeMedia,
   currentLocaleState,
   queueAutoPublish,
-} from "./host-state.js?v=20260615d";
+} from "./host-state.js?v=20260615e";
 import {
   collectTemplate,
   syncFields,
@@ -54,8 +55,8 @@ import {
   updateCtaIconPreview,
   updateCategoryIconPreview,
   syncPanelState,
-} from "./host-rendering.js?v=20260615d";
-import { dom } from "./host.js?v=20260615d";
+} from "./host-rendering.js?v=20260615e";
+import { dom } from "./host.js?v=20260615e";
 
 let draggingSectionId = null;
 let authBound = false;
@@ -224,7 +225,7 @@ export function bindEditorEvents() {
       }
     }
     const collected = collectTemplate();
-    setState(saveTemplate(collected));
+    setStateSilent(saveTemplate(collected));
     queueAutoPublish();
   });
 
@@ -832,7 +833,7 @@ export function bindAuthEvents(onOpenEditor) {
     const previousSession = getState();
     // We pass to host-state.js
     // Wait, let's call the exported state setter
-    import("./host-state.js?v=20260615d").then((mod) => {
+    import("./host-state.js?v=20260615e").then((mod) => {
       mod.setSession(nextSession);
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
@@ -860,7 +861,7 @@ export function bindAuthEvents(onOpenEditor) {
   });
 
   window.addEventListener("hashchange", () => {
-    import("./host-state.js?v=20260615d").then((mod) => {
+    import("./host-state.js?v=20260615e").then((mod) => {
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
       

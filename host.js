@@ -9,9 +9,9 @@ import {
   setEditorLoading,
   hydrateEditorState,
   setSession,
-} from "./host-state.js?v=20260615d";
-import { syncFields, setStatus } from "./host-rendering.js?v=20260615d";
-import { bindEditorEvents, bindAuthEvents } from "./host-events.js?v=20260615d";
+} from "./host-state.js?v=20260615e";
+import { syncFields, setStatus } from "./host-rendering.js?v=20260615e";
+import { bindEditorEvents, bindAuthEvents } from "./host-events.js?v=20260615e";
 
 // Unregister any active service worker on the host panel to avoid caching stale code
 if ("serviceWorker" in navigator) {
