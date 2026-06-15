@@ -1045,6 +1045,8 @@ select:focus-visible {
 
   .host-cta-presets {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
   }
 }
 
@@ -1348,8 +1350,11 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
 }
 .host-tabs {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0.5rem;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-bottom: 0.5rem;
@@ -1371,6 +1376,7 @@ input[type="color"].host-color-picker::-webkit-color-swatch {
   white-space: nowrap;
   min-height: unset;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 .host-tab-btn:hover {
   background: rgba(255, 255, 255, 0.04);
