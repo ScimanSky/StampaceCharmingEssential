@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260615e";
+} from "./content.js?v=20260615f";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260615e";
+} from "./security.js?v=20260615f";
 
 // State variables
 let state = null;
@@ -728,7 +728,6 @@ export async function publishNow({ silent = false } = {}) {
 export function queueAutoPublish() {
   if (!isAuthorizedSession()) return;
   window.clearTimeout(autoPublishTimer);
-  notifyStateChange(); // Trigger status update to show "sincronizzazione tra pochi secondi..."
   autoPublishTimer = window.setTimeout(async () => {
     try {
       await publishNow({ silent: true });

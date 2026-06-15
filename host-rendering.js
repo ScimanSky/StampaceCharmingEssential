@@ -11,7 +11,7 @@ import {
   isMediaItem,
   isHostPrivateItem,
   normalizeTemplate,
-} from "./content.js?v=20260615e";
+} from "./content.js?v=20260615f";
 import {
   IMAGE_MAX_BYTES,
   DOCUMENT_MAX_BYTES,
@@ -25,9 +25,9 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260615e";
-import { renderIcon, iconPaths } from "./icons.js?v=20260615e";
-import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260615e";
+} from "./security.js?v=20260615f";
+import { renderIcon, iconPaths } from "./icons.js?v=20260615f";
+import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260615f";
 import {
   getState,
   getSelectedEditorLocale,
@@ -36,8 +36,8 @@ import {
   getExpandedPanelIds,
   currentLocaleState,
   syncExpandedSections,
-} from "./host-state.js?v=20260615e";
-import { dom } from "./host.js?v=20260615e";
+} from "./host-state.js?v=20260615f";
+import { dom } from "./host.js?v=20260615f";
 
 const AVAILABLE_FONTS = [
   { value: "Roboto", label: "Roboto (Sans-serif pulito)" },
@@ -1283,6 +1283,38 @@ export function renderCategoryEditors() {
 export function syncFields() {
   const state = getState();
   if (!state) return;
+
+  // Save focus and selection range
+  const activeEl = document.activeElement;
+  let focusState = null;
+  if (activeEl && (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.tagName === "SELECT")) {
+    const sectionCard = activeEl.closest("[data-section-id]");
+    const categoryCard = activeEl.closest("[data-category-id]");
+    const ctaItem = activeEl.closest("[data-cta-item]");
+    const imageItem = activeEl.closest("[data-image-item]");
+    const mediaItem = activeEl.closest("[data-media-item]");
+
+    focusState = {
+      sectionId: sectionCard ? sectionCard.dataset.sectionId : null,
+      categoryId: categoryCard ? categoryCard.dataset.categoryId : null,
+      ctaIndex: ctaItem ? ctaItem.dataset.ctaIndex : null,
+      imageIndex: imageItem ? imageItem.dataset.imageIndex : null,
+      mediaIndex: mediaItem ? mediaItem.dataset.mediaIndex : null,
+
+      field: activeEl.dataset.field || null,
+      ctaField: activeEl.dataset.ctaField || null,
+      imageField: activeEl.dataset.imageField || null,
+      mediaField: activeEl.dataset.mediaField || null,
+      themeField: activeEl.dataset.themeField || null,
+
+      id: activeEl.id || null,
+      tagName: activeEl.tagName,
+      
+      selectionStart: ("selectionStart" in activeEl) ? activeEl.selectionStart : null,
+      selectionEnd: ("selectionEnd" in activeEl) ? activeEl.selectionEnd : null,
+    };
+  }
+
   if (dom.fontPrimary && dom.fontPrimary.options.length === 0) {
     const fontOptions = optionsHtml(AVAILABLE_FONTS);
     dom.fontPrimary.innerHTML = fontOptions;
@@ -1322,6 +1354,44 @@ export function syncFields() {
   syncPanelState();
   renderOptionalLocaleSelect();
   renderSectionEditors();
+
+  // Restore focus and selection range
+  if (focusState) {
+    let container = document;
+    if (focusState.sectionId) {
+      container = document.querySelector(`[data-section-id="${CSS.escape(focusState.sectionId)}"]`);
+    } else if (focusState.categoryId) {
+      container = document.querySelector(`[data-category-id="${CSS.escape(focusState.categoryId)}"]`);
+    }
+
+    if (container) {
+      let targetEl = null;
+      if (focusState.ctaIndex !== null && focusState.ctaField) {
+        targetEl = container.querySelector(`[data-cta-index="${CSS.escape(focusState.ctaIndex)}"] [data-cta-field="${CSS.escape(focusState.ctaField)}"]`);
+      } else if (focusState.imageIndex !== null && focusState.imageField) {
+        targetEl = container.querySelector(`[data-image-index="${CSS.escape(focusState.imageIndex)}"] [data-image-field="${CSS.escape(focusState.imageField)}"]`);
+      } else if (focusState.mediaIndex !== null && focusState.mediaField) {
+        targetEl = container.querySelector(`[data-media-index="${CSS.escape(focusState.mediaIndex)}"] [data-media-field="${CSS.escape(focusState.mediaField)}"]`);
+      } else if (focusState.field) {
+        targetEl = container.querySelector(`[data-field="${CSS.escape(focusState.field)}"]`);
+      } else if (focusState.themeField) {
+        targetEl = document.querySelector(`[data-theme-field="${CSS.escape(focusState.themeField)}"]`);
+      } else if (focusState.id) {
+        targetEl = document.getElementById(focusState.id);
+      }
+
+      if (targetEl) {
+        targetEl.focus();
+        if (typeof focusState.selectionStart === "number" && typeof focusState.selectionEnd === "number") {
+          try {
+            targetEl.setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
+          } catch (e) {
+            // Ignore if input type doesn't support selection range
+          }
+        }
+      }
+    }
+  }
 }
 
 export function collectTemplate() {

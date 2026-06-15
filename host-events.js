@@ -6,14 +6,14 @@ import {
   isImageItem,
   isMediaItem,
   saveTemplate,
-} from "./content.js?v=20260615e";
+} from "./content.js?v=20260615f";
 import { getHostSupabase, HOST_EMAIL } from "./supabase.js";
 import {
   escapeAttribute,
   escapeHtml,
   sanitizeCssColor,
-} from "./security.js?v=20260615e";
-import { iconColorStyle } from "./theme-utils.js?v=20260615e";
+} from "./security.js?v=20260615f";
+import { iconColorStyle } from "./theme-utils.js?v=20260615f";
 import {
   setState,
   setStateSilent,
@@ -46,7 +46,7 @@ import {
   removeMedia,
   currentLocaleState,
   queueAutoPublish,
-} from "./host-state.js?v=20260615e";
+} from "./host-state.js?v=20260615f";
 import {
   collectTemplate,
   syncFields,
@@ -55,8 +55,8 @@ import {
   updateCtaIconPreview,
   updateCategoryIconPreview,
   syncPanelState,
-} from "./host-rendering.js?v=20260615e";
-import { dom } from "./host.js?v=20260615e";
+} from "./host-rendering.js?v=20260615f";
+import { dom } from "./host.js?v=20260615f";
 
 let draggingSectionId = null;
 let authBound = false;
@@ -307,37 +307,8 @@ export function bindEditorEvents() {
     }
 
     if (event.target.matches('[data-cta-field], [data-image-field], [data-media-field], [data-field]')) {
-      const activeFocusedElement = document.activeElement;
-      const sectionCard = activeFocusedElement?.closest('[data-section-id]');
-      const activeFocusedSectionId = sectionCard?.dataset.sectionId;
-      const activeFocusedField = activeFocusedElement?.dataset.field;
-      const activeFocusedCtaId = activeFocusedElement?.closest('[data-cta-item]')?.dataset.ctaId;
-      const activeFocusedCtaField = activeFocusedElement?.dataset.ctaField;
-      const hasSelection = activeFocusedElement && ('selectionStart' in activeFocusedElement);
-      const selectionStart = hasSelection ? activeFocusedElement.selectionStart : null;
-      const selectionEnd = hasSelection ? activeFocusedElement.selectionEnd : null;
-
       const collected = collectTemplate();
       setState(saveTemplate(collected));
-
-      // Restore focus for sections
-      if (activeFocusedSectionId) {
-        const card = dom.sections.querySelector(`[data-section-id="${activeFocusedSectionId}"]`);
-        let input = null;
-        if (activeFocusedCtaId && activeFocusedCtaField) {
-          const ctaCard = card?.querySelector(`[data-cta-item="${activeFocusedCtaId}"]`);
-          input = ctaCard?.querySelector(`[data-cta-field="${activeFocusedCtaField}"]`);
-        } else if (activeFocusedField) {
-          input = card?.querySelector(`[data-field="${activeFocusedField}"]`);
-        }
-        if (input) {
-          input.focus();
-          if (hasSelection && typeof selectionStart === "number" && selectionStart !== null && selectionEnd !== null) {
-            input.setSelectionRange(selectionStart, selectionEnd);
-          }
-        }
-      }
-
       queueAutoPublish();
     }
   });
@@ -776,27 +747,9 @@ export function bindEditorEvents() {
       if (event.target.matches('[data-field="icon"], [data-field="iconColor"]')) {
         updateCategoryIconPreview(event.target.closest("[data-category-id]"));
       }
-      if (event.target.matches('[data-field]')) {
-        const activeFocusedElement = document.activeElement;
-        const activeFocusedId = activeFocusedElement?.closest('[data-category-id]')?.dataset.categoryId;
-        const activeFocusedField = activeFocusedElement?.dataset.field;
-        const selectionStart = activeFocusedElement?.selectionStart;
-        const selectionEnd = activeFocusedElement?.selectionEnd;
-
+      if (event.target.matches('[data-field], [data-cta-field]')) {
         const collected = collectTemplate();
         setState(saveTemplate(collected));
-        
-        if (activeFocusedId && activeFocusedField) {
-          const card = dom.categories.querySelector(`[data-category-id="${activeFocusedId}"]`);
-          const input = card?.querySelector(`[data-field="${activeFocusedField}"]`);
-          if (input) {
-            input.focus();
-            if (typeof selectionStart === "number") {
-              input.setSelectionRange(selectionStart, selectionEnd);
-            }
-          }
-        }
-        
         queueAutoPublish();
       }
     });
@@ -833,7 +786,7 @@ export function bindAuthEvents(onOpenEditor) {
     const previousSession = getState();
     // We pass to host-state.js
     // Wait, let's call the exported state setter
-    import("./host-state.js?v=20260615e").then((mod) => {
+    import("./host-state.js?v=20260615f").then((mod) => {
       mod.setSession(nextSession);
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
@@ -861,7 +814,7 @@ export function bindAuthEvents(onOpenEditor) {
   });
 
   window.addEventListener("hashchange", () => {
-    import("./host-state.js?v=20260615e").then((mod) => {
+    import("./host-state.js?v=20260615f").then((mod) => {
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
       
