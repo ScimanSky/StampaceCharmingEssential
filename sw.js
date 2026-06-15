@@ -1,16 +1,16 @@
-const CACHE_NAME = "stampace-essential-v20260615a";
+const CACHE_NAME = "stampace-essential-v20260615b";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
   "./guest/",
   "./guest/index.html",
-  "./styles.css?v=20260615a",
-  "./app.js?v=20260615a",
-  "./icons.js?v=20260615a",
-  "./theme-utils.js?v=20260615a",
-  "./content.js?v=20260615a",
+  "./styles.css?v=20260615b",
+  "./app.js?v=20260615b",
+  "./icons.js?v=20260615b",
+  "./theme-utils.js?v=20260615b",
+  "./content.js?v=20260615b",
   "./supabase.js",
-  "./security.js?v=20260615a",
+  "./security.js?v=20260615b",
   "./template.json",
   "./manifest.json",
   "./img/app-icon.svg",
@@ -85,6 +85,9 @@ self.addEventListener("fetch", (event) => {
   if (
     url.pathname.endsWith("/host.html") ||
     url.pathname.includes("/host.js") ||
+    url.pathname.includes("/host-state.js") ||
+    url.pathname.includes("/host-rendering.js") ||
+    url.pathname.includes("/host-events.js") ||
     url.pathname.includes("/host.css")
   ) {
     return;

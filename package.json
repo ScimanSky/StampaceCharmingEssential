@@ -5,9 +5,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && cp index.html app.js icons.js theme-utils.js content.js supabase.js security.js styles.css host.html host.js host.css manifest.json sw.js template.json .nojekyll dist/ && cp -R guest img dist/",
+    "build": "rm -rf dist && mkdir -p dist && cp index.html app.js icons.js theme-utils.js content.js supabase.js security.js styles.css host.html host.js host-state.js host-rendering.js host-events.js host.css manifest.json sw.js template.json .nojekyll dist/ && cp -R guest img dist/",
     "check": "npm run check:js && npm run check:json",
-    "check:js": "node --check app.js && node --check host.js && node --check content.js && node --check supabase.js && node --check security.js && node --check sw.js && node --check icons.js && node --check theme-utils.js",
+    "check:js": "node --check app.js && node --check host.js && node --check host-state.js && node --check host-rendering.js && node --check host-events.js && node --check content.js && node --check supabase.js && node --check security.js && node --check sw.js && node --check icons.js && node --check theme-utils.js",
     "check:json": "node -e \"JSON.parse(require('fs').readFileSync('template.json', 'utf8')); JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'))\"",
     "lint": "eslint .",
     "test": "node --experimental-test-module-mocks --test tests/security.test.mjs tests/content.test.mjs"

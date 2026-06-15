@@ -9,7 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260615a";
+} from "./content.js?v=20260615b";
 import {
   escapeAttribute,
   escapeHtml,
@@ -18,10 +18,10 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260615a";
+} from "./security.js?v=20260615b";
 import { subscribeToRemoteTemplate } from "./supabase.js";
-import { renderIcon, iconPaths } from "./icons.js?v=20260615a";
-import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260615a";
+import { renderIcon, iconPaths } from "./icons.js?v=20260615b";
+import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260615b";
 
 
 const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";
