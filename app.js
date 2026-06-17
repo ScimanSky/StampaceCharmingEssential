@@ -371,15 +371,14 @@ function renderMediaItem(item) {
   }
 
   const title = item.title || translations.docFallback;
+  const docIcon = item.icon || "book";
 
   return `
-    <article class="sheet-card sheet-card-file">
-      <span class="sheet-card-index sheet-card-icon" aria-hidden="true">${renderIcon("book")}</span>
-      <div class="sheet-card-copy">
-        <strong>${escapeHtml(title)}</strong>
-        ${caption}
-        <a class="sheet-link" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer" download>${escapeHtml(translations.openDoc)}</a>
-      </div>
+    <article class="sheet-card sheet-card-cta">
+      <a class="sheet-cta sheet-cta--web" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer">
+        <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(docIcon)}</span>
+        <span class="sheet-cta-label">${escapeHtml(title)}</span>
+      </a>
     </article>
   `;
 }
