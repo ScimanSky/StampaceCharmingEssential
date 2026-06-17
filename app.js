@@ -381,7 +381,6 @@ function renderMediaItem(item) {
   }
   if (item.bgColor) {
     styles.push(`background-color: ${sanitizeCssColor(item.bgColor)}`);
-    styles.push(`background-image: none`);
   }
   if (item.textColor) {
     styles.push(`color: ${sanitizeCssColor(item.textColor)}`);
