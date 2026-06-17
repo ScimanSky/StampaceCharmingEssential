@@ -473,9 +473,9 @@ function setColorInputValue(field, value, fallback) {
   field.value = colorToInputValue(value, fallback);
 }
 
-function colorInputHtml(fieldName, selectedValue = "", { cta = false, fallback = "#dfc39c" } = {}) {
-  const attr = cta ? "data-cta-field" : "data-field";
-  return `<input ${attr}="${escapeAttribute(fieldName)}" class="host-color-picker" type="color" value="${escapeAttribute(colorToInputValue(selectedValue, fallback))}" />`;
+function colorInputHtml(fieldName, selectedValue = "", { cta = false, media = false, fallback = "#dfc39c", disabled = false } = {}) {
+  const attr = media ? "data-media-field" : (cta ? "data-cta-field" : "data-field");
+  return `<input ${attr}="${escapeAttribute(fieldName)}" class="host-color-picker" type="color" value="${escapeAttribute(colorToInputValue(selectedValue, fallback))}" ${disabled ? "disabled" : ""} />`;
 }
 
 function setFieldValue(field, value) {
@@ -943,7 +943,46 @@ export function renderSectionMedia(section) {
         const src = sanitizeImageSrc(item.src);
         if (!src) return "";
         const kindLabel = item.mediaKind === "video" ? "🎬 Video" : "📄 Documento";
-        const title = item.title || item.fileName || (item.mediaKind === "video" ? "Video" : "Documento");
+        
+        let extraFieldsHtml = "";
+        if (item.mediaKind !== "video") {
+          const icon = item.icon || "book";
+          const iconColor = sanitizeCssColor(item.iconColor);
+          const bgColor = sanitizeCssColor(item.bgColor);
+          const textColor = sanitizeCssColor(item.textColor);
+          const fontFamily = item.fontFamily || "";
+
+          extraFieldsHtml = `
+            <div class="host-media-grid" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem;">
+              <label>
+                <span>Icona</span>
+                <select data-media-field="icon" ${!editable ? "disabled" : ""}>
+                  ${CTA_ICON_OPTIONS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === icon ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                </select>
+              </label>
+              <label>
+                <span>Colore icona</span>
+                ${colorInputHtml("iconColor", iconColor, { media: true, fallback: "#dfc39c", disabled: !editable })}
+              </label>
+              <label>
+                <span>Colore sfondo</span>
+                ${colorInputHtml("bgColor", bgColor, { media: true, fallback: "#2d2319", disabled: !editable })}
+              </label>
+              <label>
+                <span>Colore scritte</span>
+                ${colorInputHtml("textColor", textColor, { media: true, fallback: "#e7d8c1", disabled: !editable })}
+              </label>
+              <label>
+                <span>Font del titolo</span>
+                <select data-media-field="fontFamily" ${!editable ? "disabled" : ""}>
+                  <option value="">(Usa predefinito del tema)</option>
+                  ${AVAILABLE_FONTS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === fontFamily ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+                </select>
+              </label>
+            </div>
+          `;
+        }
+
         return `
         <article class="host-media-item" data-media-item data-media-index="${escapeAttribute(index)}" data-media-path="${escapeAttribute(item.path ?? "")}" data-media-src="${escapeAttribute(src)}" data-media-kind="${escapeAttribute(item.mediaKind || "document")}" data-media-file-name="${escapeAttribute(item.fileName || "")}" data-media-mime-type="${escapeAttribute(item.mimeType || "")}" data-media-size-bytes="${escapeAttribute(item.sizeBytes || 0)}">
           <div class="host-media-item-header">
@@ -953,12 +992,13 @@ export function renderSectionMedia(section) {
           <div class="host-media-fields">
             <label>
               <span>Titolo</span>
-              <input data-media-field="title" type="text" value="${escapeAttribute(item.title ?? "")}" />
+              <input data-media-field="title" type="text" value="${escapeAttribute(item.title ?? "")}" ${!editable ? "disabled" : ""} />
             </label>
             <label>
               <span>Didascalia</span>
-              <input data-media-field="caption" type="text" value="${escapeAttribute(item.caption ?? "")}" />
+              <input data-media-field="caption" type="text" value="${escapeAttribute(item.caption ?? "")}" ${!editable ? "disabled" : ""} />
             </label>
+            ${extraFieldsHtml}
           </div>
         </article>
       `;
@@ -1489,6 +1529,11 @@ export function collectTemplate() {
       fileName: item.dataset.mediaFileName || "",
       mimeType: item.dataset.mediaMimeType || "",
       sizeBytes: Number(item.dataset.mediaSizeBytes) || 0,
+      icon: item.querySelector('[data-media-field="icon"]')?.value || "",
+      iconColor: sanitizeCssColor(item.querySelector('[data-media-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="iconColor"]')?.value),
+      bgColor: sanitizeCssColor(item.querySelector('[data-media-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="bgColor"]')?.value),
+      textColor: sanitizeCssColor(item.querySelector('[data-media-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="textColor"]')?.value),
+      fontFamily: item.querySelector('[data-media-field="fontFamily"]')?.value || "",
     })).filter((item) => item.src);
     const selectedIcon = card.querySelector('[data-field="icon"]')?.value || base.icon || "spark";
     const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);

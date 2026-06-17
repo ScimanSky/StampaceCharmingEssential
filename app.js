@@ -373,9 +373,28 @@ function renderMediaItem(item) {
   const title = item.title || translations.docFallback;
   const docIcon = item.icon || "book";
 
+  const styles = [];
+  if (item.iconColor) {
+    styles.push(`--icon-custom-color: ${sanitizeCssColor(item.iconColor)}`);
+  } else if (item.textColor) {
+    styles.push(`--icon-custom-color: ${sanitizeCssColor(item.textColor)}`);
+  }
+  if (item.bgColor) {
+    styles.push(`background-color: ${sanitizeCssColor(item.bgColor)}`);
+    styles.push(`background-image: none`);
+  }
+  if (item.textColor) {
+    styles.push(`color: ${sanitizeCssColor(item.textColor)}`);
+    styles.push(`--text: ${sanitizeCssColor(item.textColor)}`);
+  }
+  if (item.fontFamily) {
+    styles.push(`--cta-font: "${item.fontFamily}"`);
+  }
+  const styleAttr = styles.length ? ` style="${escapeAttribute(styles.join("; "))}"` : "";
+
   return `
     <article class="sheet-card sheet-card-cta">
-      <a class="sheet-cta sheet-cta--web" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer">
+      <a class="sheet-cta sheet-cta--web" href="${escapeAttribute(src)}" target="_blank" rel="noopener noreferrer"${styleAttr}>
         <span class="sheet-cta-icon" aria-hidden="true">${renderIcon(docIcon)}</span>
         <span class="sheet-cta-label">${escapeHtml(title)}</span>
       </a>

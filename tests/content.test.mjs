@@ -74,6 +74,40 @@ describe('Content module', () => {
       assert.deepStrictEqual(normalized.enabledLocales, ['it', 'en', 'fr']);
     });
 
+    it('should preserve custom styling fields on media items', () => {
+      const template = {
+        enabledLocales: ['it'],
+        locales: {
+          it: {
+            sections: [
+              {
+                id: 'sec-doc',
+                items: [
+                  {
+                    type: 'media',
+                    mediaKind: 'document',
+                    src: 'doc.pdf',
+                    icon: 'book',
+                    iconColor: '#ff0000',
+                    bgColor: '#00ff00',
+                    textColor: '#0000ff',
+                    fontFamily: 'Roboto'
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      };
+      const normalized = normalizeTemplate(template);
+      const mediaItem = normalized.locales.it.sections[0].items[0];
+      assert.strictEqual(mediaItem.icon, 'book');
+      assert.strictEqual(mediaItem.iconColor, '#ff0000');
+      assert.strictEqual(mediaItem.bgColor, '#00ff00');
+      assert.strictEqual(mediaItem.textColor, '#0000ff');
+      assert.strictEqual(mediaItem.fontFamily, 'Roboto');
+    });
+
 
 
     it('should preserve placement for custom categories and default to homepage', () => {

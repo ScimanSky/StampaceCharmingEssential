@@ -1480,6 +1480,11 @@ function normalizeItems(items, fallbackItems) {
             fileName: cleanString(item.fileName),
             mimeType: cleanString(item.mimeType),
             sizeBytes: Number.isFinite(Number(item.sizeBytes)) ? Number(item.sizeBytes) : 0,
+            icon: cleanString(item.icon),
+            iconColor: cleanIconColor(item.iconColor),
+            bgColor: cleanIconColor(item.bgColor),
+            textColor: cleanIconColor(item.textColor),
+            fontFamily: cleanString(item.fontFamily),
           };
         }
         if (item.type === IMAGE_ITEM_TYPE || item.src) {
