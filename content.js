@@ -1859,7 +1859,7 @@ function localizedSectionForItalianSection(italianSection, sectionIndex, localiz
   );
 }
 
-function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fallbackItems = [], localeCode = FIXED_LOCALE) {
+function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fallbackItems = [], localeCode = FIXED_LOCALE, sectionId = "") {
   const localizedCtas = localizedItems.filter(isCtaItem);
   const fallbackCtas = fallbackItems.filter(isCtaItem);
   const localizedImages = localizedItems.filter(isImageItem);
@@ -1887,6 +1887,8 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
       let label = cleanString(localizedItem?.label, italianItem.label);
       if (italianItem.kind === "booking" || italianItem.label?.toLowerCase() === "booking" || italianItem.icon === "booking" || label.toLowerCase() === "booking") {
         label = "Booking";
+      } else if (sectionId === "custom-mq66lur5ptea") {
+        label = italianItem.label;
       }
       return {
         ...cloneItem(italianItem),
@@ -2056,6 +2058,7 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
               localizedItems,
               fallbackItems,
               language.code,
+              section.id,
             );
 
             let resolvedMenuTitle = pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle || section.menuTitle);

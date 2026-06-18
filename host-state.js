@@ -541,7 +541,8 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
 
       if (isCtaItem(item)) {
         const isRestaurantSection = section.id === "around" || /ristoranti|locali/i.test(section.menuTitle || "");
-        if (isRestaurantSection) {
+        const isLuggageSection = section.id === "custom-mq66lur5ptea" || /deposito/i.test(section.menuTitle || "");
+        if (isRestaurantSection || isLuggageSection) {
           targetSection.items.push({ ...item });
           return;
         }
