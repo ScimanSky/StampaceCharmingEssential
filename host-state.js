@@ -426,6 +426,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
           menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
           sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
           lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
+          payText: pickSectionValue(section.payText || "", itBaseSection.payText || "", scBaseSection.payText ?? section.payText || ""),
           items,
         };
       }),
@@ -446,6 +447,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
       menuTitle: "",
       sectionTitle: "",
       lead: "",
+      payText: "",
       items: [],
     })),
   };
@@ -483,6 +485,11 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
     texts.push(section.lead);
     appliers.push((value) => {
       targetSection.lead = value;
+    });
+
+    texts.push(section.payText || "");
+    appliers.push((value) => {
+      targetSection.payText = value;
     });
 
     section.items.forEach((item) => {

@@ -1578,6 +1578,7 @@ function buildFallbackSection(section = {}, index = 0) {
     menuTitle: fallbackTitle,
     sectionTitle: cleanString(section?.sectionTitle, fallbackTitle),
     lead: cleanString(section?.lead, ""),
+    payText: cleanString(section?.payText, ""),
     items: [],
   };
 }
@@ -1988,6 +1989,7 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
                 menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
                 sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
                 lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
+                payText: pickSectionValue(section.payText || "", itBaseSection.payText || "", scBaseSection.payText ?? section.payText || ""),
                 items: section.id === "host" ? ensureHostPrivateItem(items, language.code) : items,
               };
             }),
