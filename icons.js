@@ -150,9 +150,9 @@ export const iconPaths = {
   telegram:
     '<defs><radialGradient id="telegram-blue-icon" cx="64%" cy="22%" r="82%"><stop offset="0%" stop-color="#3fabf4"/><stop offset="100%" stop-color="#0088cc"/></radialGradient></defs><circle cx="12" cy="12" r="11.4" fill="url(#telegram-blue-icon)" stroke="none"/><path d="M5.3 11.5 C5.3 11.5 17.5 6.2 18.2 5.9 C18.9 5.6 19.3 5.7 19.2 6.5 C19.1 7.2 17.8 14.8 17.1 18.2 C16.9 19.1 16.3 19.3 15.6 18.9 C14.6 18.2 12.8 16.9 12.0 16.3 C11.3 15.7 11.7 15.3 12.2 14.8 C12.4 14.5 16.2 10.7 16.4 9.8 C16.5 9.4 16.2 9.2 15.7 9.5 C15.0 10.0 9.8 13.5 8.7 14.2 C8.0 14.7 7.3 14.8 6.8 14.8 C6.1 14.7 4.7 14.2 3.6 13.8 C2.3 13.3 2.1 12.6 3.5 12.1 C4.1 11.9 5.3 11.5 5.3 11.5 Z" fill="#fff" stroke="none"/>',
   paypal:
-    '<defs><clipPath id="paypal-clip"><circle cx="12" cy="12" r="11.4"/></clipPath></defs><circle cx="12" cy="12" r="11.4" fill="#003087" stroke="none"/><image href="img/paypal.png" x="0" y="0" width="24" height="24" clip-path="url(#paypal-clip)"/>',
+    '<defs><clipPath id="paypal-clip"><circle cx="12" cy="12" r="11.4"/></clipPath></defs><circle cx="12" cy="12" r="11.4" fill="#ffffff" stroke="none"/><image href="img/paypal.png" x="-1" y="-1" width="26" height="26" clip-path="url(#paypal-clip)"/>',
   revolut:
-    '<defs><clipPath id="revolut-clip"><circle cx="12" cy="12" r="11.4"/></clipPath></defs><circle cx="12" cy="12" r="11.4" fill="#ffffff" stroke="none"/><image href="img/revolut.png" x="-4" y="1.5" width="32" height="28.2" clip-path="url(#revolut-clip)"/>',
+    '<defs><clipPath id="revolut-clip"><circle cx="12" cy="12" r="11.4"/></clipPath></defs><circle cx="12" cy="12" r="11.4" fill="#ffffff" stroke="none"/><image href="img/revolut.png" x="4" y="4" width="16" height="16" clip-path="url(#revolut-clip)"/>',
 };
 
 export function renderIcon(name) {
