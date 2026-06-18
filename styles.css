@@ -1496,6 +1496,34 @@ body.sheet-open .page-shell {
   .sheet-image {
     max-height: min(48vh, 17rem);
   }
+
+  /* Host section specific overrides on mobile to prevent lead message wrapping */
+  #section-sheet[data-section="host"] .sheet-header {
+    grid-template-columns: 3rem 1fr 2.7rem;
+    grid-template-rows: auto auto;
+    gap: 0.5rem 0.8rem;
+  }
+
+  #section-sheet[data-section="host"] .sheet-icon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  #section-sheet[data-section="host"] .sheet-close {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  #section-sheet[data-section="host"] .sheet-title-block {
+    grid-column: 1 / span 3;
+    grid-row: 2;
+  }
+
+  #section-sheet[data-section="host"] .sheet-lead {
+    white-space: nowrap;
+    font-size: clamp(0.72rem, 3.3vw, 0.95rem);
+    margin-top: 0.2rem;
+  }
 }
 
 @media (min-width: 421px) and (max-width: 960px) {

@@ -18,3 +18,10 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Scratch files
+scratch/
+current_live.json
+current_live_new.json
+updated_live.json
+
