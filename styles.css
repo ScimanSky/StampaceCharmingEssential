@@ -726,6 +726,10 @@ body.sheet-open .page-shell {
   flex-direction: column;
 }
 
+#section-sheet[data-section="host"] .sheet-lead {
+  margin-bottom: 1.25rem;
+}
+
 #section-sheet[data-section="host"] .sheet-content {
   display: flex;
   flex-direction: column;

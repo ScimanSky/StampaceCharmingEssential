@@ -227,7 +227,7 @@ async function translateBatch(texts, targetLocale) {
 async function translateIntroLine(text, targetLocale) {
   if (!text || targetLocale === FIXED_LOCALE) return text;
   const clean = text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-  if (clean === "keybox" || clean === "stampace") return text;
+  if (clean === "keybox" || clean === "stampace" || clean.includes("booking")) return text;
   const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
   const key = translationKey(targetLocale, `introLines::${text}`);
   if (translationCache.has(key)) return translationCache.get(key);
@@ -286,7 +286,7 @@ async function translateTexts(texts, targetLocale) {
       return;
     }
     const clean = text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-    if (clean === "keybox" || clean === "stampace") {
+    if (clean === "keybox" || clean === "stampace" || clean.includes("booking")) {
       results[index] = text;
       return;
     }
