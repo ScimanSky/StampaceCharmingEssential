@@ -2054,8 +2054,8 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
               language.code,
             );
 
-            let resolvedMenuTitle = pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle);
-            let resolvedSectionTitle = pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle);
+            let resolvedMenuTitle = pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle || section.menuTitle);
+            let resolvedSectionTitle = pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle || section.sectionTitle);
 
             // Keep auto-generated category section titles in sync with the category's resolved menuTitle
             if (section.id.startsWith("section-cat-") || (section.category && section.id === `section-${section.category}`)) {
@@ -2075,8 +2075,8 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
               category: section.category,
               menuTitle: resolvedMenuTitle,
               sectionTitle: resolvedSectionTitle,
-              lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),
-              payText: pickLocalizedValue(localizedSection?.payText, section.payText, localizedDefaultSection.payText || ""),
+              lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead || section.lead),
+              payText: pickLocalizedValue(localizedSection?.payText, section.payText, localizedDefaultSection.payText || section.payText || ""),
               items:
                 section.id === "host"
                   ? ensureHostPrivateItem(resolvedItems, language.code)
