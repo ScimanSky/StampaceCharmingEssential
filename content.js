@@ -1608,6 +1608,7 @@ function normalizeSection(section, baseSection, localeCode) {
     menuTitle: resolvedMenuTitle,
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
+    payText: cleanString(section?.payText, baseSection.payText || ""),
     items: baseSection.id === "host" ? ensureHostPrivateItem(normalizedItems, localeCode) : normalizedItems,
   };
 }
@@ -2073,6 +2074,7 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
               menuTitle: resolvedMenuTitle,
               sectionTitle: resolvedSectionTitle,
               lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead),
+              payText: pickLocalizedValue(localizedSection?.payText, section.payText, localizedDefaultSection.payText || ""),
               items:
                 section.id === "host"
                   ? ensureHostPrivateItem(resolvedItems, language.code)

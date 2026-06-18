@@ -1134,6 +1134,17 @@ body.sheet-open .page-shell {
   transform: scale(0.96);
 }
 
+.sheet-pay-text {
+  margin: 1.5rem 0 1rem;
+  color: var(--section-body-color, var(--muted-strong));
+  line-height: 1.5;
+  font-size: var(--section-body-size, var(--body-size));
+  font-weight: var(--section-body-weight, var(--body-weight));
+  font-family: var(--section-body-font, var(--font-secondary)), sans-serif;
+  text-wrap: pretty;
+  text-align: center;
+}
+
 .sheet-host-actions {
   display: flex;
   flex-wrap: wrap;

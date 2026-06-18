@@ -1139,6 +1139,12 @@ export function renderSectionEditors() {
                 <span>Testo introduttivo</span>
                 <textarea data-field="lead">${escapeHtml(section.lead)}</textarea>
               </label>
+              ${section.id === "host" ? `
+              <label>
+                <span>Testo sopra PayPal/Revolut</span>
+                <textarea data-field="payText">${escapeHtml(section.payText || "")}</textarea>
+              </label>
+              ` : ""}
               <label>
                 <span>Contenuti: usa "+" all'inizio di una riga per creare un nuovo paragrafo</span>
                 <textarea data-field="items">${escapeHtml(serializeItems(section.items))}</textarea>
@@ -1653,6 +1659,7 @@ export function collectTemplate() {
       menuTitle: card.querySelector('[data-field="menuTitle"]').value,
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
+      payText: card.querySelector('[data-field="payText"]')?.value || "",
       items: [...parseItems(card.querySelector('[data-field="items"]').value), ...ctaItems, ...imageItems, ...mediaItems],
     };
   });

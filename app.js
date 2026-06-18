@@ -967,6 +967,10 @@ function renderOpenSection(sectionId) {
       contentHtml += renderHostGroup(cat, catSections);
     });
 
+    if (section.payText && section.payText.trim()) {
+      contentHtml += `<div class="sheet-pay-text">${escapeHtml(section.payText).replace(/\n/g, "<br>")}</div>`;
+    }
+
     const wideCtas = section.items
       .filter((item) => isCtaItem(item) && (item.kind === "paypal" || item.kind === "revolut"))
       .map(renderCtaItem)

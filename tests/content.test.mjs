@@ -144,6 +144,25 @@ describe('Content module', () => {
       assert.strictEqual(ctaItem.fontFamily, 'Roboto');
     });
 
+    it('should preserve payText property on sections', () => {
+      const template = {
+        locales: {
+          it: {
+            sections: [
+              {
+                id: 'host',
+                payText: 'Please support me on PayPal or Revolut.'
+              }
+            ]
+          }
+        }
+      };
+      const normalized = normalizeTemplate(template);
+      const hostSection = normalized.locales.it.sections.find(s => s.id === 'host');
+      assert.ok(hostSection);
+      assert.strictEqual(hostSection.payText, 'Please support me on PayPal or Revolut.');
+    });
+
     it('should preserve placement for custom categories and default to homepage', () => {
       const custom = {
         locales: {
