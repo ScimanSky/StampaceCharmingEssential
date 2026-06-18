@@ -752,7 +752,6 @@ function renderSectionItems(items, sectionId) {
     const actions = [];
     const cards = [];
     const mediaCards = [];
-    const wideCtas = [];
 
     items.forEach((item) => {
       const action =
@@ -766,7 +765,7 @@ function renderSectionItems(items, sectionId) {
 
       if (isCtaItem(item)) {
         if (item.kind === "paypal" || item.kind === "revolut") {
-          wideCtas.push(renderCtaItem(item));
+          // Ignore, rendered bottom in openSection
         } else if (action) {
           actions.push(action);
         }
@@ -804,7 +803,7 @@ function renderSectionItems(items, sectionId) {
       cards.push(renderGenericLinkItem(item, marker, sectionId));
     });
 
-    return `${cards.join("")}${renderHostActions(actions)}${wideCtas.join("")}${mediaCards.join("")}`;
+    return `${cards.join("")}${renderHostActions(actions)}${mediaCards.join("")}`;
   }
 
   let safeItemIndex = 0;
@@ -967,6 +966,12 @@ function renderOpenSection(sectionId) {
       );
       contentHtml += renderHostGroup(cat, catSections);
     });
+
+    const wideCtas = section.items
+      .filter((item) => isCtaItem(item) && (item.kind === "paypal" || item.kind === "revolut"))
+      .map(renderCtaItem)
+      .join("");
+    contentHtml += wideCtas;
 
     contentHtml += `
       <footer class="app-footer" style="margin-top: 3rem; margin-bottom: 1.5rem;" aria-label="Footer">
