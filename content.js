@@ -1884,9 +1884,13 @@ function alignLocalizedItemsToItalian(italianItems = [], localizedItems = [], fa
     if (isCtaItem(italianItem)) {
       const localizedItem = localizedCtaFor(italianItem, ctaIndex, localizedCtas, fallbackCtas);
       ctaIndex += 1;
+      let label = cleanString(localizedItem?.label, italianItem.label);
+      if (italianItem.kind === "booking" || italianItem.label?.toLowerCase() === "booking" || italianItem.icon === "booking" || label.toLowerCase() === "booking") {
+        label = "Booking";
+      }
       return {
         ...cloneItem(italianItem),
-        label: cleanString(localizedItem?.label, italianItem.label),
+        label,
         iconColor: cleanIconColor(localizedItem?.iconColor, italianItem.iconColor),
         hidden: Boolean(italianItem.hidden),
       };

@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260615g";
+} from "./content.js?v=20260618a";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260615g";
+} from "./security.js?v=20260618a";
 
 // State variables
 let state = null;
@@ -530,6 +530,10 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
         const isRestaurantSection = section.id === "around" || /ristoranti|locali/i.test(section.menuTitle || "");
         if (isRestaurantSection) {
           targetSection.items.push({ ...item });
+          return;
+        }
+        if (item.kind === "booking" || item.label?.toLowerCase() === "booking" || item.icon === "booking") {
+          targetSection.items.push({ ...item, label: "Booking" });
           return;
         }
         const translatedItem = { ...item, label: "" };

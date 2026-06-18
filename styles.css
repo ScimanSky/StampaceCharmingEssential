@@ -726,6 +726,11 @@ body.sheet-open .page-shell {
   flex-direction: column;
 }
 
+#section-sheet[data-section="host"] .sheet-header {
+  width: 100%;
+  flex-shrink: 0;
+}
+
 #section-sheet[data-section="host"] .sheet-lead {
   margin-bottom: 1.25rem;
 }
@@ -1139,7 +1144,7 @@ body.sheet-open .page-shell {
 }
 
 .sheet-pay-text {
-  margin: 1.5rem 0 1rem;
+  margin: 2rem 0 1.2rem;
   color: var(--section-body-color, var(--muted-strong));
   line-height: 1.5;
   font-size: var(--section-body-size, var(--body-size));
