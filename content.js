@@ -2062,7 +2062,9 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
             );
 
             let resolvedMenuTitle = pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle || section.menuTitle);
-            let resolvedSectionTitle = pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle || section.sectionTitle);
+            let resolvedSectionTitle = section.id === "host"
+              ? (localizedSection?.sectionTitle || section.sectionTitle)
+              : pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle || section.sectionTitle);
 
             // Keep auto-generated category section titles in sync with the category's resolved menuTitle
             if (section.id.startsWith("section-cat-") || (section.category && section.id === `section-${section.category}`)) {
