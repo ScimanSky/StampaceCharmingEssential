@@ -305,8 +305,11 @@ async function translateTexts(texts, targetLocale) {
     }
     const key = translationKey(targetLocale, text);
     if (translationCache.has(key)) {
-      results[index] = translationCache.get(key);
-      return;
+      const cached = translationCache.get(key);
+      if (cached && cached.trim()) {
+        results[index] = cached;
+        return;
+      }
     }
     missingTexts.push(text);
     missingIndexes.push(index);
@@ -326,12 +329,13 @@ async function translateTexts(texts, targetLocale) {
       const source = missingTexts[idx];
       const index = missingIndexes[idx];
       const key = translationKey(targetLocale, source);
-      if (shouldCache) {
-        translationCache.set(key, value);
+      const val = value && value.trim() ? value.trim() : source;
+      if (shouldCache && val !== source) {
+        translationCache.set(key, val);
       } else {
         translationCache.delete(key);
       }
-      results[index] = value;
+      results[index] = val;
     });
     saveTranslationCache();
   }
