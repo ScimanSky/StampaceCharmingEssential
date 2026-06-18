@@ -2,7 +2,6 @@ import {
   AVAILABLE_LANGUAGES,
   CTA_ITEM_TYPE,
   FIXED_LOCALE,
-  getHostPrivateItem,
   HOST_PRIVATE_ITEM,
   MEDIA_ITEM_TYPE,
   REQUIRED_LOCALES,
@@ -33,7 +32,6 @@ import {
   getSelectedEditorLocale,
   getExpandedSectionIds,
   getExpandedCategoryIds,
-  getExpandedPanelIds,
   currentLocaleState,
   syncExpandedSections,
 } from "./host-state.js?v=20260615g";
@@ -280,26 +278,6 @@ function ctaDefaultIcon(kind = "web") {
     booking: "booking", vrbo: "vrbo", paypal: "paypal", revolut: "revolut",
   };
   return fallbackMap[kind] ?? "link";
-}
-
-function ctaDefaultLabel(kind = "web") {
-  const fallbackMap = {
-    web: "Apri link", maps: "Apri mappa", whatsapp: "Scrivi su WhatsApp",
-    telegram: "Scrivi su Telegram", email: "Invia email", gmail: "Invia email",
-    tel: "Chiama", airbnb: "Airbnb", booking: "Booking", vrbo: "Vrbo",
-    paypal: "PayPal", revolut: "Revolut",
-  };
-  return fallbackMap[kind] ?? "Apri link";
-}
-
-function ctaDefaultHref(kind = "web") {
-  const fallbackMap = {
-    web: "https://example.com", maps: "https://maps.google.com/", whatsapp: "+39",
-    telegram: "username", email: "email@example.com", gmail: "email@example.com",
-    tel: "+39", airbnb: "https://www.airbnb.it/", booking: "https://www.booking.com/",
-    vrbo: "https://www.vrbo.com/", paypal: "https://www.paypal.me/", revolut: "https://revolut.me/",
-  };
-  return fallbackMap[kind] ?? "https://example.com";
 }
 
 // Helpers
@@ -984,7 +962,7 @@ export function renderSectionMedia(section) {
         const src = sanitizeImageSrc(item.src);
         if (!src) return "";
         const kindLabel = item.mediaKind === "video" ? "🎬 Video" : "📄 Documento";
-        
+
         let extraFieldsHtml = "";
         if (item.mediaKind !== "video") {
           const icon = item.icon || "book";
@@ -1052,10 +1030,6 @@ export function renderSectionEditors() {
   const localeState = currentLocaleState();
   if (!localeState) return;
   syncExpandedSections();
-  const localeHostPrivateItem = localeState.sections
-    .find((section) => section.id === "host")
-    ?.items.find(isHostPrivateItem) ?? HOST_PRIVATE_ITEM;
-
   const categories = localeState.categories || [];
   const catIds = categories.map(cat => cat.id);
   const expandedSectionIds = getExpandedSectionIds();
@@ -1229,7 +1203,7 @@ export function renderCategoryEditors() {
 
   dom.categories.innerHTML = categories
     .map(
-      (cat, index) => `
+      (cat) => `
         <section class="host-section-card${expandedCategoryIds.has(cat.id) ? "" : " is-collapsed"}${cat.hidden ? " is-hidden-section" : ""}" data-category-id="${escapeAttribute(cat.id)}" data-category-hidden="${cat.hidden ? "true" : "false"}">
           <div class="host-section-meta">
             <div class="host-section-meta-main">
@@ -1474,7 +1448,7 @@ export function syncFields() {
         if (typeof focusState.selectionStart === "number" && typeof focusState.selectionEnd === "number") {
           try {
             targetEl.setSelectionRange(focusState.selectionStart, focusState.selectionEnd);
-          } catch (e) {
+          } catch (_e) {
             // Ignore if input type doesn't support selection range
           }
         }

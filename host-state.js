@@ -426,7 +426,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
           menuTitle: pickSectionValue(section.menuTitle, itBaseSection.menuTitle, scBaseSection.menuTitle ?? section.menuTitle),
           sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
           lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
-          payText: pickSectionValue(section.payText || "", itBaseSection.payText || "", scBaseSection.payText ?? section.payText || ""),
+          payText: pickSectionValue(section.payText || "", itBaseSection.payText || "", (scBaseSection.payText ?? section.payText) || ""),
           items,
         };
       }),

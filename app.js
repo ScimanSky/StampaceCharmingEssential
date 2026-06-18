@@ -53,7 +53,6 @@ const dom = {
 let template = null;
 let activeSectionId = null;
 let remoteTemplateUpdatedAt = null;
-let unsubscribeRealtime = null;
 let lastFocusedElement = null;
 let sheetCloseTimer = null;
 let lastInteractionWasKeyboard = false;
@@ -225,14 +224,14 @@ function renderHostActions(actions) {
   return `
     <div class="sheet-host-actions" aria-label="Contatti e link host">
       ${actions
-        .map(
-          (action) => `
+      .map(
+        (action) => `
             <a class="sheet-host-action sheet-host-action--${escapeAttribute(action.kind)}" href="${escapeAttribute(action.href)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeAttribute(action.label)}"${iconColorStyle(action.iconColor)}>
               ${renderHostActionIcon(action)}
             </a>
           `,
-        )
-        .join("")}
+      )
+      .join("")}
     </div>
   `;
 }
@@ -250,14 +249,13 @@ function renderGenericLinkItem(item, marker, sectionId) {
         <div class="sheet-card-copy">
           ${title}
           ${body}
-          ${
-            href
-              ? `<a class="sheet-cta sheet-host-template-cta" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
+          ${href
+        ? `<a class="sheet-cta sheet-host-template-cta" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
                   <span class="sheet-cta-icon" aria-hidden="true">${renderIcon("user")}</span>
                   <span class="sheet-cta-label">${escapeHtml(label)}</span>
                 </a>`
-              : ""
-          }
+        : ""
+      }
         </div>
       </article>
     `;
@@ -269,11 +267,10 @@ function renderGenericLinkItem(item, marker, sectionId) {
       <div class="sheet-card-copy">
         ${title}
         ${body}
-        ${
-          href
-            ? `<a class="sheet-link" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`
-            : ""
-        }
+        ${href
+      ? `<a class="sheet-link" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`
+      : ""
+    }
       </div>
     </article>
   `;
@@ -339,11 +336,10 @@ function renderImageItem(item, { plain = false, hostQr = false } = {}) {
     <article class="sheet-card sheet-card-media${plain ? " sheet-card-media--plain" : ""}${hostQrClass}">
       <div class="sheet-card-media-body">
         <img class="sheet-image sheet-image--${escapeAttribute(item.size || "grande")}${plain ? " sheet-image--plain" : ""}" src="${escapeAttribute(src)}" alt="${escapeAttribute(item.alt ?? "")}" loading="eager" />
-        ${
-          item.caption
-            ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
-            : ""
-        }
+        ${item.caption
+      ? `<p class="sheet-image-caption">${escapeHtml(item.caption)}</p>`
+      : ""
+    }
       </div>
     </article>
   `;
@@ -876,13 +872,13 @@ function renderSectionItems(items, sectionId) {
         if (sectionId === "wifi" && wifiColonStrings.includes(finalItem)) {
           const index = wifiColonStrings.indexOf(finalItem);
           const parts = finalItem.split(/[:：]/);
-          
+
           const type = index === 0 ? "rete" : "password";
           const label = index === 0 ? "Rete" : "Password";
-          
+
           // Use the Italian value if available to prevent translation of network name/password!
-          const value = (type === "rete" ? italianWifiValues.rete : italianWifiValues.password) || 
-                        (parts.length > 1 ? parts.slice(1).join(":").trim() : finalItem.trim());
+          const value = (type === "rete" ? italianWifiValues.rete : italianWifiValues.password) ||
+            (parts.length > 1 ? parts.slice(1).join(":").trim() : finalItem.trim());
 
           return `
             <article class="sheet-card">
@@ -1710,7 +1706,7 @@ function startLiveSync() {
 
   window.addEventListener("focus", syncRemoteTemplate);
 
-  unsubscribeRealtime = subscribeToRemoteTemplate((row) => {
+  subscribeToRemoteTemplate((row) => {
     remoteTemplateUpdatedAt = row.updated_at ?? null;
     if (row.content) {
       template = normalizeTemplate(row.content);
@@ -1739,7 +1735,7 @@ async function init() {
   if (!template.enabledLocales.includes(currentLocale)) {
     currentLocale = FIXED_LOCALE;
   }
-  
+
   dom.mainMenu.classList.add("is-animating");
   render();
   window.setTimeout(() => {
