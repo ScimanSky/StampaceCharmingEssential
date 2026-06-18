@@ -757,6 +757,8 @@ function parseItems(value) {
 export function renderSectionCtas(section) {
   const ctas = section.items.filter(isCtaItem);
   const editable = getSelectedEditorLocale() === FIXED_LOCALE;
+  const state = getState();
+  const themeColors = state?.theme?.colors || {};
 
   if (!ctas.length) {
     return `<p class="host-cta-empty">Nessun pulsante grafico configurato.</p>`;
@@ -798,15 +800,15 @@ export function renderSectionCtas(section) {
             </label>
             <label>
               <span>Colore icona</span>
-              ${colorInputHtml("iconColor", iconColor, { cta: true })}
+              ${colorInputHtml("iconColor", iconColor, { cta: true, fallback: themeColors.icon || "#dfc39c", disabled: !editable })}
             </label>
             <label>
               <span>Colore sfondo</span>
-              ${colorInputHtml("bgColor", item.bgColor || "", { cta: true, disabled: !editable })}
+              ${colorInputHtml("bgColor", item.bgColor || "", { cta: true, fallback: themeColors.row || "#17120e", disabled: !editable })}
             </label>
             <label>
               <span>Colore scritte</span>
-              ${colorInputHtml("textColor", item.textColor || "", { cta: true, disabled: !editable })}
+              ${colorInputHtml("textColor", item.textColor || "", { cta: true, fallback: themeColors.text || "#e7d8c1", disabled: !editable })}
             </label>
             <label>
               <span>Font del titolo</span>
@@ -844,6 +846,8 @@ export function renderCategoryCtas(cat) {
   const autoSec = locState ? (locState.sections || []).find((s) => s.id === autoSecId) : null;
   const ctas = autoSec ? autoSec.items.filter(isCtaItem) : [];
   const editable = getSelectedEditorLocale() === FIXED_LOCALE;
+  const state = getState();
+  const themeColors = state?.theme?.colors || {};
 
   if (!ctas.length) {
     return `<p class="host-cta-empty">Nessun pulsante grafico configurato.</p>`;
@@ -885,15 +889,15 @@ export function renderCategoryCtas(cat) {
             </label>
             <label>
               <span>Colore icona</span>
-              ${colorInputHtml("iconColor", iconColor, { cta: true })}
+              ${colorInputHtml("iconColor", iconColor, { cta: true, fallback: themeColors.icon || "#dfc39c", disabled: !editable })}
             </label>
             <label>
               <span>Colore sfondo</span>
-              ${colorInputHtml("bgColor", item.bgColor || "", { cta: true, disabled: !editable })}
+              ${colorInputHtml("bgColor", item.bgColor || "", { cta: true, fallback: themeColors.row || "#17120e", disabled: !editable })}
             </label>
             <label>
               <span>Colore scritte</span>
-              ${colorInputHtml("textColor", item.textColor || "", { cta: true, disabled: !editable })}
+              ${colorInputHtml("textColor", item.textColor || "", { cta: true, fallback: themeColors.text || "#e7d8c1", disabled: !editable })}
             </label>
             <label>
               <span>Font del titolo</span>
@@ -1056,6 +1060,8 @@ export function renderSectionEditors() {
   const catIds = categories.map(cat => cat.id);
   const expandedSectionIds = getExpandedSectionIds();
   const selectedEditorLocale = getSelectedEditorLocale();
+  const state = getState();
+  const themeColors = state?.theme?.colors || {};
 
   const visibleSections = localeState.sections.filter((section) => {
     if (!section || !section.id) return false;
@@ -1118,7 +1124,7 @@ export function renderSectionEditors() {
               </label>
               <label>
                 <span>Colore icona</span>
-                ${colorInputHtml("iconColor", section.iconColor)}
+                ${colorInputHtml("iconColor", section.iconColor, { fallback: themeColors.icon || "#dfc39c", disabled: selectedEditorLocale !== FIXED_LOCALE })}
               </label>
               <label>
                 <span>Categoria menu</span>
@@ -1212,6 +1218,8 @@ export function renderCategoryEditors() {
   const catIds = categories.map(c => c.id);
   const expandedCategoryIds = getExpandedCategoryIds();
   const selectedEditorLocale = getSelectedEditorLocale();
+  const state = getState();
+  const themeColors = state?.theme?.colors || {};
 
   dom.categories.innerHTML = categories
     .map(
@@ -1223,8 +1231,8 @@ export function renderCategoryEditors() {
                 <span class="host-section-icon" data-category-icon-preview${iconColorStyle(cat.iconColor)}>${renderIcon(cat.icon)}</span>
                 <span class="host-section-heading">
                   <span>
-                    <p class="host-kicker">Pulsante Principale</p>
-                    <h2>${escapeHtml(cat.menuTitle || "Nuovo Gruppo")}</h2>
+                    <p class="host-kicker">${escapeHtml(cat.id)}</p>
+                    <h2>${escapeHtml(cat.menuTitle)}</h2>
                   </span>
                   <span class="host-section-chevron" aria-hidden="true">⌄</span>
                 </span>
@@ -1256,15 +1264,15 @@ export function renderCategoryEditors() {
               </label>
               <label>
                 <span>Colore icona</span>
-                ${colorInputHtml("iconColor", cat.iconColor)}
+                ${colorInputHtml("iconColor", cat.iconColor, { fallback: themeColors.icon || "#dfc39c", disabled: selectedEditorLocale !== FIXED_LOCALE })}
               </label>
               <label>
                 <span>Colore sfondo</span>
-                ${colorInputHtml("bgColor", cat.bgColor)}
+                ${colorInputHtml("bgColor", cat.bgColor, { fallback: themeColors.row || "#17120e", disabled: selectedEditorLocale !== FIXED_LOCALE })}
               </label>
               <label>
                 <span>Colore testo</span>
-                ${colorInputHtml("textColor", cat.textColor)}
+                ${colorInputHtml("textColor", cat.textColor, { fallback: themeColors.text || "#e7d8c1", disabled: selectedEditorLocale !== FIXED_LOCALE })}
               </label>
               <label>
                 <span>Dimensione font</span>
@@ -1473,14 +1481,26 @@ export function collectTemplate() {
   const state = getState();
   const selectedEditorLocale = getSelectedEditorLocale();
   const next = JSON.parse(JSON.stringify(state));
+  const themeColors = state?.theme?.colors || {};
+
   const categoryCards = [...(dom.categories?.querySelectorAll("[data-category-id]") || [])];
   const categoryCtas = {};
   const categories = categoryCards.map((card) => {
     const id = card.dataset.categoryId;
     const base = (currentLocaleState().categories || []).find((cat) => cat.id === id) || {};
-    const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);
-    const bgColor = sanitizeCssColor(card.querySelector('[data-field="bgColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="bgColor"]')?.value);
-    const textColor = sanitizeCssColor(card.querySelector('[data-field="textColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="textColor"]')?.value);
+
+    const iconColorInput = card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value;
+    const bgColorInput = card.querySelector('[data-field="bgColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="bgColor"]')?.value;
+    const textColorInput = card.querySelector('[data-field="textColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="textColor"]')?.value;
+
+    const iconColorRaw = sanitizeCssColor(iconColorInput);
+    const bgColorRaw = sanitizeCssColor(bgColorInput);
+    const textColorRaw = sanitizeCssColor(textColorInput);
+
+    const iconColor = (iconColorRaw === (themeColors.icon || "#dfc39c")) ? "" : iconColorRaw;
+    const bgColor = (bgColorRaw === (themeColors.row || "#17120e")) ? "" : bgColorRaw;
+    const textColor = (textColorRaw === (themeColors.text || "#e7d8c1")) ? "" : textColorRaw;
+
     const placement = card.querySelector('[data-field="placement"]')?.value || "homepage";
 
     if (placement === "host") {
@@ -1493,9 +1513,19 @@ export function collectTemplate() {
         }
         const href = normalizeCtaHref(kind, rawHref);
         const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
-        const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
-        const bgColor = sanitizeCssColor(item.querySelector('[data-cta-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="bgColor"]')?.value);
-        const textColor = sanitizeCssColor(item.querySelector('[data-cta-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="textColor"]')?.value);
+
+        const itemIconColorInput = item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value;
+        const itemBgColorInput = item.querySelector('[data-cta-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="bgColor"]')?.value;
+        const itemTextColorInput = item.querySelector('[data-cta-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="textColor"]')?.value;
+
+        const itemIconColorRaw = sanitizeCssColor(itemIconColorInput);
+        const itemBgColorRaw = sanitizeCssColor(itemBgColorInput);
+        const itemTextColorRaw = sanitizeCssColor(itemTextColorInput);
+
+        const itemIconColor = (itemIconColorRaw === (themeColors.icon || "#dfc39c")) ? "" : itemIconColorRaw;
+        const itemBgColor = (itemBgColorRaw === (themeColors.row || "#17120e")) ? "" : itemBgColorRaw;
+        const itemTextColor = (itemTextColorRaw === (themeColors.text || "#e7d8c1")) ? "" : itemTextColorRaw;
+
         const fontFamily = item.querySelector('[data-cta-field="fontFamily"]')?.value || "";
         const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
         return {
@@ -1504,9 +1534,9 @@ export function collectTemplate() {
           label,
           href,
           icon,
-          iconColor,
-          bgColor,
-          textColor,
+          iconColor: itemIconColor,
+          bgColor: itemBgColor,
+          textColor: itemTextColor,
           fontFamily,
           hidden,
         };
@@ -1542,9 +1572,19 @@ export function collectTemplate() {
       }
       const href = normalizeCtaHref(kind, rawHref);
       const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
-      const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
-      const bgColor = sanitizeCssColor(item.querySelector('[data-cta-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="bgColor"]')?.value);
-      const textColor = sanitizeCssColor(item.querySelector('[data-cta-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="textColor"]')?.value);
+
+      const itemIconColorInput = item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value;
+      const itemBgColorInput = item.querySelector('[data-cta-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="bgColor"]')?.value;
+      const itemTextColorInput = item.querySelector('[data-cta-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="textColor"]')?.value;
+
+      const itemIconColorRaw = sanitizeCssColor(itemIconColorInput);
+      const itemBgColorRaw = sanitizeCssColor(itemBgColorInput);
+      const itemTextColorRaw = sanitizeCssColor(itemTextColorInput);
+
+      const itemIconColor = (itemIconColorRaw === (themeColors.icon || "#dfc39c")) ? "" : itemIconColorRaw;
+      const itemBgColor = (itemBgColorRaw === (themeColors.row || "#17120e")) ? "" : itemBgColorRaw;
+      const itemTextColor = (itemTextColorRaw === (themeColors.text || "#e7d8c1")) ? "" : itemTextColorRaw;
+
       const fontFamily = item.querySelector('[data-cta-field="fontFamily"]')?.value || "";
       const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
       return {
@@ -1553,9 +1593,9 @@ export function collectTemplate() {
         label,
         href,
         icon,
-        iconColor,
-        bgColor,
-        textColor,
+        iconColor: itemIconColor,
+        bgColor: itemBgColor,
+        textColor: itemTextColor,
         fontFamily,
         hidden,
       };
@@ -1568,24 +1608,42 @@ export function collectTemplate() {
       caption: item.querySelector('[data-image-field="caption"]').value,
       size: item.querySelector('[data-image-field="size"]')?.value || "grande",
     })).filter((item) => item.src);
-    const mediaItems = [...card.querySelectorAll("[data-media-item]")].map((item) => ({
-      type: MEDIA_ITEM_TYPE,
-      mediaKind: item.dataset.mediaKind || "document",
-      path: item.dataset.mediaPath || "",
-      src: sanitizeImageSrc(item.dataset.mediaSrc || ""),
-      title: item.querySelector('[data-media-field="title"]')?.value || "",
-      caption: item.querySelector('[data-media-field="caption"]')?.value || "",
-      fileName: item.dataset.mediaFileName || "",
-      mimeType: item.dataset.mediaMimeType || "",
-      sizeBytes: Number(item.dataset.mediaSizeBytes) || 0,
-      icon: item.querySelector('[data-media-field="icon"]')?.value || "",
-      iconColor: sanitizeCssColor(item.querySelector('[data-media-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="iconColor"]')?.value),
-      bgColor: sanitizeCssColor(item.querySelector('[data-media-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="bgColor"]')?.value),
-      textColor: sanitizeCssColor(item.querySelector('[data-media-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="textColor"]')?.value),
-      fontFamily: item.querySelector('[data-media-field="fontFamily"]')?.value || "",
-    })).filter((item) => item.src);
+    const mediaItems = [...card.querySelectorAll("[data-media-item]")].map((item) => {
+      const itemIconColorInput = item.querySelector('[data-media-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="iconColor"]')?.value;
+      const itemBgColorInput = item.querySelector('[data-media-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="bgColor"]')?.value;
+      const itemTextColorInput = item.querySelector('[data-media-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-media-field="textColor"]')?.value;
+
+      const itemIconColorRaw = sanitizeCssColor(itemIconColorInput);
+      const itemBgColorRaw = sanitizeCssColor(itemBgColorInput);
+      const itemTextColorRaw = sanitizeCssColor(itemTextColorInput);
+
+      const itemIconColor = (itemIconColorRaw === "#dfc39c") ? "" : itemIconColorRaw;
+      const itemBgColor = (itemBgColorRaw === "#2d2319") ? "" : itemBgColorRaw;
+      const itemTextColor = (itemTextColorRaw === "#e7d8c1") ? "" : itemTextColorRaw;
+
+      return {
+        type: MEDIA_ITEM_TYPE,
+        mediaKind: item.dataset.mediaKind || "document",
+        path: item.dataset.mediaPath || "",
+        src: sanitizeImageSrc(item.dataset.mediaSrc || ""),
+        title: item.querySelector('[data-media-field="title"]')?.value || "",
+        caption: item.querySelector('[data-media-field="caption"]')?.value || "",
+        fileName: item.dataset.mediaFileName || "",
+        mimeType: item.dataset.mediaMimeType || "",
+        sizeBytes: Number(item.dataset.mediaSizeBytes) || 0,
+        icon: item.querySelector('[data-media-field="icon"]')?.value || "",
+        iconColor: itemIconColor,
+        bgColor: itemBgColor,
+        textColor: itemTextColor,
+        fontFamily: item.querySelector('[data-media-field="fontFamily"]')?.value || "",
+      };
+    }).filter((item) => item.src);
+
     const selectedIcon = card.querySelector('[data-field="icon"]')?.value || base.icon || "spark";
-    const iconColor = sanitizeCssColor(card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value);
+    const iconColorInput = card.querySelector('[data-field="iconColor"]')?.value ?? card.querySelector('.host-color-picker[data-field="iconColor"]')?.value;
+    const iconColorRaw = sanitizeCssColor(iconColorInput);
+    const iconColor = (iconColorRaw === (themeColors.icon || "#dfc39c")) ? "" : iconColorRaw;
+
     return {
       id,
       icon: selectedIcon.trim() || "spark",
