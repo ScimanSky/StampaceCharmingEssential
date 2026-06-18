@@ -1,6 +1,6 @@
 const SAFE_LINK_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 const SAFE_WEB_PROTOCOLS = new Set(["http:", "https:"]);
-const CTA_KINDS = new Set(["web", "maps", "whatsapp", "telegram", "email", "gmail", "tel", "airbnb", "booking", "vrbo"]);
+const CTA_KINDS = new Set(["web", "maps", "whatsapp", "telegram", "email", "gmail", "tel", "airbnb", "booking", "vrbo", "paypal", "revolut"]);
 const SAFE_CSS_NAMED_COLORS = new Set(["currentcolor", "transparent"]);
 
 export function escapeHtml(value) {

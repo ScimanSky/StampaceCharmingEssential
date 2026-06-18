@@ -152,6 +152,8 @@ const CTA_KIND_OPTIONS = [
   { value: "airbnb", label: "Airbnb" },
   { value: "booking", label: "Booking" },
   { value: "vrbo", label: "Vrbo" },
+  { value: "paypal", label: "PayPal" },
+  { value: "revolut", label: "Revolut" },
 ];
 const CTA_ICON_OPTIONS = [
   { value: "map", label: "Mappa" },
@@ -195,6 +197,8 @@ const CTA_ICON_OPTIONS = [
   { value: "airbnb", label: "Airbnb" },
   { value: "booking", label: "Booking" },
   { value: "vrbo", label: "Vrbo" },
+  { value: "paypal", label: "PayPal" },
+  { value: "revolut", label: "Revolut" },
 ];
 const SECTION_ICON_OPTIONS = [
   { value: "spark", label: "Automatica" },
@@ -264,6 +268,8 @@ const CTA_PRESET_OPTIONS = [
   { kind: "airbnb", label: "Icona Airbnb" },
   { kind: "booking", label: "Icona Booking" },
   { kind: "vrbo", label: "Icona Vrbo" },
+  { kind: "paypal", label: "CTA PayPal" },
+  { kind: "revolut", label: "CTA Revolut" },
 ];
 const LINK_ITEM_PREFIX = "LINK";
 
@@ -271,7 +277,7 @@ function ctaDefaultIcon(kind = "web") {
   const fallbackMap = {
     web: "link", maps: "map", whatsapp: "whatsapp", telegram: "telegram",
     email: "gmail", gmail: "gmail", tel: "phone", airbnb: "airbnb",
-    booking: "booking", vrbo: "vrbo",
+    booking: "booking", vrbo: "vrbo", paypal: "paypal", revolut: "revolut",
   };
   return fallbackMap[kind] ?? "link";
 }
@@ -281,6 +287,7 @@ function ctaDefaultLabel(kind = "web") {
     web: "Apri link", maps: "Apri mappa", whatsapp: "Scrivi su WhatsApp",
     telegram: "Scrivi su Telegram", email: "Invia email", gmail: "Invia email",
     tel: "Chiama", airbnb: "Airbnb", booking: "Booking", vrbo: "Vrbo",
+    paypal: "PayPal", revolut: "Revolut",
   };
   return fallbackMap[kind] ?? "Apri link";
 }
@@ -290,7 +297,7 @@ function ctaDefaultHref(kind = "web") {
     web: "https://example.com", maps: "https://maps.google.com/", whatsapp: "+39",
     telegram: "username", email: "email@example.com", gmail: "email@example.com",
     tel: "+39", airbnb: "https://www.airbnb.it/", booking: "https://www.booking.com/",
-    vrbo: "https://www.vrbo.com/",
+    vrbo: "https://www.vrbo.com/", paypal: "https://www.paypal.me/", revolut: "https://revolut.me/",
   };
   return fallbackMap[kind] ?? "https://example.com";
 }
@@ -794,6 +801,21 @@ export function renderSectionCtas(section) {
               ${colorInputHtml("iconColor", iconColor, { cta: true })}
             </label>
             <label>
+              <span>Colore sfondo</span>
+              ${colorInputHtml("bgColor", item.bgColor || "", { cta: true, disabled: !editable })}
+            </label>
+            <label>
+              <span>Colore scritte</span>
+              ${colorInputHtml("textColor", item.textColor || "", { cta: true, disabled: !editable })}
+            </label>
+            <label>
+              <span>Font del titolo</span>
+              <select data-cta-field="fontFamily" ${!editable ? "disabled" : ""}>
+                <option value="">(Usa predefinito del tema)</option>
+                ${AVAILABLE_FONTS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === (item.fontFamily || "") ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+              </select>
+            </label>
+            <label>
               <span>Etichetta bottone</span>
               <input data-cta-field="label" type="text" value="${escapeAttribute(item.label ?? "")}" ${!editable ? "disabled" : ""} />
             </label>
@@ -864,6 +886,21 @@ export function renderCategoryCtas(cat) {
             <label>
               <span>Colore icona</span>
               ${colorInputHtml("iconColor", iconColor, { cta: true })}
+            </label>
+            <label>
+              <span>Colore sfondo</span>
+              ${colorInputHtml("bgColor", item.bgColor || "", { cta: true, disabled: !editable })}
+            </label>
+            <label>
+              <span>Colore scritte</span>
+              ${colorInputHtml("textColor", item.textColor || "", { cta: true, disabled: !editable })}
+            </label>
+            <label>
+              <span>Font del titolo</span>
+              <select data-cta-field="fontFamily" ${!editable ? "disabled" : ""}>
+                <option value="">(Usa predefinito del tema)</option>
+                ${AVAILABLE_FONTS.map((option) => `<option value="${escapeAttribute(option.value)}" ${option.value === (item.fontFamily || "") ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+              </select>
             </label>
             <label>
               <span>Etichetta bottone</span>
@@ -1457,6 +1494,9 @@ export function collectTemplate() {
         const href = normalizeCtaHref(kind, rawHref);
         const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
         const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
+        const bgColor = sanitizeCssColor(item.querySelector('[data-cta-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="bgColor"]')?.value);
+        const textColor = sanitizeCssColor(item.querySelector('[data-cta-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="textColor"]')?.value);
+        const fontFamily = item.querySelector('[data-cta-field="fontFamily"]')?.value || "";
         const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
         return {
           type: CTA_ITEM_TYPE,
@@ -1465,6 +1505,9 @@ export function collectTemplate() {
           href,
           icon,
           iconColor,
+          bgColor,
+          textColor,
+          fontFamily,
           hidden,
         };
       });
@@ -1500,6 +1543,9 @@ export function collectTemplate() {
       const href = normalizeCtaHref(kind, rawHref);
       const icon = item.querySelector('[data-cta-field="icon"]').value || ctaDefaultIcon(kind);
       const iconColor = sanitizeCssColor(item.querySelector('[data-cta-field="iconColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="iconColor"]')?.value);
+      const bgColor = sanitizeCssColor(item.querySelector('[data-cta-field="bgColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="bgColor"]')?.value);
+      const textColor = sanitizeCssColor(item.querySelector('[data-cta-field="textColor"]')?.value ?? item.querySelector('.host-color-picker[data-cta-field="textColor"]')?.value);
+      const fontFamily = item.querySelector('[data-cta-field="fontFamily"]')?.value || "";
       const hidden = item.querySelector('[data-cta-field="hidden"]')?.value === "true";
       return {
         type: CTA_ITEM_TYPE,
@@ -1508,6 +1554,9 @@ export function collectTemplate() {
         href,
         icon,
         iconColor,
+        bgColor,
+        textColor,
+        fontFamily,
         hidden,
       };
     });

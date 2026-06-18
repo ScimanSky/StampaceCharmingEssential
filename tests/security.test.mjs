@@ -90,4 +90,18 @@ describe('Security module', () => {
       assert.strictEqual(normalizeCtaHref('telegram', 'http://t.me/myhost'), ''); // Only https is allowed
     });
   });
+
+  describe('normalizeCtaKind', () => {
+    it('should allow valid and brand CTA kinds including paypal and revolut', () => {
+      assert.strictEqual(normalizeCtaKind('paypal'), 'paypal');
+      assert.strictEqual(normalizeCtaKind('revolut'), 'revolut');
+      assert.strictEqual(normalizeCtaKind('web'), 'web');
+      assert.strictEqual(normalizeCtaKind('whatsapp'), 'whatsapp');
+    });
+
+    it('should default to web for invalid kinds', () => {
+      assert.strictEqual(normalizeCtaKind('invalid'), 'web');
+      assert.strictEqual(normalizeCtaKind(null), 'web');
+    });
+  });
 });

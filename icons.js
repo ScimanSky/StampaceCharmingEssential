@@ -149,10 +149,14 @@ export const iconPaths = {
     '<circle cx="12" cy="12" r="11.4" fill="#092240" stroke="none"/><path d="M7.4 6.2c.8.2 1.6 2.2 2.0 5.2l1.3 7.6" stroke="#6abce6" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M8.0 6.2c.8.2 1.6 2.2 2.0 5.2l1.4 7.6" stroke="#0062ac" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M8.6 6.2c.8.2 1.6 2.2 2.0 5.2l1.5 7.6" stroke="#00387b" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M9.2 6.2c.8.2 1.6 2.2 2.0 5.2l1.6 7.6" stroke="#eb690b" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M9.8 6.2c.8.2 1.6 2.2 2.0 5.2l1.7 7.6" stroke="#8cc63f" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M15.8 6.2c-.7.8-1.2 2.2-1.4 3.7l-.6 4.3" stroke="#8cc63f" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M16.4 6.2c-.7.8-1.2 2.2-1.4 3.7l-.6 4.3" stroke="#eb690b" stroke-width="0.6" fill="none" stroke-linecap="round"/><path d="M17.0 6.2c-.7.8-1.2 2.2-1.4 3.7l-.6 4.3" stroke="#0062ac" stroke-width="0.6" fill="none" stroke-linecap="round"/>',
   telegram:
     '<defs><radialGradient id="telegram-blue-icon" cx="64%" cy="22%" r="82%"><stop offset="0%" stop-color="#3fabf4"/><stop offset="100%" stop-color="#0088cc"/></radialGradient></defs><circle cx="12" cy="12" r="11.4" fill="url(#telegram-blue-icon)" stroke="none"/><path d="M5.3 11.5 C5.3 11.5 17.5 6.2 18.2 5.9 C18.9 5.6 19.3 5.7 19.2 6.5 C19.1 7.2 17.8 14.8 17.1 18.2 C16.9 19.1 16.3 19.3 15.6 18.9 C14.6 18.2 12.8 16.9 12.0 16.3 C11.3 15.7 11.7 15.3 12.2 14.8 C12.4 14.5 16.2 10.7 16.4 9.8 C16.5 9.4 16.2 9.2 15.7 9.5 C15.0 10.0 9.8 13.5 8.7 14.2 C8.0 14.7 7.3 14.8 6.8 14.8 C6.1 14.7 4.7 14.2 3.6 13.8 C2.3 13.3 2.1 12.6 3.5 12.1 C4.1 11.9 5.3 11.5 5.3 11.5 Z" fill="#fff" stroke="none"/>',
+  paypal:
+    '<image href="img/paypal.png" x="0" y="0" width="24" height="24"/>',
+  revolut:
+    '<image href="img/revolut.png" x="0" y="0" width="24" height="24"/>',
 };
 
 export function renderIcon(name) {
-  const isBrand = ["whatsapp", "gmail", "telegram", "airbnb", "booking", "vrbo"].includes(name);
+  const isBrand = ["whatsapp", "gmail", "telegram", "airbnb", "booking", "vrbo", "paypal", "revolut"].includes(name);
   const classAttr = isBrand ? ' class="icon-brand"' : '';
   return `<svg viewBox="0 0 24 24" aria-hidden="true"${classAttr}>${iconPaths[name] ?? iconPaths.spark}</svg>`;
 }

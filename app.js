@@ -291,6 +291,8 @@ function ctaIcon(item) {
     airbnb: "airbnb",
     booking: "booking",
     vrbo: "vrbo",
+    paypal: "paypal",
+    revolut: "revolut",
   };
   return item.icon || kindFallback[item.kind] || "link";
 }
@@ -301,9 +303,27 @@ function renderCtaItem(item) {
   const href = normalizeCtaHref(kind, item.href);
   if (!href) return "";
 
+  const styles = [];
+  if (item.iconColor) {
+    styles.push(`--icon-custom-color: ${sanitizeCssColor(item.iconColor)}`);
+  } else if (item.textColor) {
+    styles.push(`--icon-custom-color: ${sanitizeCssColor(item.textColor)}`);
+  }
+  if (item.bgColor) {
+    styles.push(`background-color: ${sanitizeCssColor(item.bgColor)}`);
+  }
+  if (item.textColor) {
+    styles.push(`color: ${sanitizeCssColor(item.textColor)}`);
+    styles.push(`--text: ${sanitizeCssColor(item.textColor)}`);
+  }
+  if (item.fontFamily) {
+    styles.push(`--cta-font: "${item.fontFamily}"`);
+  }
+  const styleAttr = styles.length ? ` style="${escapeAttribute(styles.join("; "))}"` : "";
+
   return `
     <article class="sheet-card sheet-card-cta">
-      <a class="sheet-cta sheet-cta--${escapeAttribute(kind)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer">
+      <a class="sheet-cta sheet-cta--${escapeAttribute(kind)}" href="${escapeAttribute(href)}" target="_blank" rel="noopener noreferrer"${styleAttr}>
         <span class="sheet-cta-icon" aria-hidden="true"${iconColorStyle(item.iconColor)}>${renderIcon(ctaIcon(item))}</span>
         <span class="sheet-cta-label">${escapeHtml(item.label)}</span>
       </a>
@@ -732,6 +752,7 @@ function renderSectionItems(items, sectionId) {
     const actions = [];
     const cards = [];
     const mediaCards = [];
+    const wideCtas = [];
 
     items.forEach((item) => {
       const action =
@@ -744,7 +765,9 @@ function renderSectionItems(items, sectionId) {
       if (isHostPrivateItem(item)) return;
 
       if (isCtaItem(item)) {
-        if (action) {
+        if (item.kind === "paypal" || item.kind === "revolut") {
+          wideCtas.push(renderCtaItem(item));
+        } else if (action) {
           actions.push(action);
         }
         return;
@@ -781,7 +804,7 @@ function renderSectionItems(items, sectionId) {
       cards.push(renderGenericLinkItem(item, marker, sectionId));
     });
 
-    return `${cards.join("")}${renderHostActions(actions)}${mediaCards.join("")}`;
+    return `${cards.join("")}${renderHostActions(actions)}${wideCtas.join("")}${mediaCards.join("")}`;
   }
 
   let safeItemIndex = 0;

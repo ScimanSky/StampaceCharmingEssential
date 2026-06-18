@@ -785,7 +785,7 @@ function buildCtaPreset(kind = "web") {
     const fallbackMap = {
       web: "link", maps: "map", whatsapp: "whatsapp", telegram: "telegram",
       email: "gmail", gmail: "gmail", tel: "phone", airbnb: "airbnb",
-      booking: "booking", vrbo: "vrbo",
+      booking: "booking", vrbo: "vrbo", paypal: "paypal", revolut: "revolut",
     };
     return fallbackMap[k] ?? "link";
   };
@@ -795,6 +795,7 @@ function buildCtaPreset(kind = "web") {
       web: "Apri link", maps: "Apri mappa", whatsapp: "Scrivi su WhatsApp",
       telegram: "Scrivi su Telegram", email: "Invia email", gmail: "Invia email",
       tel: "Chiama", airbnb: "Airbnb", booking: "Booking", vrbo: "Vrbo",
+      paypal: "PayPal", revolut: "Revolut",
     };
     return fallbackMap[k] ?? "Apri link";
   };
@@ -804,7 +805,7 @@ function buildCtaPreset(kind = "web") {
       web: "https://example.com", maps: "https://maps.google.com/", whatsapp: "+39",
       telegram: "username", email: "email@example.com", gmail: "email@example.com",
       tel: "+39", airbnb: "https://www.airbnb.it/", booking: "https://www.booking.com/",
-      vrbo: "https://www.vrbo.com/",
+      vrbo: "https://www.vrbo.com/", paypal: "https://www.paypal.me/", revolut: "https://revolut.me/",
     };
     return fallbackMap[k] ?? "https://example.com";
   };
@@ -816,6 +817,9 @@ function buildCtaPreset(kind = "web") {
     href: ctaDefaultHref(kind),
     icon: ctaDefaultIcon(kind),
     iconColor: "",
+    bgColor: "",
+    textColor: "",
+    fontFamily: "",
   };
 }
 

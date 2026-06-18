@@ -108,7 +108,41 @@ describe('Content module', () => {
       assert.strictEqual(mediaItem.fontFamily, 'Roboto');
     });
 
-
+    it('should preserve custom styling fields on CTA items', () => {
+      const template = {
+        enabledLocales: ['it'],
+        locales: {
+          it: {
+            sections: [
+              {
+                id: 'sec-cta',
+                items: [
+                  {
+                    type: 'cta',
+                    kind: 'paypal',
+                    label: 'Paga con PayPal',
+                    href: 'https://paypal.me/user',
+                    icon: 'paypal',
+                    iconColor: '#ff0000',
+                    bgColor: '#00ff00',
+                    textColor: '#0000ff',
+                    fontFamily: 'Roboto',
+                    hidden: false
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      };
+      const normalized = normalizeTemplate(template);
+      const ctaItem = normalized.locales.it.sections[0].items[0];
+      assert.strictEqual(ctaItem.icon, 'paypal');
+      assert.strictEqual(ctaItem.iconColor, '#ff0000');
+      assert.strictEqual(ctaItem.bgColor, '#00ff00');
+      assert.strictEqual(ctaItem.textColor, '#0000ff');
+      assert.strictEqual(ctaItem.fontFamily, 'Roboto');
+    });
 
     it('should preserve placement for custom categories and default to homepage', () => {
       const custom = {

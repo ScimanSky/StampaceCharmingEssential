@@ -1505,6 +1505,9 @@ function normalizeItems(items, fallbackItems) {
             href: cleanString(item.href),
             icon: cleanString(item.icon),
             iconColor: cleanIconColor(item.iconColor),
+            bgColor: cleanIconColor(item.bgColor),
+            textColor: cleanIconColor(item.textColor),
+            fontFamily: cleanString(item.fontFamily),
             hidden: Boolean(item.hidden),
           };
         }
