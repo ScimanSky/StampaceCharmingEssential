@@ -1,4 +1,4 @@
-import { sanitizeCssColor, escapeAttribute } from "./security.js?v=20260618a";
+import { sanitizeCssColor, escapeAttribute } from "./security.js?v=20260618b";
 
 export function themeValue(group, key, fallback) {
   const value = group?.[key];

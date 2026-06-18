@@ -313,4 +313,102 @@ describe('Content module', () => {
       assert.strictEqual(enSection.sectionTitle, 'Contacts');
     });
   });
+
+  describe('host section title and Fabrizio proper name protection', () => {
+    it('should heal localized sectionTitle to Fabrizio if Italian is Fabrizio and database has Fabrycy or Host', () => {
+      const template = {
+        enabledLocales: ['it', 'pl', 'en'],
+        locales: {
+          it: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Fabrizio', items: [] }
+            ]
+          },
+          pl: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Fabrycy', items: [] }
+            ]
+          },
+          en: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Host', items: [] }
+            ]
+          }
+        }
+      };
+
+      const normalized = normalizeTemplate(template);
+
+      const plSection = normalized.locales.pl.sections.find(s => s.id === 'host');
+      assert.ok(plSection);
+      assert.strictEqual(plSection.sectionTitle, 'Fabrizio');
+
+      const enSection = normalized.locales.en.sections.find(s => s.id === 'host');
+      assert.ok(enSection);
+      assert.strictEqual(enSection.sectionTitle, 'Fabrizio');
+    });
+
+    it('should heal partially translated host section titles containing Fabrizio', () => {
+      const template = {
+        enabledLocales: ['it', 'pl', 'en'],
+        locales: {
+          it: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Contatta Fabrizio', items: [] }
+            ]
+          },
+          pl: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Skontaktuj się z Fabrycy', items: [] }
+            ]
+          },
+          en: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Contact Host', items: [] }
+            ]
+          }
+        }
+      };
+
+      const normalized = normalizeTemplate(template);
+
+      const plSection = normalized.locales.pl.sections.find(s => s.id === 'host');
+      assert.ok(plSection);
+      assert.strictEqual(plSection.sectionTitle, 'Skontaktuj się z Fabrizio');
+
+      const enSection = normalized.locales.en.sections.find(s => s.id === 'host');
+      assert.ok(enSection);
+      assert.strictEqual(enSection.sectionTitle, 'Contact Fabrizio');
+    });
+
+    it('should translate default Host section title to correct default translation', () => {
+      const template = {
+        enabledLocales: ['it', 'pl', 'en'],
+        locales: {
+          it: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Host', items: [] }
+            ]
+          },
+          pl: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Host', items: [] }
+            ]
+          },
+          en: {
+            sections: [
+              { id: 'host', menuTitle: 'Host', sectionTitle: 'Host', items: [] }
+            ]
+          }
+        }
+      };
+
+      const normalized = normalizeTemplate(template);
+
+      const plSection = normalized.locales.pl.sections.find(s => s.id === 'host');
+      assert.ok(plSection);
+      // default Polish translation for Host section should be Host
+      assert.strictEqual(plSection.sectionTitle, 'Host');
+    });
+  });
 });

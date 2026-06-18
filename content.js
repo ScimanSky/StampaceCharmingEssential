@@ -2062,9 +2062,28 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
             );
 
             let resolvedMenuTitle = pickLocalizedValue(localizedSection?.menuTitle, section.menuTitle, localizedDefaultSection.menuTitle || section.menuTitle);
-            let resolvedSectionTitle = section.id === "host"
-              ? (localizedSection?.sectionTitle || section.sectionTitle)
-              : pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle || section.sectionTitle);
+            let resolvedSectionTitle;
+            if (section.id === "host") {
+              const defaultItTitle = DEFAULT_LOCALE_CONTENT[FIXED_LOCALE]?.sections?.find(s => s.id === "host")?.sectionTitle || "Host";
+              const rawTitle = section.sectionTitle !== defaultItTitle
+                ? (localizedSection?.sectionTitle || section.sectionTitle)
+                : pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle || section.sectionTitle);
+              
+              resolvedSectionTitle = rawTitle;
+              if (section.sectionTitle.toLowerCase().includes("fabrizio")) {
+                resolvedSectionTitle = rawTitle.replace(/\b(Fabrycy|Fabrice|Fabricius|Hostitel|Host)\b/gi, (match) => {
+                  if (/host/i.test(match) && !section.sectionTitle.toLowerCase().includes("host")) {
+                    return "Fabrizio";
+                  }
+                  if (/fabrycy|fabrice|fabricius/i.test(match)) {
+                    return "Fabrizio";
+                  }
+                  return match;
+                });
+              }
+            } else {
+              resolvedSectionTitle = pickLocalizedValue(localizedSection?.sectionTitle, section.sectionTitle, localizedDefaultSection.sectionTitle || section.sectionTitle);
+            }
 
             // Keep auto-generated category section titles in sync with the category's resolved menuTitle
             if (section.id.startsWith("section-cat-") || (section.category && section.id === `section-${section.category}`)) {

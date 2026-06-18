@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260618a";
+} from "./content.js?v=20260618b";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260618a";
+} from "./security.js?v=20260618b";
 
 // State variables
 let state = null;
@@ -55,7 +55,7 @@ function protectUntranslatable(text) {
 
 function restoreUntranslatable(text) {
   if (typeof text !== "string") return text;
-  return text.replace(/___fab___/gi, "Fabrizio");
+  return text.replace(/___fab___/gi, "Fabrizio").replace(/___\s*fab\s*___/gi, "Fabrizio");
 }
 
 const AUTO_PUBLISH_DELAY = 2500;
