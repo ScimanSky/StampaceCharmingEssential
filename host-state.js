@@ -48,6 +48,16 @@ let shouldSeedExpandedSection = true;
 const expandedPanelIds = new Set();
 let lastTranslationFallbackLocales = [];
 
+function protectUntranslatable(text) {
+  if (typeof text !== "string") return text;
+  return text.replace(/\bFabrizio\b/gi, "___FAB___");
+}
+
+function restoreUntranslatable(text) {
+  if (typeof text !== "string") return text;
+  return text.replace(/___fab___/gi, "Fabrizio");
+}
+
 const AUTO_PUBLISH_DELAY = 2500;
 const TRANSLATE_ENDPOINT = "https://translate.googleapis.com/translate_a/single";
 const TRANSLATE_SEPARATOR = "\n[[[STAMPACE_TRANSLATE_SPLIT]]]\n";
@@ -173,6 +183,7 @@ function translationKey(targetLocale, text) {
 async function translateBatch(texts, targetLocale) {
   if (!texts.length || targetLocale === FIXED_LOCALE) return texts;
   const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
+  const protectedTexts = texts.map(protectUntranslatable);
 
   const translated = [];
   let currentChunk = [];
@@ -211,7 +222,7 @@ async function translateBatch(texts, targetLocale) {
     currentSize = 0;
   }
 
-  for (const text of texts) {
+  for (const text of protectedTexts) {
     const nextSize = currentSize + text.length + TRANSLATE_SEPARATOR.length;
     if (currentChunk.length && nextSize > TRANSLATE_CHUNK_LIMIT) {
       await flushChunk();
@@ -221,23 +232,24 @@ async function translateBatch(texts, targetLocale) {
   }
 
   await flushChunk();
-  return translated;
+  return translated.map(restoreUntranslatable);
 }
 
 async function translateIntroLine(text, targetLocale) {
   if (!text || targetLocale === FIXED_LOCALE) return text;
   const clean = text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-  if (clean === "keybox" || clean === "stampace" || clean.includes("booking")) return text;
+  if (clean === "keybox" || clean === "stampace" || clean.includes("booking") || clean === "fabrizio") return text;
   const serviceLocale = TRANSLATE_LOCALE_MAP[targetLocale] ?? targetLocale;
   const key = translationKey(targetLocale, `introLines::${text}`);
   if (translationCache.has(key)) return translationCache.get(key);
 
+  const protectedText = protectUntranslatable(text);
   const params = new URLSearchParams({
     client: "gtx",
     sl: FIXED_LOCALE,
     tl: serviceLocale,
     dt: "t",
-    q: text,
+    q: protectedText,
   });
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), TRANSLATE_TIMEOUT_MS);
@@ -250,7 +262,8 @@ async function translateIntroLine(text, targetLocale) {
       throw new Error("Servizio di traduzione non disponibile.");
     }
     const payload = await response.json();
-    const translated = (payload[0] ?? []).map((part) => part[0] ?? "").join("").trim();
+    const translatedRaw = (payload[0] ?? []).map((part) => part[0] ?? "").join("").trim();
+    const translated = restoreUntranslatable(translatedRaw);
     if (!translated || translated === text) {
       throw new Error("Traduzione vuota o invariata.");
     }
@@ -286,7 +299,7 @@ async function translateTexts(texts, targetLocale) {
       return;
     }
     const clean = text.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-    if (clean === "keybox" || clean === "stampace" || clean.includes("booking")) {
+    if (clean === "keybox" || clean === "stampace" || clean.includes("booking") || clean === "fabrizio") {
       results[index] = text;
       return;
     }
