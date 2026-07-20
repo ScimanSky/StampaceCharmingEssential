@@ -9,7 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260618b";
+} from "./content.js?v=20260720b";
 import {
   escapeAttribute,
   escapeHtml,
@@ -18,13 +18,14 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260618b";
+} from "./security.js?v=20260720b";
 import { subscribeToRemoteTemplate } from "./supabase.js";
-import { renderIcon, iconPaths } from "./icons.js?v=20260618b";
-import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260618b";
+import { renderIcon, iconPaths } from "./icons.js?v=20260720b";
+import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260720b";
 
 
 const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";
+const HOST_IBAN = "IT08L0329601601000067226782";
 
 const dom = {
   appName: document.querySelector("#app-name"),
@@ -109,6 +110,45 @@ function renderVrboBrandIcon() {
 
 function gmailComposeHref(email) {
   return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+}
+
+function renderCopyIcon() {
+  return `
+    <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  `;
+}
+
+function renderCopyableField({ marker, label, value, valueId, valueClass = "" }) {
+  const className = ["sheet-wifi-value", valueClass].filter(Boolean).join(" ");
+  return `
+    <article class="sheet-card">
+      ${marker}
+      <div class="sheet-wifi-field">
+        <div class="sheet-wifi-label-value">
+          <span class="sheet-wifi-label">${escapeHtml(label)}</span>
+          <span class="${escapeAttribute(className)}" id="${escapeAttribute(valueId)}">${escapeHtml(value)}</span>
+        </div>
+        <button class="copy-btn" data-copy-id="${escapeAttribute(valueId)}" data-copy-label="${escapeAttribute(label)}" title="Copia ${escapeAttribute(label)}" aria-label="Copia ${escapeAttribute(label)}" type="button">
+          ${renderCopyIcon()}
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function renderHostIban(section) {
+  const markerColorStyle = iconColorStyle(sectionIconColor(section));
+  const marker = `<span class="sheet-card-index sheet-card-icon" aria-hidden="true"${markerColorStyle}>${renderIcon("receipt")}</span>`;
+  return renderCopyableField({
+    marker,
+    label: "IBAN",
+    value: HOST_IBAN,
+    valueId: "host-iban-value",
+    valueClass: "sheet-iban-value",
+  });
 }
 
 function renderHostStringItem(item, marker) {
@@ -880,23 +920,12 @@ function renderSectionItems(items, sectionId) {
           const value = (type === "rete" ? italianWifiValues.rete : italianWifiValues.password) ||
             (parts.length > 1 ? parts.slice(1).join(":").trim() : finalItem.trim());
 
-          return `
-            <article class="sheet-card">
-              ${marker}
-              <div class="sheet-wifi-field">
-                <div class="sheet-wifi-label-value">
-                  <span class="sheet-wifi-label">${label}</span>
-                  <span class="sheet-wifi-value" id="wifi-value-${type}">${escapeHtml(value)}</span>
-                </div>
-                <button class="copy-btn" data-copy-id="wifi-value-${type}" title="Copia" type="button">
-                  <svg class="copy-icon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                </button>
-              </div>
-            </article>
-          `;
+          return renderCopyableField({
+            marker,
+            label,
+            value,
+            valueId: `wifi-value-${type}`,
+          });
         }
 
         if (sectionId === "host") {
@@ -966,6 +995,8 @@ function renderOpenSection(sectionId) {
     if (section.payText && section.payText.trim()) {
       contentHtml += `<div class="sheet-pay-text">${escapeHtml(section.payText).replace(/\n/g, "<br>")}</div>`;
     }
+
+    contentHtml += renderHostIban(section);
 
     const wideCtas = section.items
       .filter((item) => isCtaItem(item) && (item.kind === "paypal" || item.kind === "revolut"))
@@ -1450,17 +1481,24 @@ function bindCopyButtons() {
     const targetEl = document.getElementById(targetId);
     if (!targetEl) return;
 
-    const textToCopy = targetEl.textContent;
+    const textToCopy = targetEl.textContent.trim();
 
     navigator.clipboard.writeText(textToCopy).then(() => {
       const originalHTML = copyBtn.innerHTML;
+      const originalTitle = copyBtn.title;
+      const originalAriaLabel = copyBtn.getAttribute("aria-label");
+      const copyLabel = copyBtn.dataset.copyLabel || "Valore";
       copyBtn.innerHTML = `
-        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       `;
+      copyBtn.title = `${copyLabel} copiato`;
+      copyBtn.setAttribute("aria-label", `${copyLabel} copiato`);
       setTimeout(() => {
         copyBtn.innerHTML = originalHTML;
+        copyBtn.title = originalTitle;
+        if (originalAriaLabel) copyBtn.setAttribute("aria-label", originalAriaLabel);
       }, 1500);
     }).catch(err => {
       console.error("Copy failed: ", err);
