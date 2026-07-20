@@ -96,7 +96,7 @@ Il nucleo applicativo supera 12.600 righe tra JavaScript, CSS e test. I moduli p
 
 ### SEC-01 — Snapshot live in un repository pubblico
 
-**Evidenza:** `scratch/live_template.json` (circa 765 KB) e `scratch/cleaned_live_template.json` (circa 748 KB) sono ancora tracciati da Git, nonostante `scratch/` sia ora in `.gitignore`. Sono entrati nella cronologia con il commit `4ba1344`. L'analisi dei pattern mostra dati di contatto e altri valori operativi; questo report evita intenzionalmente di riprodurli.
+**Evidenza al commit analizzato:** `scratch/live_template.json` (circa 765 KB) e `scratch/cleaned_live_template.json` (circa 748 KB) erano tracciati da Git, nonostante `scratch/` fosse in `.gitignore`. Sono entrati nella cronologia con il commit `4ba1344`. L'analisi dei pattern ha rilevato dati di contatto e altri valori operativi; questo report evita intenzionalmente di riprodurli. I due snapshot sono stati successivamente rimossi dal branch corrente, ma restano recuperabili dai commit precedenti finché la cronologia non viene riscritta.
 
 **Impatto:** aggiungere una cartella a `.gitignore` non rimuove file già tracciati e non cancella le revisioni passate. Dati eliminati nel commit corrente resterebbero recuperabili dalla cronologia GitHub.
 
