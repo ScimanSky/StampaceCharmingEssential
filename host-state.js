@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260618b";
+} from "./content.js?v=20260720a";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260618b";
+} from "./security.js?v=20260720a";
 
 // State variables
 let state = null;
@@ -673,7 +673,7 @@ function cleanupCorruptedMediaItems(tempState) {
   return tempState;
 }
 
-function cleanupOrphanedCategoriesAndDuplicates(tempState) {
+export function cleanupOrphanedCategoriesAndDuplicates(tempState) {
   if (!tempState?.locales) return tempState;
 
   let cleanedAny = false;
@@ -696,9 +696,8 @@ function cleanupOrphanedCategoriesAndDuplicates(tempState) {
     }
 
     const kb1 = localeData.sections.find((s) => s.id === "custom-mq6bdpmrcoj0");
-    if (kb1 && (kb1.hidden || kb1.category !== "casa")) {
+    if (kb1 && kb1.category !== "casa") {
       kb1.category = "casa";
-      kb1.hidden = false;
       cleanedAny = true;
     }
 
