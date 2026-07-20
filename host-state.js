@@ -23,7 +23,8 @@ import {
   fetchRemoteTemplateRow,
   getHostSupabase,
   HOST_EMAIL,
-  publishRemoteTemplate,
+  TEMPLATE_ROW_ID,
+  TEMPLATE_TABLE,
   uploadSectionImage,
   uploadSectionMedia,
 } from "./supabase.js";
@@ -40,6 +41,7 @@ let session = null;
 let latestRemoteUpdatedAt = null;
 let autoPublishTimer = null;
 let draftRevision = 0;
+let publishConflict = null;
 let editorReady = false;
 let editorLoading = false;
 let selectedEditorLocale = FIXED_LOCALE;
@@ -111,6 +113,7 @@ export function getSession() { return session; }
 export function setSession(val) { session = val; notifyStateChange(); }
 export function getLatestRemoteUpdatedAt() { return latestRemoteUpdatedAt; }
 export function setLatestRemoteUpdatedAt(val) { latestRemoteUpdatedAt = val; }
+export function getPublishConflict() { return publishConflict; }
 export function getSelectedEditorLocale() { return selectedEditorLocale; }
 export function setSelectedEditorLocale(val) { selectedEditorLocale = val; notifyStateChange(); }
 export function getExpandedSectionIds() { return expandedSectionIds; }
@@ -724,6 +727,8 @@ export function cleanupOrphanedCategoriesAndDuplicates(tempState) {
 // Hydrate state
 export async function hydrateEditorState() {
   shouldSeedExpandedSection = true;
+  publishConflict = null;
+  draftRevision += 1;
   let tempState = await loadTemplate({ preferLocal: true });
 
   try {
@@ -743,6 +748,41 @@ export async function hydrateEditorState() {
 }
 
 // Publish mechanisms
+export const TEMPLATE_CONFLICT_CODE = "TEMPLATE_VERSION_CONFLICT";
+
+function templateConflictError() {
+  const error = new Error("Il template online è stato modificato da un altro dispositivo.");
+  error.code = TEMPLATE_CONFLICT_CODE;
+  return error;
+}
+
+export async function publishRemoteTemplateIfCurrent(
+  content,
+  expectedUpdatedAt,
+  client = supabase,
+) {
+  let request = client
+    .from(TEMPLATE_TABLE)
+    .update({
+      content,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", TEMPLATE_ROW_ID);
+
+  if (expectedUpdatedAt) {
+    request = request.eq("updated_at", expectedUpdatedAt);
+  }
+
+  const { data, error } = await request
+    .select("content, updated_at")
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data && expectedUpdatedAt) throw templateConflictError();
+  if (!data) throw new Error("Template live non trovato.");
+  return data;
+}
+
 export function createSingleFlightPublishQueue(runPublish) {
   let activePromise = null;
   let publishRequested = false;
@@ -779,13 +819,20 @@ async function publishSnapshot() {
   if (!isAuthorizedSession()) {
     throw new Error("Accedi come host per sincronizzare le modifiche live.");
   }
+  if (publishConflict) {
+    throw templateConflictError();
+  }
 
   const snapshotRevision = draftRevision;
   const sourceSnapshot = JSON.parse(JSON.stringify(state));
 
   try {
     const publishedTemplate = await buildPublishedTemplate(sourceSnapshot);
-    const published = await publishRemoteTemplate(publishedTemplate, supabase);
+    const published = await publishRemoteTemplateIfCurrent(
+      publishedTemplate,
+      latestRemoteUpdatedAt,
+      supabase,
+    );
     latestRemoteUpdatedAt = published.updated_at ?? null;
 
     // Edits made while translation/upload was in progress must remain in the editor.
@@ -795,6 +842,18 @@ async function publishSnapshot() {
       notifyStateChange();
     }
   } catch (err) {
+    if (err?.code === TEMPLATE_CONFLICT_CODE) {
+      try {
+        const remote = await fetchRemoteTemplateRow(supabase);
+        publishConflict = {
+          remoteUpdatedAt: remote.updated_at ?? null,
+        };
+      } catch {
+        publishConflict = { remoteUpdatedAt: null };
+      }
+      notifyStateChange();
+      throw templateConflictError();
+    }
     throw new Error("Sincronizzazione live fallita. Verifica accesso host, setup Supabase o traduzione online.");
   }
 }
@@ -811,6 +870,30 @@ export async function publishNow({ markDirty = true } = {}) {
   }
 
   return publishQueue.request();
+}
+
+export async function resolvePublishConflictWithLocal() {
+  if (!publishConflict) return;
+  const remote = await fetchRemoteTemplateRow(supabase);
+  latestRemoteUpdatedAt = remote.updated_at ?? null;
+  publishConflict = null;
+  notifyStateChange();
+  await publishNow({ markDirty: true });
+}
+
+export async function resolvePublishConflictWithRemote() {
+  if (!publishConflict) return;
+  const remote = await fetchRemoteTemplateRow(supabase);
+  if (!remote.content) {
+    throw new Error("La versione online non è disponibile.");
+  }
+
+  clearAutoPublishTimer();
+  draftRevision += 1;
+  latestRemoteUpdatedAt = remote.updated_at ?? null;
+  state = saveTemplate(normalizeTemplate(remote.content));
+  publishConflict = null;
+  notifyStateChange();
 }
 
 export function queueAutoPublish() {
@@ -863,6 +946,7 @@ export async function logout() {
   await supabase.auth.signOut();
   session = null;
   editorReady = false;
+  publishConflict = null;
   notifyStateChange();
 }
 

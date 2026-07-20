@@ -19,7 +19,8 @@ mock.module("../supabase.js", {
     fetchRemoteTemplateRow: async () => ({ content: null, updated_at: null }),
     getHostSupabase: () => ({}),
     HOST_EMAIL: "host@example.com",
-    publishRemoteTemplate: async (content) => ({ content, updated_at: null }),
+    TEMPLATE_ROW_ID: "live",
+    TEMPLATE_TABLE: "app_templates",
     uploadSectionImage: async () => ({}),
     uploadSectionMedia: async () => ({}),
   },
@@ -28,7 +29,45 @@ mock.module("../supabase.js", {
 const {
   cleanupOrphanedCategoriesAndDuplicates,
   createSingleFlightPublishQueue,
+  publishRemoteTemplateIfCurrent,
+  TEMPLATE_CONFLICT_CODE,
 } = await import("../host-state.js");
+
+function createTemplateUpdateClient(result) {
+  const calls = {
+    table: null,
+    update: null,
+    filters: [],
+    select: null,
+  };
+  const query = {
+    update(value) {
+      calls.update = value;
+      return this;
+    },
+    eq(field, value) {
+      calls.filters.push([field, value]);
+      return this;
+    },
+    select(columns) {
+      calls.select = columns;
+      return this;
+    },
+    async maybeSingle() {
+      return result;
+    },
+  };
+
+  return {
+    calls,
+    client: {
+      from(table) {
+        calls.table = table;
+        return query;
+      },
+    },
+  };
+}
 
 function keyboxTemplate({ hidden, category }) {
   return {
@@ -129,5 +168,47 @@ describe("Host publish queue", () => {
 
     assert.strictEqual(attempts, 2);
     assert.strictEqual(queue.isActive(), false);
+  });
+});
+
+describe("Host cross-device publish protection", () => {
+  it("updates only the remote version originally loaded by the editor", async () => {
+    const expectedUpdatedAt = "2026-07-20T10:00:00.000Z";
+    const publishedRow = {
+      content: { appName: "Versione locale" },
+      updated_at: "2026-07-20T10:05:00.000Z",
+    };
+    const { client, calls } = createTemplateUpdateClient({
+      data: publishedRow,
+      error: null,
+    });
+
+    const result = await publishRemoteTemplateIfCurrent(
+      publishedRow.content,
+      expectedUpdatedAt,
+      client,
+    );
+
+    assert.deepStrictEqual(result, publishedRow);
+    assert.strictEqual(calls.table, "app_templates");
+    assert.deepStrictEqual(calls.filters, [
+      ["id", "live"],
+      ["updated_at", expectedUpdatedAt],
+    ]);
+    assert.deepStrictEqual(calls.update.content, publishedRow.content);
+    assert.strictEqual(calls.select, "content, updated_at");
+  });
+
+  it("reports a conflict instead of overwriting a newer remote version", async () => {
+    const { client } = createTemplateUpdateClient({ data: null, error: null });
+
+    await assert.rejects(
+      publishRemoteTemplateIfCurrent(
+        { appName: "Versione locale" },
+        "2026-07-20T10:00:00.000Z",
+        client,
+      ),
+      (error) => error.code === TEMPLATE_CONFLICT_CODE,
+    );
   });
 });

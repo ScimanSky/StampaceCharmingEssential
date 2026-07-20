@@ -34,8 +34,8 @@ import {
   getExpandedCategoryIds,
   currentLocaleState,
   syncExpandedSections,
-} from "./host-state.js?v=20260720d";
-import { dom } from "./host.js?v=20260720d";
+} from "./host-state.js?v=20260720e";
+import { dom } from "./host.js?v=20260720e";
 
 const AVAILABLE_FONTS = [
   { value: "Roboto", label: "Roboto (Sans-serif pulito)" },

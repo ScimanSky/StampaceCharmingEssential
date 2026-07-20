@@ -46,7 +46,7 @@ import {
   removeMedia,
   currentLocaleState,
   queueAutoPublish,
-} from "./host-state.js?v=20260720d";
+} from "./host-state.js?v=20260720e";
 import {
   collectTemplate,
   syncFields,
@@ -55,8 +55,8 @@ import {
   updateCtaIconPreview,
   updateCategoryIconPreview,
   syncPanelState,
-} from "./host-rendering.js?v=20260720d";
-import { dom } from "./host.js?v=20260720d";
+} from "./host-rendering.js?v=20260720e";
+import { dom } from "./host.js?v=20260720e";
 
 let draggingSectionId = null;
 let authBound = false;
@@ -786,7 +786,7 @@ export function bindAuthEvents(onOpenEditor) {
     const previousSession = getState();
     // We pass to host-state.js
     // Wait, let's call the exported state setter
-    import("./host-state.js?v=20260720d").then((mod) => {
+    import("./host-state.js?v=20260720e").then((mod) => {
       mod.setSession(nextSession);
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
@@ -814,7 +814,7 @@ export function bindAuthEvents(onOpenEditor) {
   });
 
   window.addEventListener("hashchange", () => {
-    import("./host-state.js?v=20260720d").then((mod) => {
+    import("./host-state.js?v=20260720e").then((mod) => {
       const isAuth = mod.isAuthorizedSession();
       const editorReady = mod.isEditorReady();
       

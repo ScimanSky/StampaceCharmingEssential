@@ -145,7 +145,7 @@ La riscrittura della cronologia è distruttiva e va eseguita come intervento sep
 
 Un secondo scenario avviene chiudendo la pagina prima del timer: la bozza resta in `localStorage`, ma alla riapertura viene sostituita dal remoto precedente.
 
-**Stato successivo all'analisi:** la race condition nella singola sessione è stata corretta introducendo una coda single-flight, richieste coalescenti e una revisione locale che impedisce a uno snapshot obsoleto di rimpiazzare lo stato più recente. Ritardo, traduzione e pubblicazione atomica delle lingue sono rimasti invariati. Restano da affrontare separatamente il recupero della bozza dopo una chiusura anticipata e il conflitto tra schede/dispositivi diversi.
+**Stato successivo all'analisi:** la race condition nella singola sessione è stata corretta introducendo una coda single-flight, richieste coalescenti e una revisione locale che impedisce a uno snapshot obsoleto di rimpiazzare lo stato più recente. È stata inoltre aggiunta una scrittura condizionale basata su `updated_at`: se un altro dispositivo ha già pubblicato, la copia locale non sovrascrive quella online e l'editor offre la scelta esplicita tra pubblicare la versione locale o caricare quella remota. Ritardo, traduzione e pubblicazione atomica delle lingue sono rimasti invariati. Resta da affrontare separatamente il recupero della bozza dopo una chiusura anticipata.
 
 **Soluzione raccomandata:**
 

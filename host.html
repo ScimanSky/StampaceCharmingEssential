@@ -13,11 +13,22 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./host.css?v=20260720c" />
+    <link rel="stylesheet" href="./host.css?v=20260720d" />
   </head>
   <body>
     <main class="host-shell">
       <p class="host-status" id="host-status"></p>
+
+      <section class="host-conflict hidden" id="host-conflict" role="alert" aria-live="assertive">
+        <div>
+          <strong>Modifica rilevata da un altro dispositivo</strong>
+          <p>Le tue modifiche locali non sono state sovrascritte. Scegli quale versione continuare a usare.</p>
+        </div>
+        <div class="host-conflict-actions">
+          <button id="host-conflict-keep-local" type="button">Mantieni le mie modifiche</button>
+          <button class="ghost-button" id="host-conflict-use-remote" type="button">Carica versione online</button>
+        </div>
+      </section>
 
       <section class="host-gate" id="host-gate">
         <p class="host-kicker">Stampace Charming</p>
@@ -409,6 +420,6 @@
       </section>
     </main>
 
-    <script type="module" src="./host.js?v=20260720d"></script>
+    <script type="module" src="./host.js?v=20260720e"></script>
   </body>
 </html>

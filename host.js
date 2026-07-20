@@ -5,13 +5,16 @@ import {
   isAuthorizedSession,
   isEditorReady,
   isEditorLoading,
+  getPublishConflict,
+  resolvePublishConflictWithLocal,
+  resolvePublishConflictWithRemote,
   setEditorReady,
   setEditorLoading,
   hydrateEditorState,
   setSession,
-} from "./host-state.js?v=20260720d";
-import { syncFields, setStatus } from "./host-rendering.js?v=20260720d";
-import { bindEditorEvents, bindAuthEvents } from "./host-events.js?v=20260720d";
+} from "./host-state.js?v=20260720e";
+import { syncFields, setStatus } from "./host-rendering.js?v=20260720e";
+import { bindEditorEvents, bindAuthEvents } from "./host-events.js?v=20260720e";
 
 // Unregister any active service worker on the host panel to avoid caching stale code
 if ("serviceWorker" in navigator) {
@@ -35,6 +38,9 @@ export const dom = {
   logout: document.querySelector("#host-logout"),
   shareGuest: document.querySelector("#host-share-guest"),
   status: document.querySelector("#host-status"),
+  conflict: document.querySelector("#host-conflict"),
+  conflictKeepLocal: document.querySelector("#host-conflict-keep-local"),
+  conflictUseRemote: document.querySelector("#host-conflict-use-remote"),
   save: document.querySelector("#host-save"),
   reset: document.querySelector("#host-reset"),
   export: document.querySelector("#host-export"),
@@ -106,6 +112,45 @@ function updateAccessState() {
   dom.app.classList.toggle("hidden", !showEditor);
 }
 
+function updateConflictState() {
+  dom.conflict?.classList.toggle("hidden", !getPublishConflict());
+}
+
+function setConflictActionsDisabled(disabled) {
+  if (dom.conflictKeepLocal) dom.conflictKeepLocal.disabled = disabled;
+  if (dom.conflictUseRemote) dom.conflictUseRemote.disabled = disabled;
+}
+
+function bindConflictActions() {
+  dom.conflictKeepLocal?.addEventListener("click", async () => {
+    setConflictActionsDisabled(true);
+    setStatus("Pubblicazione della versione locale...", "");
+    try {
+      await resolvePublishConflictWithLocal();
+      setStatus("Versione locale pubblicata correttamente.", "success");
+    } catch (err) {
+      setStatus(err.message || "Risoluzione del conflitto fallita.", "error");
+    } finally {
+      setConflictActionsDisabled(false);
+      updateConflictState();
+    }
+  });
+
+  dom.conflictUseRemote?.addEventListener("click", async () => {
+    setConflictActionsDisabled(true);
+    setStatus("Caricamento della versione online...", "");
+    try {
+      await resolvePublishConflictWithRemote();
+      setStatus("Versione online caricata nell'editor.", "success");
+    } catch (err) {
+      setStatus(err.message || "Caricamento della versione online fallito.", "error");
+    } finally {
+      setConflictActionsDisabled(false);
+      updateConflictState();
+    }
+  });
+}
+
 async function openEditor() {
   if (!isAuthorizedSession() || isEditorLoading()) return;
 
@@ -133,6 +178,7 @@ async function openEditor() {
 onStateChange(() => {
   syncFields();
   updateAccessState();
+  updateConflictState();
 });
 
 window.addEventListener("hostAuthChange", () => {
@@ -142,6 +188,7 @@ window.addEventListener("hostAuthChange", () => {
 async function init() {
   dom.email.value = HOST_EMAIL;
   bindAuthEvents(openEditor);
+  bindConflictActions();
 
   const supabase = getHostSupabase();
   const { data } = await supabase.auth.getSession();
