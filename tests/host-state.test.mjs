@@ -25,7 +25,10 @@ mock.module("../supabase.js", {
   },
 });
 
-const { cleanupOrphanedCategoriesAndDuplicates } = await import("../host-state.js");
+const {
+  cleanupOrphanedCategoriesAndDuplicates,
+  createSingleFlightPublishQueue,
+} = await import("../host-state.js");
 
 function keyboxTemplate({ hidden, category }) {
   return {
@@ -76,5 +79,55 @@ describe("Host template cleanup", () => {
 
     assert.strictEqual(keybox.hidden, true);
     assert.strictEqual(keybox.category, "casa");
+  });
+});
+
+describe("Host publish queue", () => {
+  it("never runs publishes in parallel and coalesces pending requests", async () => {
+    let releaseFirstPublish;
+    const firstPublishGate = new Promise((resolve) => {
+      releaseFirstPublish = resolve;
+    });
+    let startedPublishes = 0;
+    let activePublishes = 0;
+    let maxActivePublishes = 0;
+
+    const queue = createSingleFlightPublishQueue(async () => {
+      startedPublishes += 1;
+      activePublishes += 1;
+      maxActivePublishes = Math.max(maxActivePublishes, activePublishes);
+      if (startedPublishes === 1) {
+        await firstPublishGate;
+      }
+      activePublishes -= 1;
+    });
+
+    const completed = queue.request();
+    queue.request();
+    queue.request();
+
+    assert.strictEqual(startedPublishes, 1);
+    assert.strictEqual(queue.isActive(), true);
+
+    releaseFirstPublish();
+    await completed;
+
+    assert.strictEqual(startedPublishes, 2);
+    assert.strictEqual(maxActivePublishes, 1);
+    assert.strictEqual(queue.isActive(), false);
+  });
+
+  it("accepts a new publish after a failed one", async () => {
+    let attempts = 0;
+    const queue = createSingleFlightPublishQueue(async () => {
+      attempts += 1;
+      if (attempts === 1) throw new Error("temporary failure");
+    });
+
+    await assert.rejects(queue.request(), /temporary failure/);
+    await queue.request();
+
+    assert.strictEqual(attempts, 2);
+    assert.strictEqual(queue.isActive(), false);
   });
 });

@@ -10,7 +10,7 @@
 
 ## Sintesi esecutiva
 
-L'applicazione è una PWA vanilla HTML/CSS/JavaScript con un editor host, Supabase come sorgente live e traduzione automatica dei contenuti. La base è funzionale e presenta diverse buone difese contro XSS, una configurazione RLS che limita le scritture all'account host, controlli client sui file e una suite di 40 test attualmente verde.
+L'applicazione è una PWA vanilla HTML/CSS/JavaScript con un editor host, Supabase come sorgente live e traduzione automatica dei contenuti. La base è funzionale e presenta diverse buone difese contro XSS, una configurazione RLS che limita le scritture all'account host, controlli client sui file e una suite di 42 test attualmente verde.
 
 Le criticità principali non sono però cosmetiche: riguardano la riservatezza dei dati operativi e l'integrità delle modifiche effettuate dall'host.
 
@@ -60,7 +60,7 @@ Il nucleo applicativo supera 12.600 righe tra JavaScript, CSS e test. I moduli p
 - Il bucket immagini impone lato database formati e limite di 5 MB; il client applica limiti anche a documenti e video.
 - L'interfaccia include focus visibile e supporto a `prefers-reduced-motion`.
 - Il service worker separa navigazioni e asset statici e rimuove le vecchie cache all'attivazione.
-- `npm run check` passa; i 40 test passano; `npm audit` non segnala vulnerabilità nei pacchetti installati.
+- `npm run check` passa; i 42 test passano; `npm audit` non segnala vulnerabilità nei pacchetti installati.
 - Le GitHub Actions sul commit analizzato risultano verdi.
 
 ## Registro delle criticità
@@ -144,6 +144,8 @@ La riscrittura della cronologia è distruttiva e va eseguita come intervento sep
 4. `state` viene riassegnato ad A e B può scomparire.
 
 Un secondo scenario avviene chiudendo la pagina prima del timer: la bozza resta in `localStorage`, ma alla riapertura viene sostituita dal remoto precedente.
+
+**Stato successivo all'analisi:** la race condition nella singola sessione è stata corretta introducendo una coda single-flight, richieste coalescenti e una revisione locale che impedisce a uno snapshot obsoleto di rimpiazzare lo stato più recente. Ritardo, traduzione e pubblicazione atomica delle lingue sono rimasti invariati. Restano da affrontare separatamente il recupero della bozza dopo una chiusura anticipata e il conflitto tra schede/dispositivi diversi.
 
 **Soluzione raccomandata:**
 
@@ -318,7 +320,7 @@ Il lint dei soli file tracciati termina con 24 warning, soprattutto import e var
 | Verifica | Esito |
 |---|---|
 | `npm run check` | Passa |
-| `npm test` | 40 test passati, 0 falliti |
+| `npm test` | 42 test passati, 0 falliti |
 | `npm audit --json` | 0 vulnerabilità nei pacchetti npm installati |
 | ESLint sui soli file tracciati | 0 errori, 24 warning |
 | GitHub Actions sul commit `244f6d4` | `Check` e deploy Pages verdi |

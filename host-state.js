@@ -39,6 +39,7 @@ let state = null;
 let session = null;
 let latestRemoteUpdatedAt = null;
 let autoPublishTimer = null;
+let draftRevision = 0;
 let editorReady = false;
 let editorLoading = false;
 let selectedEditorLocale = FIXED_LOCALE;
@@ -742,28 +743,84 @@ export async function hydrateEditorState() {
 }
 
 // Publish mechanisms
-export async function publishNow({ silent = false } = {}) {
+export function createSingleFlightPublishQueue(runPublish) {
+  let activePromise = null;
+  let publishRequested = false;
+
+  const drain = async () => {
+    while (publishRequested) {
+      publishRequested = false;
+      await runPublish();
+    }
+  };
+
+  const request = () => {
+    publishRequested = true;
+    if (!activePromise) {
+      activePromise = drain().finally(() => {
+        activePromise = null;
+        if (publishRequested) {
+          request().catch((err) => {
+            console.error("[host-state] Queued publish failed:", err);
+          });
+        }
+      });
+    }
+    return activePromise;
+  };
+
+  return {
+    request,
+    isActive: () => Boolean(activePromise),
+  };
+}
+
+async function publishSnapshot() {
   if (!isAuthorizedSession()) {
     throw new Error("Accedi come host per sincronizzare le modifiche live.");
   }
 
+  const snapshotRevision = draftRevision;
+  const sourceSnapshot = JSON.parse(JSON.stringify(state));
+
   try {
-    state = await buildPublishedTemplate(state);
-    saveTemplate(state);
-    const published = await publishRemoteTemplate(state, supabase);
+    const publishedTemplate = await buildPublishedTemplate(sourceSnapshot);
+    const published = await publishRemoteTemplate(publishedTemplate, supabase);
     latestRemoteUpdatedAt = published.updated_at ?? null;
-    notifyStateChange();
+
+    // Edits made while translation/upload was in progress must remain in the editor.
+    if (snapshotRevision === draftRevision) {
+      state = publishedTemplate;
+      saveTemplate(state);
+      notifyStateChange();
+    }
   } catch (err) {
     throw new Error("Sincronizzazione live fallita. Verifica accesso host, setup Supabase o traduzione online.");
   }
 }
 
+const publishQueue = createSingleFlightPublishQueue(publishSnapshot);
+
+export async function publishNow({ markDirty = true } = {}) {
+  if (!isAuthorizedSession()) {
+    throw new Error("Accedi come host per sincronizzare le modifiche live.");
+  }
+
+  if (markDirty) {
+    draftRevision += 1;
+  }
+
+  return publishQueue.request();
+}
+
 export function queueAutoPublish() {
   if (!isAuthorizedSession()) return;
+  draftRevision += 1;
   window.clearTimeout(autoPublishTimer);
   autoPublishTimer = window.setTimeout(async () => {
+    autoPublishTimer = null;
     try {
-      await publishNow({ silent: true });
+      await publishNow({ markDirty: false });
     } catch (err) {
       console.error("[host-state] Auto publish failed:", err);
     }
