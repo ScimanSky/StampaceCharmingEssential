@@ -1597,7 +1597,7 @@ body.sheet-open .page-shell {
 }
 
 .sheet-iban-label-value .sheet-wifi-label {
-  font-size: clamp(0.88rem, 3.8vw, 1.05rem);
+  font-size: clamp(1.1rem, 5.4vw, 1.4rem);
   letter-spacing: 0.08em;
   color: var(--text);
 }
