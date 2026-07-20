@@ -10,7 +10,7 @@ import {
   isMediaItem,
   isHostPrivateItem,
   normalizeTemplate,
-} from "./content.js?v=20260720a";
+} from "./content.js?v=20260720c";
 import {
   IMAGE_MAX_BYTES,
   DOCUMENT_MAX_BYTES,
@@ -24,9 +24,9 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260720a";
-import { renderIcon, iconPaths } from "./icons.js?v=20260720a";
-import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260720a";
+} from "./security.js?v=20260720c";
+import { renderIcon, iconPaths } from "./icons.js?v=20260720c";
+import { themeValue, iconColorStyle } from "./theme-utils.js?v=20260720c";
 import {
   getState,
   getSelectedEditorLocale,
@@ -34,8 +34,8 @@ import {
   getExpandedCategoryIds,
   currentLocaleState,
   syncExpandedSections,
-} from "./host-state.js?v=20260720a";
-import { dom } from "./host.js?v=20260720a";
+} from "./host-state.js?v=20260720c";
+import { dom } from "./host.js?v=20260720c";
 
 const AVAILABLE_FONTS = [
   { value: "Roboto", label: "Roboto (Sans-serif pulito)" },
@@ -1115,6 +1115,10 @@ export function renderSectionEditors() {
               </label>
               ${section.id === "host" ? `
               <label>
+                <span>IBAN (unico per tutte le lingue)</span>
+                <input data-field="iban" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="42" value="${escapeAttribute(section.iban || "")}" ${selectedEditorLocale !== FIXED_LOCALE ? "disabled" : ""} />
+              </label>
+              <label>
                 <span>Testo sopra PayPal/Revolut</span>
                 <textarea data-field="payText">${escapeHtml(section.payText || "")}</textarea>
               </label>
@@ -1634,6 +1638,9 @@ export function collectTemplate() {
       sectionTitle: card.querySelector('[data-field="sectionTitle"]').value,
       lead: card.querySelector('[data-field="lead"]').value,
       payText: card.querySelector('[data-field="payText"]')?.value || "",
+      ...(id === "host"
+        ? { iban: (card.querySelector('[data-field="iban"]')?.value || "").replace(/\s+/g, "").toUpperCase() }
+        : {}),
       items: [...parseItems(card.querySelector('[data-field="items"]').value), ...ctaItems, ...imageItems, ...mediaItems],
     };
   });

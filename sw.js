@@ -1,16 +1,16 @@
-const CACHE_NAME = "stampace-essential-v20260720b";
+const CACHE_NAME = "stampace-essential-v20260720c";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
   "./guest/",
   "./guest/index.html",
-  "./styles.css?v=20260720b",
-  "./app.js?v=20260720b",
-  "./icons.js?v=20260720b",
-  "./theme-utils.js?v=20260720b",
-  "./content.js?v=20260720b",
+  "./styles.css?v=20260720c",
+  "./app.js?v=20260720c",
+  "./icons.js?v=20260720c",
+  "./theme-utils.js?v=20260720c",
+  "./content.js?v=20260720c",
   "./supabase.js",
-  "./security.js?v=20260720b",
+  "./security.js?v=20260720c",
   "./template.json",
   "./manifest.json",
   "./img/app-icon.svg",

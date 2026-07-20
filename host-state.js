@@ -16,7 +16,7 @@ import {
   normalizeTemplate,
   saveTemplate,
   SUBMENU_TRANSLATIONS,
-} from "./content.js?v=20260720a";
+} from "./content.js?v=20260720c";
 import {
   deleteSectionImage,
   deleteSectionMedia,
@@ -32,7 +32,7 @@ import {
   normalizeCtaKind,
   sanitizeCssColor,
   sanitizeImageSrc,
-} from "./security.js?v=20260720a";
+} from "./security.js?v=20260720c";
 
 // State variables
 let state = null;
@@ -444,6 +444,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
           sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
           lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
           payText: pickSectionValue(section.payText || "", itBaseSection.payText || "", (scBaseSection.payText ?? section.payText) || ""),
+          ...(section.id === "host" ? { iban: section.iban || "" } : {}),
           items,
         };
       }),
@@ -465,6 +466,7 @@ async function buildTranslatedLocale(italianLocale, targetLocale) {
       sectionTitle: "",
       lead: "",
       payText: "",
+      ...(section.id === "host" ? { iban: section.iban || "" } : {}),
       items: [],
     })),
   };

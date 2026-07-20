@@ -16,6 +16,7 @@ const {
   isHostPrivateItem,
   getLocaleContent,
   defaultTemplate,
+  DEFAULT_HOST_IBAN,
   defaultCategoryForSection
 } = await import('../content.js');
 
@@ -161,6 +162,45 @@ describe('Content module', () => {
       const hostSection = normalized.locales.it.sections.find(s => s.id === 'host');
       assert.ok(hostSection);
       assert.strictEqual(hostSection.payText, 'Please support me on PayPal or Revolut.');
+    });
+
+    it('should preserve and mirror the Host IBAN without translating it', () => {
+      const iban = 'FR7630006000011234567890189';
+      const template = {
+        locales: {
+          it: {
+            sections: [
+              {
+                id: 'host',
+                iban: `  ${iban.toLowerCase()}  `
+              }
+            ]
+          }
+        }
+      };
+
+      const normalized = normalizeTemplate(template);
+      const italianHost = normalized.locales.it.sections.find(s => s.id === 'host');
+      const englishHost = normalized.locales.en.sections.find(s => s.id === 'host');
+
+      assert.strictEqual(italianHost.iban, iban);
+      assert.strictEqual(englishHost.iban, iban);
+    });
+
+    it('should provide the current IBAN for legacy templates and allow clearing it', () => {
+      const legacyTemplate = normalizeTemplate({});
+      const legacyHost = legacyTemplate.locales.it.sections.find(s => s.id === 'host');
+      assert.strictEqual(legacyHost.iban, DEFAULT_HOST_IBAN);
+
+      const clearedTemplate = normalizeTemplate({
+        locales: {
+          it: {
+            sections: [{ id: 'host', iban: '' }]
+          }
+        }
+      });
+      const clearedHost = clearedTemplate.locales.it.sections.find(s => s.id === 'host');
+      assert.strictEqual(clearedHost.iban, '');
     });
 
     it('should preserve placement for custom categories and default to homepage', () => {

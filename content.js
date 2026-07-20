@@ -8,6 +8,7 @@ export const FIXED_LOCALE = "it";
 export const REQUIRED_LOCALES = [FIXED_LOCALE, "en"];
 export const MAX_VISIBLE_LOCALES = 3;
 export const MAX_OPTIONAL_LOCALES = MAX_VISIBLE_LOCALES - REQUIRED_LOCALES.length;
+export const DEFAULT_HOST_IBAN = "IT08L0329601601000067226782";
 const FLAG_ASSET_VERSION = "20260604b";
 
 export const AVAILABLE_LANGUAGES = [
@@ -219,6 +220,7 @@ const DEFAULT_LOCALE_CONTENT = Object.freeze({
         menuTitle: "Host",
         sectionTitle: "Host",
         lead: "Contatti rapidi e riferimenti utili dell'host.",
+        iban: DEFAULT_HOST_IBAN,
         items: [
           "Nome host: da inserire",
           "Telefono / WhatsApp: da inserire",
@@ -1425,6 +1427,11 @@ function cleanIconColor(value, fallback = "") {
   return "";
 }
 
+function cleanIban(value, fallback = "") {
+  if (typeof value !== "string") return fallback;
+  return value.replace(/\s+/g, "").toUpperCase();
+}
+
 function cleanMediaKind(value) {
   return value === "video" ? "video" : "document";
 }
@@ -1600,6 +1607,7 @@ export function defaultCategoryForSection(sectionId, menuTitle = "") {
 function normalizeSection(section, baseSection, localeCode) {
   const normalizedItems = normalizeItems(section?.items, baseSection.items);
   const resolvedMenuTitle = cleanString(section?.menuTitle, baseSection.menuTitle);
+  const hasIban = Object.prototype.hasOwnProperty.call(section ?? {}, "iban");
   return {
     id: baseSection.id,
     icon: migrateSectionIcon({ ...section, icon: cleanString(section?.icon, baseSection.icon) }),
@@ -1610,6 +1618,9 @@ function normalizeSection(section, baseSection, localeCode) {
     sectionTitle: cleanString(section?.sectionTitle, baseSection.sectionTitle),
     lead: cleanString(section?.lead, baseSection.lead),
     payText: cleanString(section?.payText, baseSection.payText || ""),
+    ...(baseSection.id === "host"
+      ? { iban: hasIban ? cleanIban(section.iban) : cleanIban(baseSection.iban, DEFAULT_HOST_IBAN) }
+      : {}),
     items: baseSection.id === "host" ? ensureHostPrivateItem(normalizedItems, localeCode) : normalizedItems,
   };
 }
@@ -1996,6 +2007,7 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
                 sectionTitle: pickSectionValue(section.sectionTitle, itBaseSection.sectionTitle, scBaseSection.sectionTitle ?? section.sectionTitle),
                 lead: pickSectionValue(section.lead, itBaseSection.lead, scBaseSection.lead ?? section.lead),
                 payText: pickSectionValue(section.payText || "", itBaseSection.payText || "", (scBaseSection.payText ?? section.payText) || ""),
+                ...(section.id === "host" ? { iban: section.iban || "" } : {}),
                 items: section.id === "host" ? ensureHostPrivateItem(items, language.code) : items,
               };
             }),
@@ -2105,6 +2117,7 @@ function mirrorItalianContent(localeMap, rawLocales = {}) {
               sectionTitle: resolvedSectionTitle,
               lead: pickLocalizedValue(localizedSection?.lead, section.lead, localizedDefaultSection.lead || section.lead),
               payText: pickLocalizedValue(localizedSection?.payText, section.payText, localizedDefaultSection.payText || section.payText || ""),
+              ...(section.id === "host" ? { iban: section.iban || "" } : {}),
               items:
                 section.id === "host"
                   ? ensureHostPrivateItem(resolvedItems, language.code)

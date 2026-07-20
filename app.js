@@ -9,7 +9,7 @@ import {
   isMediaItem,
   loadTemplate,
   normalizeTemplate,
-} from "./content.js?v=20260720b";
+} from "./content.js?v=20260720c";
 import {
   escapeAttribute,
   escapeHtml,
@@ -18,14 +18,13 @@ import {
   sanitizeCssColor,
   sanitizeHref,
   sanitizeImageSrc,
-} from "./security.js?v=20260720b";
+} from "./security.js?v=20260720c";
 import { subscribeToRemoteTemplate } from "./supabase.js";
-import { renderIcon, iconPaths } from "./icons.js?v=20260720b";
-import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260720b";
+import { renderIcon, iconPaths } from "./icons.js?v=20260720c";
+import { themeValue, iconColorStyle, iconColorValue } from "./theme-utils.js?v=20260720c";
 
 
 const HOST_AVATAR_SRC = "./img/host-avatar.jpg?v=20260528a";
-const HOST_IBAN = "IT08L0329601601000067226782";
 
 const dom = {
   appName: document.querySelector("#app-name"),
@@ -56,6 +55,7 @@ let activeSectionId = null;
 let remoteTemplateUpdatedAt = null;
 let lastFocusedElement = null;
 let sheetCloseTimer = null;
+let ibanResizeObserver = null;
 let lastInteractionWasKeyboard = false;
 const SHEET_HISTORY_KEY = "stampaceSectionId";
 const GUEST_SHARE_URL = "https://stampacecharming.pages.dev/";
@@ -121,13 +121,25 @@ function renderCopyIcon() {
   `;
 }
 
-function renderCopyableField({ marker, label, value, valueId, valueClass = "" }) {
+function renderCopyableField({
+  marker = "",
+  label,
+  value,
+  valueId,
+  valueClass = "",
+  cardClass = "",
+  fieldClass = "",
+  contentClass = "",
+}) {
   const className = ["sheet-wifi-value", valueClass].filter(Boolean).join(" ");
+  const articleClassName = ["sheet-card", cardClass].filter(Boolean).join(" ");
+  const copyFieldClassName = ["sheet-wifi-field", fieldClass].filter(Boolean).join(" ");
+  const labelValueClassName = ["sheet-wifi-label-value", contentClass].filter(Boolean).join(" ");
   return `
-    <article class="sheet-card">
+    <article class="${escapeAttribute(articleClassName)}">
       ${marker}
-      <div class="sheet-wifi-field">
-        <div class="sheet-wifi-label-value">
+      <div class="${escapeAttribute(copyFieldClassName)}">
+        <div class="${escapeAttribute(labelValueClassName)}">
           <span class="sheet-wifi-label">${escapeHtml(label)}</span>
           <span class="${escapeAttribute(className)}" id="${escapeAttribute(valueId)}">${escapeHtml(value)}</span>
         </div>
@@ -140,15 +152,48 @@ function renderCopyableField({ marker, label, value, valueId, valueClass = "" })
 }
 
 function renderHostIban(section) {
-  const markerColorStyle = iconColorStyle(sectionIconColor(section));
-  const marker = `<span class="sheet-card-index sheet-card-icon" aria-hidden="true"${markerColorStyle}>${renderIcon("receipt")}</span>`;
+  const iban = String(section?.iban || "").trim();
+  if (!iban) return "";
   return renderCopyableField({
-    marker,
     label: "IBAN",
-    value: HOST_IBAN,
+    value: iban,
     valueId: "host-iban-value",
     valueClass: "sheet-iban-value",
+    cardClass: "sheet-iban-card",
+    fieldClass: "sheet-iban-field",
+    contentClass: "sheet-iban-label-value",
   });
+}
+
+function fitIbanValue() {
+  const value = document.querySelector("#host-iban-value");
+  if (!value) return;
+
+  value.style.removeProperty("font-size");
+  const availableWidth = value.clientWidth;
+  const naturalWidth = value.scrollWidth;
+  if (!availableWidth || naturalWidth <= availableWidth) return;
+
+  const naturalFontSize = Number.parseFloat(window.getComputedStyle(value).fontSize);
+  const fittedFontSize = Math.max(6, naturalFontSize * (availableWidth / naturalWidth) * 0.98);
+  value.style.fontSize = `${fittedFontSize}px`;
+}
+
+function watchIbanValue() {
+  ibanResizeObserver?.disconnect();
+  ibanResizeObserver = null;
+
+  const field = document.querySelector(".sheet-iban-field");
+  if (!field) return;
+
+  window.requestAnimationFrame(fitIbanValue);
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(fitIbanValue);
+  }
+  if (window.ResizeObserver) {
+    ibanResizeObserver = new window.ResizeObserver(fitIbanValue);
+    ibanResizeObserver.observe(field);
+  }
 }
 
 function renderHostStringItem(item, marker) {
@@ -1016,6 +1061,7 @@ function renderOpenSection(sectionId) {
     `;
   }
   dom.sheetContent.innerHTML = contentHtml;
+  watchIbanValue();
 
   dom.sheet.classList.remove("hidden");
   dom.sheet.classList.remove("is-closing");

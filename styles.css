@@ -1572,10 +1572,34 @@ body.sheet-open .page-shell {
 }
 
 .sheet-iban-value {
-  font-size: clamp(0.72rem, 3.35vw, 0.94rem);
+  display: block;
+  max-width: 100%;
+  font-size: clamp(0.72rem, 3.7vw, 1.08rem);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.025em;
-  overflow-wrap: anywhere;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.sheet-iban-card {
+  grid-template-columns: minmax(0, 1fr);
+  padding-inline: 0.75rem;
+}
+
+.sheet-iban-field {
+  gap: 0.5rem;
+}
+
+.sheet-iban-label-value {
+  align-items: center;
+  text-align: center;
+}
+
+.sheet-iban-label-value .sheet-wifi-label {
+  font-size: clamp(0.88rem, 3.8vw, 1.05rem);
+  letter-spacing: 0.08em;
+  color: var(--text);
 }
 
 .copy-btn {
